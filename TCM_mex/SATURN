@@ -1,0 +1,9 @@
+PATH=
+                            ===SATURN===
+XH2S     XNH3     XH2O     XCH4    XPH3     XCO    XHe    g[cm/s^2]   R0[cm]   P0[bar]
+410e-6   520.0e-6 1.0e-6   4.2e-3  0.0   0.0    0.07   900.0       6.03e9     0.5
+T(deep;K)  P(deep;bar)    NH3-supersat-H2S   look angle weighting function coeff's
+489.5      70.0          0.0          0.0    2.188  0.136  -0.554
+use Lindal?    T(target)   P(target)  P(terminate)
+Y              146.2       1.29848       0.06
+TP.SAT 27

@@ -1,0 +1,17 @@
+--- model.jup_test 
+contains the altitude-dependent temperature and pressure profiles, together with
+abundances of H2, He, H2O, CH4, NH3, PH3.
+
+--- cldden.jup_test
+contains cloud densities for NH3-H2O solution, H2O ice, NH4SH solid, NH3 ice, 
+H2S ice
+
+--- mixrat.jup_test
+contains mole fractions of the variety of species in the atmosphere, together 
+with the changes to their mixing ratios that happen as the clouds condense out.
+
+--- thermal.jup_test
+contains model inputs together with the basics calculated from the model, such
+as lapse rates, heat capacity of the atmosphere and H2, mean mass, concentration 
+of NH3 & H2S in the solution, and fraction of ortho-para hydrogen used in 
+calculation. 

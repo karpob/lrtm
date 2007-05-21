@@ -1,0 +1,9 @@
+h2=0.86;
+he=0.14;
+nh3=2e-11;
+T=89.9;
+f=[2.3]';
+P=0.2;
+quickbg
+quickspil
+[alphanh3,alphaspilker]*434294.5
