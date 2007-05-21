@@ -1,6 +1,6 @@
 % Main 
 %load TCM.out
-function [Tbeam,jims_zenith]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model)
+function [Tbeam,jims_zenith,wfwa,wfwb,wfwc,wfwd]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model)
 global CRITICALFLAG
 CRITICALFLAG=0				% If is '1' then critical refraction reached for that ray
 USEBEAM=1;
