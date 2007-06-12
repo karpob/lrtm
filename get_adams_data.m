@@ -1,5 +1,11 @@
-function [tcme,tcmp]= get_adams_data(oblateness_factor)
-file_handle=fopen('Adams_model/mixrat.jup_test','r');
+function [tcme,tcmp]= get_adams_data(oblateness_factor,data_directory,suffix)
+
+%oblateness factor==ratio of polar to equatorial radius.
+%data directory==relative path name where the data is stored
+%suffix==filename.* where * is the suffix ie (mixrat.jup_test suffix=jup_test)
+
+name=strcat(data_directory,'/mixrat.',suffix);
+file_handle=fopen(name,'r');
 oblateness_factor
 %skip over the header
 buffer_line1=fgetl(file_handle);
@@ -35,8 +41,8 @@ DPH3=data(:,15);
 
 %Now get pressure and Temperature from initial model input file (need to
 %for precision, and garbage fortran output in Temperature.
-
-file_handle=fopen('Adams_model/model.jup_test','r');
+name2=strcat(data_directory,'/model.',suffix);
+file_handle=fopen(name2,'r');
 %Skip header
 buffer_line1=fgetl(file_handle);
 buffer_line2=fgetl(file_handle);
