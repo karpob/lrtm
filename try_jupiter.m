@@ -50,7 +50,7 @@ adams_data_directory='adams_model_3x';
 adams_suffix='j08';
 
 %For data as of June 12, 2007 "6 times Solar H_2O and 3 times Solar NH_3"
-%adams_data_directory='adam_model_6x'
+%adams_data_directory='adams_model_6x'
 %adams_suffix='j09';
 [tcme,tcmp]=get_adams_data(oblateness_factor,adams_data_directory,adams_suffix);
 
