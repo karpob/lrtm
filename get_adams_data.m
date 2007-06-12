@@ -26,7 +26,7 @@ fclose(file_handle);
 data=[raw_data(:,1),zeros(length(raw_data),1),raw_data(:,9:21)];
 z=data(:,1);
 %pressure=data(:,3);
-XH2O=2.0*data(:,4);
+XH2O=data(:,4);
 DH2O=data(:,5);
 XNH3=data(:,6);
 DNH3=data(:,7);
