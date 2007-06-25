@@ -10,6 +10,9 @@ ao=71492*100000; % along x (in centimeters)
 bo=ao;       % along y
 co=ao; % along z
 
+% Select a Filename
+output_filename='give_me_a_cool_name.mat';
+
 %select_ammonia_model
 %1 original hoffman coding of spilker
 %2 toms code joiner-steffes
@@ -55,15 +58,15 @@ adams_suffix='j08';
 %adams_suffix='j09';
 [tcme,tcmp]=get_adams_data(oblateness_factor,adams_data_directory,adams_suffix);
 
-%  theta=0
-%  Raydirection(1)=-cos(theta*(pi/180));
-%  Raydirection(2)=sin(theta*(pi/180));
-%     for j=1:6
-%        no_ph3=0; 
-%         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
-%          Tbeam_nadir
-%         clear maintamone;
-%     end
+  theta=0
+  Raydirection(1)=-cos(theta*(pi/180));
+  Raydirection(2)=sin(theta*(pi/180));
+     for j=1:6
+        no_ph3=0; 
+         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
+          Tbeam_nadir
+         clear maintamone;
+     end
 
   theta=54.59115 %along z
  %theta=54.5912 %along y
@@ -82,34 +85,8 @@ adams_suffix='j08';
       clear maintamone;
       Tbeam_limb
   end
- % R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
+  R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
 
-save weighting_functions.dat
- ray_antenna_to_planet=[Rayorigin(1) 0 0; intercepts_boresight(1,:,1)]
- plot3(ray_antenna_to_planet(:,1),ray_antenna_to_planet(:,2),ray_antenna_to_planet(:,3),'color','g');
- hold on;
- 
- x_axis=[-Rayorigin(1)*1 0 0;Rayorigin(1)*1 0 0];
- plot3(x_axis(:,1),x_axis(:,2),x_axis(:,3),'color','k');
- 
- y_axis=[0 -Rayorigin(1)*1  0;0 Rayorigin(1)*1  0]
- plot3(y_axis(:,1),y_axis(:,2),y_axis(:,3),'color','k');
- 
- z_axis=[0 0 -Rayorigin(1);0 0 Rayorigin(1)*1 ];
- plot3(z_axis(:,1),z_axis(:,2),z_axis(:,3),'color','k');
- plot3(intercepts_boresight(:,1),intercepts_boresight(:,2),intercepts_boresight(:,3))
- 
- [m,n,o,p]=size(intercepts_b);
- for i=1:m
-    plot3(intercepts_b(i,:,1,1),intercepts_b(i,:,2,1),intercepts_b(i,:,3,1),'color','r')
- end
- 
-[m,n,o,p]=size(intercepts_c);
-for i=1:m
-    plot3(intercepts_c(i,:,1,1),intercepts_c(i,:,2,1),intercepts_c(i,:,3,1),'color','m')
-end
-[m,n,o,p]=size(intercepts_d);
-for i=1:m
-    plot3(intercepts_d(i,:,1,1),intercepts_d(i,:,2,1),intercepts_d(i,:,3,1),'color','c')
-end
+save(output_filename);
+
 
