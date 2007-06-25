@@ -81,7 +81,7 @@ adams_suffix='j08';
   no_ph3=0;
   for j=1:6
       no_ph3=0;
-      [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j),intercepts_boresight(:,:,j),intercepts_b(:,:,:,j),intercepts_c(:,:,:,j),intercepts_d(:,:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
+      [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
       clear maintamone;
       Tbeam_limb
   end
