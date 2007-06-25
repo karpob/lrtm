@@ -8,7 +8,7 @@ z=[0 0 1];
 c=Raydirection;
 
 rvect_e=cross(z,c);
-rvect_e=rvect_e;%/norm(rvect_e);
+rvect_e=rvect_e/norm(rvect_e);
 rang_e=acos(dot(z,c));
 kx=rvect_e(1);
 ky=rvect_e(2);

@@ -95,21 +95,18 @@ XHe_i=[He,He,He,He,He,He,He,He,He,He,He,He,He,He,He];
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 
-for kk=1:1%length(AutoStep_range)
+%for kk=1:1%length(AutoStep_range)
 AutoStep_constant=8;
-for k=1:1
+for k=1:15
     cd TCM_mex
     [P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,g,mu,ref_w_o,ref_w,z]=TCM(dz(k),XHe_i(k),XH2S_i(k),XNH3_i(k),XH2O_i(k),XCH4_i(k),XPH3_i(k),XCO(k),P_temp(k),T_temp(k),g0_i(k),R0e_i(k),P0_i(k),T_targ_i(k),P_targ_i(k),P_term_i(k),1,27,SuperSatSelf_H2S(k),SuperSatSelf_NH3(k),SuperSatSelf_PH3(k),SuperSatSelf_H2O(k),supersatNH3(k),supersatH2S(k),AutoStep_constant);
     clear TCM;
-    
-   
-    tcme(:,:,k)=load('tcm.out');
-%    tcmp(1:me(k),1:22,k)=[tcme(1:me(k),1:2,k),(co/ao).*tcme(1:me(k),3,k),tcme(1:me(k),4:22,k)];
-%    tcme(:,:,k)=tcmel(1:slicefun,1:22,k);
-    tcmp(:,1:22,k)=[tcme(:,1:2,k),(co/ao).*tcme(:,3,k),tcme(:,4:22,k)];
+    [me(k),n]=size(P);
     cd ..
-  %  tcme(1:me(k),1:22,k)=[P(1:me(k)),T(1:me(k)),z(1:me(k)),XH2(1:me(k)),XHe(1:me(k)),XH2S(1:me(k)),XNH3(1:me(k)),XH20(1:me(k)),XCH4(1:me(k)),XPH3(1:me(k)),clouds(1:me(k)),DNH4SH(1:me(k)),DH2S(1:me(k)),DNH3(1:me(k)),DH2O(1:me(k)),DCH4(1:me(k)),DPH3(1:me(k)),DSOL(1:me(k)),g(1:me(k)),mu(1:me(k)),ref_w_o(1:me(k)),ref_w(1:me(k))];
+    tcme(1:me(k),1:22,k)=[P(1:me(k)),T(1:me(k)),z(1:me(k)),XH2(1:me(k)),XHe(1:me(k)),XH2S(1:me(k)),XNH3(1:me(k)),XH20(1:me(k)),XCH4(1:me(k)),XPH3(1:me(k)),clouds(1:me(k)),DNH4SH(1:me(k)),DH2S(1:me(k)),DNH3(1:me(k)),DH2O(1:me(k)),DCH4(1:me(k)),DPH3(1:me(k)),DSOL(1:me(k)),g(1:me(k)),mu(1:me(k)),ref_w_o(1:me(k)),ref_w(1:me(k))];
 end
+
+tcmp(1:me(k),1:22,k)=[tcme(1:me(k),1:2,k),(co/ao).*tcme(1:me(k),3,k),tcme(1:me(k),4:22,k)];
 %  for k=1:1
 %      cd TCM_mex    
 %      [P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,g,mu,ref_w_o,ref_w,z]=TCM(dz(k),XHe_i(k),XH2S_i(k),XNH3_i(k),XH2O_i(k),XCH4_i(k),XPH3_i(k),XCO(k),P_temp(k),T_temp(k),g0_p(k),R0p_i(k),P0_i(k),T_targ_i(k),P_targ_i(k),P_term_i(k),1,27,SuperSatSelf_H2S(k),SuperSatSelf_NH3(k),SuperSatSelf_PH3(k),SuperSatSelf_H2O(k),supersatNH3(k),supersatH2S(k),AutoStep_constant);
@@ -139,45 +136,50 @@ f=13.78; %operating frequency in GHz
 % spilker correction factor C goes negative, giving negative absorption
 % coefficient
 
-select_ammonia_model=1;
+select_ammonia_model=2;
 
 %select_water_model
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
-select_water_model=1;
+select_water_model=2;
  
 %Rayorigin=[4.2e10 0 0]
 %Sphereradius=ao;
 % theta=7.889
-theta=0;
+theta=7.889;
  Raydirection(1)=-cos(theta*(pi/180))
- Raydirection(2)=sin(theta*(pi/180))
+ Raydirection(3)=sin(theta*(pi/180))
+ Raydirection(2)=0;
+ figure(1)
+ellipsoid(0,0,0,ao,bo,co)
+pp=(6*ao)*[Rayorigin(1) 0 0;Raydirection(1) Raydirection(2) Raydirection(3)]
+plot3(pp(:,1),pp(:,2),pp(:,3))
 
-% ao=6.0268e9; % along x
-%bo=ao;       % along y
-%co=5.4364e9; % along z
-%tcmp(1:me(1),3,1)
-for j=1:15
-    if(j==1)
-        no_ph3=0;
-    else
-        no_ph3=1;
-    end
-%    me(k)
-    [Tbeam(j),jims_zenith_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(:,:,j),tcmp(:,:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model);
-    Tbeam(j)
-    Model_names(j)
-    residual(j)=Tbeam(j)-Tbeam_thesis(j)
-    clear maintam;
-end
-end 
-% theta=7.5
-% Raydirection(1)=-cos(theta*(pi/180))
-% Raydirection(2)=sin(theta*(pi/180))
-% 
+% % ao=6.0268e9; % along x
+% %bo=ao;       % along y
+% %co=5.4364e9; % along z
+% %tcmp(1:me(1),3,1)
 % for j=1:15
-%     [Tbeam_seventy_five(j),jims_zenith_seventy_five(j)]= maintam(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:mp(j),:,j),ao,bo,co,f);
+%     if(j==1)
+%         no_ph3=0;
+%     else
+%         no_ph3=1;
+%     end
+% %    me(k)
+%     [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model);
+%     Tbeam(j)
+%     Model_names(j)
+%     residual(j)=Tbeam(j)-Tbeam_thesis(j)
+%     clear maintam;
 % end
+% end 
+%  theta=7.5
+%  Raydirection(1)=-cos(theta*(pi/180))
+%  Raydirection(2)=sin(theta*(pi/180))
+%  
+%  for j=1:15
+%      [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model);
+%  end
 % %plot_replicate_hoffman_results
 % jims_zenith_seventy_five

@@ -1,6 +1,6 @@
 % Main 
 %load TCM.out
-function [Tbeam,jims_zenith,wfwa,wfwb,wfwc,wfwd]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model)
+function [Tbeam,jims_zenith,wfwa,intercepts_boresight,intercepts_b,intercepts_c,intercepts_d]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model)
 global CRITICALFLAG
 CRITICALFLAG=0				% If is '1' then critical refraction reached for that ray
 USEBEAM=1;
@@ -203,6 +203,7 @@ if CRITICALFLAG==1;
    [tau_a,tau]=ftau(kappa,d,masterindexa);	% Comes out with deepest first
    [Tatma,wlayersa]=ftam(T,tau,tau_a,masterindexa);
    sura=intercept(1,:);
+   intercepts_boresight=intercept;
    CRITICALFLAG=0;
    %p=length(Vr1);		% Term this for statement
 else
@@ -212,7 +213,8 @@ else
    disa=d;
    bs=1;
    [Tatma,wlayersa]=ftam(T,tau,tau_a,masterindexa);
-   sura=intercept(1,:);  
+   sura=intercept(1,:);
+   intercepts_boresight=intercept;
 end   
 
 
@@ -249,8 +251,8 @@ VRONE=0
 for p=1:length(Vr1);
    %disp('Doing Vr1')
    bs=bs+1;						% bs-beamspread- keeps track of beamspread samples
-   Raydirection=[Vr1(:,p)]';
-   [intercept,internormal,d,t,masterindexb,missflag]=findraypath(recordlength,refindex,P,ellipses,Rayorigin,Raydirection);
+   Rd=[Vr1(:,p)]';
+   [intercept,internormal,d,t,masterindexb,missflag]=findraypath(recordlength,refindex,P,ellipses,Rayorigin,Rd);
    windexb(1:size(masterindexb,1),p)=masterindexb;
    %tb(p,:)=t
    disb=d;
@@ -276,6 +278,8 @@ for p=1:length(Vr1);
       [tau_a,tau]=ftau(kappa,d,masterindexb);	% Comes out with deepest first
       [Tatmb(p),wlayersb(:,p)]=ftam(T,tau,tau_a,masterindexb);
       surb(p,:)=intercept(1,:);
+      intercepts_b(p,:,:)=intercept;
+      
    end
 end
 VRTWO=0
@@ -308,6 +312,7 @@ for p=1:length(Vr2)
       [tau_a,tau]=ftau(kappa,d,masterindexc);	% Comes out with deepest first
       [Tatmc(p),wlayersc(:,p)]=ftam(T,tau,tau_a,masterindexc);
       surc(p,:)=intercept(1,:);
+      intercepts_c(p,:,:)=intercept;
    end
 end
 VRTHREE=0   
@@ -341,11 +346,12 @@ for p=1:length(Vr3)
       [tau_a,tau]=ftau(kappa,d,masterindexd);	% Comes out with deepest first
       [Tatmd(p),wlayersd(:,p)]=ftam(T,tau,tau_a,masterindexd);
       surd(p,:)=intercept(1,:);
+      intercepts_d(p,:,:)=intercept;
    end
 end
 %else
 %end
-
+1.0
 % Apply Beam weights (Beam coupling)
 % T=sum(1,N)Tn*(exp(-2.76*(deltabw/3db)^2))
 b1w
