@@ -57,16 +57,16 @@ adams_suffix='j08';
 %adams_data_directory='adams_model_6x'
 %adams_suffix='j09';
  [tcme,tcmp]=get_adams_data(oblateness_factor,adams_data_directory,adams_suffix);
-% 
-%   theta=0
-%   Raydirection(1)=-cos(theta*(pi/180));
-%   Raydirection(2)=sin(theta*(pi/180));
-%      for j=1:6
-%         no_ph3=0; 
-%          [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
-%           Tbeam_nadir
-%          clear maintamone;
-%      end
+
+  theta=0
+  Raydirection(1)=-cos(theta*(pi/180));
+  Raydirection(2)=sin(theta*(pi/180));
+     for j=1:6
+        no_ph3=0; 
+         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
+          Tbeam_nadir
+         clear maintamone;
+     end
 
   theta=54.5910 %along z
  %theta=54.5912 %along y
@@ -79,7 +79,7 @@ adams_suffix='j08';
  
   Raydirection=[X_direction Y_direction Z_direction];
   no_ph3=0;
-  for j=1:1
+  for j=1:6
       no_ph3=0;
       [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
       clear maintamone;
