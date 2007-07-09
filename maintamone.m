@@ -1,6 +1,6 @@
 % Main 
 %load TCM.out
-function [Tbeam,jims_zenith,wfwa,intercepts_boresight,intercepts_b,intercepts_c,intercepts_d]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model)
+function [Tbeam,jims_zenith,wfwa,intercepts_boresight,intercepts_b,intercepts_c,intercepts_d]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds)
 global CRITICALFLAG
 CRITICALFLAG=0				% If is '1' then critical refraction reached for that ray
 USEBEAM=1;
@@ -70,6 +70,13 @@ xNH3=[0;(tcme(recordlength-k,7))];
 xH2O=[0;(tcme(recordlength-k,8))];
 xCH4=[0;(tcme(recordlength-k,9))];
 xPH3=[0;(tcme(recordlength-k,10))];
+% Get cloud Densities from TCME
+DNH4SH=[0;(tcme(recordlength-k,12))];
+DH2S=[0;(tcme(recordlength-k,13))];
+DNH3=[0;(tcme(recordlength-k,14))];
+DH2O=[0;(tcme(recordlength-k,15))];
+DSOL=[0;(tcme(recordlength-k,18))];
+
 % % cause ph3 decay (photolyse)
   if (no_ph3>0)
       look_out_for_decaying_ph3=1
@@ -193,7 +200,7 @@ jims_zenith=acos(dot(-internormal(1,:),Raydirection))*(180/pi)
 %      load old_kappa;
 %      kappa=kappa_old;
 % %  end
-kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,xH2,xHe,xNH3,xH2O,select_ammonia_model,select_water_model);
+kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,xH2,xHe,xNH3,xH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_ammonia_model,select_water_model,include_clouds);%findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,xH2,xHe,xNH3,xH2O,select_ammonia_model,select_water_model,include_clouds);
 done_with_abs_coeff=0
 
 if CRITICALFLAG==1;

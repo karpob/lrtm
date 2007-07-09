@@ -1,4 +1,4 @@
-function kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,select_ammonia_model,select_water_model)
+function kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_ammonia_model,select_water_model,include_clouds)
 
 % function kappa=findkappa(f,T,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3)
 % Finds the atmospheric absorption along the raypath
@@ -13,7 +13,9 @@ function kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,X
 
 % Includes the opcacity due to Ammonia, Phosphine, Hydrogen Sulfide, Hydrogen, Water Vapor
 % inlcuding H2 collisions with CH4
-%maxmaster=max(masterindex)			% masterindex may go up and down-only need to calc repeaters once
+%maxmaster=max(masterindex)			% masterindex may go up and down-only
+%need to calc repeaters once
+
 OpticaldepthstodB=434294.5;
 stopindex=size(T,1);
 
@@ -70,12 +72,38 @@ for k=1:stopindex
    end
 end
 cd ..
-% Sum up and get total kappa
-for k=1:stopindex
-    kappa_1(k)=alphanh3(k)+alphaph3(k)+alphah2(k)+alphah2o(k)+alphah2s(k);
+if(include_clouds==1)
+    cd clouds
+    for k=1:stopindex
+        complex_dielectric_NH4SH(k)=get_complex_dielectric_constant_water(f,T(k));
+        complex_dielectric_H2S(k)=complex_dielectric_NH4SH(k);
+        complex_dielectric_NH3(k)=complex_dielectric_NH4SH(k);
+        complex_dielectric_H2O(k)=complex_dielectric_NH4SH(k);
+        complex_dielectric_SOL(k)=complex_dielectric_NH4SH(k);
+    
+        alpha_NH4SH(k)=rayleigh_absorption(f,DNH4SH(k),1,complex_dielectric_NH4SH(k));
+        alpha_H2S(k)=rayleigh_absorption(f,DH2S(k),1,complex_dielectric_H2S(k));
+        alpha_NH3(k)=rayleigh_absorption(f,DNH3(k),1,complex_dielectric_NH3(k));
+        alpha_H2O(k)=rayleigh_absorption(f,DH2O(k),1,complex_dielectric_H2O(k));
+        alpha_SOL(k)=rayleigh_absorption(f,DSOL(k),1,complex_dielectric_SOL(k));
+    end
+    cd .. 
 end
 
-save alfs alphanh3 alphaph3 alphah2s alphah2 alphah2o
+    
+% Sum up and get total kappa
+if(include_clouds==1)
+    for k=1:stopindex
+        kappa_1(k)=alphanh3(k)+alphaph3(k)+alphah2(k)+alphah2o(k)+alphah2s(k)+alpha_NH4SH(k)+alpha_H2S(k)+alpha_NH3(k)+alpha_H2O(k)+alpha_SOL(k);
+    end
+end
+if(include_clouds==0)
+    for k=1:stopindex
+        kappa_1(k)=alphanh3(k)+alphaph3(k)+alphah2(k)+alphah2o(k)+alphah2s(k);
+    end
+end
+
+save alfs
 kappa=[kappa_1'];	% (in 1/cm) if limb-have passed same pressure twice-masterindex keeps track
 kappa_old=kappa;
 save old_kappa kappa_old

@@ -31,6 +31,11 @@ select_ammonia_model=2;
 %3 (to be implemented goodman 1969 water vapor model
 select_water_model=2;
 
+%include cloud absorption?
+%1=yes
+%0=no
+include_clouds=1;
+
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %load craft;
 
@@ -63,7 +68,7 @@ adams_suffix='j08';
   Raydirection(2)=sin(theta*(pi/180));
      for j=1:6
         no_ph3=0; 
-         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
+         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds);
           Tbeam_nadir
          clear maintamone;
      end
@@ -81,7 +86,7 @@ adams_suffix='j08';
   no_ph3=0;
   for j=1:6
       no_ph3=0;
-      [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model);
+      [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds);
       clear maintamone;
       Tbeam_limb
   end
