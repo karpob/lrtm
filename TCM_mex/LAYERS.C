@@ -81,7 +81,7 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
 	  
       if (use_lindal == 'Y')
       {
-            pfp=fopen("TP.SAT","r");
+            pfp=fopen("TP.TCM","r");
             TfL = (float *) malloc(n_lindal_pts*sizeof(float));
             PfL = (float *) malloc(n_lindal_pts*sizeof(float));
 			
@@ -129,7 +129,7 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
       }
 	  
 	  /* ...flag value */
-	  sol_cloud=0;
+	  sol_cloud=1;
 	  /********************/
 	  
       printf("\nDo %s consider solution (windex) cloud formation.\n",sol_cloud?"":"not"); //print sol_cloud to console
