@@ -9,6 +9,6 @@ tau_w=((1.1109e-10)-(3.824e-12)*T+(6.938e-14)*T^2-(5.096e-16)*T^3)/(2*pi); % rel
 
 ep_prime=ep_winf+(ep_wo-ep_winf)/(1+(2*pi*f*tau_w)^2);
 
-ep_prime_prime=(2*pi*f*tau_w*(ep_wo-ep_winf))/(2*pi*f*tau_w)^2;
+ep_prime_prime=(2*pi*f*tau_w*(ep_wo-ep_winf))/(1+(2*pi*f*tau_w)^2);
 
 complex_dielectric_constant=ep_prime+sqrt(-1)*ep_prime_prime;
