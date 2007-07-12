@@ -75,11 +75,11 @@ cd ..
 if(include_clouds==1)
     cd clouds
     for k=1:stopindex
-        complex_dielectric_NH4SH(k)=get_complex_dielectric_constant_water(f,T(k));
-        complex_dielectric_H2S(k)=complex_dielectric_NH4SH(k);
-        complex_dielectric_NH3(k)=complex_dielectric_NH4SH(k);
-        complex_dielectric_H2O(k)=complex_dielectric_NH4SH(k);
-        complex_dielectric_SOL(k)=complex_dielectric_NH4SH(k);
+        complex_dielectric_SOL(k)=get_complex_dielectric_constant_water(f,T(k)); %Use equations in Ulabny, Fung, Moore for water
+        complex_dielectric_H2S(k)=1+I*1; %Don't care no H2S clouds here.
+        complex_dielectric_NH3(k)=(((1.48)^2)-((8.73e-4)^2)) + I*(2*1.48*8.73e-4); %Use Howett, Carlson, Irwin,Calcutt ref index nu=1300 cm^-1
+        complex_dielectric_H2O(k)=3.15 + I*1e-3;                                   %Wost Case at 33 GHz Matsuoka,Fujita,Mae 1996
+        complex_dielectric_NH4SH(k)=(((2.72)^2)-((7.83e-4)^2)) + I*(2*2.72*7.83e-4);%Use Howett, Carlson, Irwin,Calcutt ref index nu=1300 cm^-1
     
         alpha_NH4SH(k)=rayleigh_absorption(f,DNH4SH(k),1,complex_dielectric_NH4SH(k));
         alpha_H2S(k)=rayleigh_absorption(f,DH2S(k),1,complex_dielectric_H2S(k));
