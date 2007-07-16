@@ -19,7 +19,7 @@ double AutoStep_constant;
 /*set 0 to turn off, 1 to turn on*/
 #define USE_SOL_CLOUD  1      /*consider its formation?*/
 double P_temp,T_temp;
-void new_layer(int j, float dz, int *eflag);
+void new_layer(int j, float dz, int *eflag );
 float specific_heat(int j, float T, float P);
 int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3,double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i,float supersatNH3_i,float supersatH2S_i);
 void init_soln_cloud(int mode);
@@ -33,9 +33,9 @@ char getMatlabCharacter(const mxArray* ptr);
 double  getMatlabScalar    (const mxArray* ptr);
 int getMatlabInt (const mxArray* ptr);
 double& createMatlabScalar (mxArray*& ptr);
-const int numInputArgs  = 25;
+const int numInputArgs  = 26;
 const int numOutputArgs = 22;
-
+float Hydrogen_Curve_Fit_Select;
 
 void mexFunction(int nlhs, mxArray *plhs[],
 		  int nrhs, const mxArray *prhs[])
@@ -82,6 +82,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	  float supersatNH3_i=getMatlabScalar(prhs[22]);
 	  float supersatH2S_i=getMatlabScalar(prhs[23]);
 	  AutoStep_constant=getMatlabScalar(prhs[24]);
+          Hydrogen_Curve_Fit_Select=getMatlabScalar(prhs[25]);
 	  //************************************************//
 	  
 	  //**************** Send value to matlab **********//

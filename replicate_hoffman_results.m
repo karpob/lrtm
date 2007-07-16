@@ -18,7 +18,7 @@ co=5.4364e9; % along z
 He_range=[0.01:0.01:0.1]
 [n,mm]=size(He_range)
 
-zstep=2
+zstep=10
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %                                                   %
@@ -86,7 +86,7 @@ supersatH2S=[0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0,0.0];
 
 AutoStep_constant_range=8*[1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0,1.0];
 %AutoStep_constant=8;
-He=0.03;
+He=0.034;
 XHe_i=[He,He,He,He,He,He,He,He,He,He,He,He,He,He,He];
 %AutoStep_range=5.6:0.01:7;
 
@@ -99,7 +99,7 @@ XHe_i=[He,He,He,He,He,He,He,He,He,He,He,He,He,He,He];
 AutoStep_constant=8;
 for k=1:15
     cd TCM_mex
-    [P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,g,mu,ref_w_o,ref_w,z]=TCM(dz(k),XHe_i(k),XH2S_i(k),XNH3_i(k),XH2O_i(k),XCH4_i(k),XPH3_i(k),XCO(k),P_temp(k),T_temp(k),g0_i(k),R0e_i(k),P0_i(k),T_targ_i(k),P_targ_i(k),P_term_i(k),1,27,SuperSatSelf_H2S(k),SuperSatSelf_NH3(k),SuperSatSelf_PH3(k),SuperSatSelf_H2O(k),supersatNH3(k),supersatH2S(k),AutoStep_constant);
+    [P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,g,mu,ref_w_o,ref_w,z]=TCM(dz(k),XHe_i(k),XH2S_i(k),XNH3_i(k),XH2O_i(k),XCH4_i(k),XPH3_i(k),XCO(k),P_temp(k),T_temp(k),g0_i(k),R0e_i(k),P0_i(k),T_targ_i(k),P_targ_i(k),P_term_i(k),1,27,SuperSatSelf_H2S(k),SuperSatSelf_NH3(k),SuperSatSelf_PH3(k),SuperSatSelf_H2O(k),supersatNH3(k),supersatH2S(k),AutoStep_constant,0.25);
     clear TCM;
     [me(k),n]=size(P);
     cd ..
@@ -107,19 +107,7 @@ for k=1:15
 end
 
 tcmp(1:me(k),1:22,k)=[tcme(1:me(k),1:2,k),(co/ao).*tcme(1:me(k),3,k),tcme(1:me(k),4:22,k)];
-%  for k=1:1
-%      cd TCM_mex    
-%      [P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,g,mu,ref_w_o,ref_w,z]=TCM(dz(k),XHe_i(k),XH2S_i(k),XNH3_i(k),XH2O_i(k),XCH4_i(k),XPH3_i(k),XCO(k),P_temp(k),T_temp(k),g0_p(k),R0p_i(k),P0_i(k),T_targ_i(k),P_targ_i(k),P_term_i(k),1,27,SuperSatSelf_H2S(k),SuperSatSelf_NH3(k),SuperSatSelf_PH3(k),SuperSatSelf_H2O(k),supersatNH3(k),supersatH2S(k),AutoStep_constant);
-%  %    cd ..
-%      clear TCM;
-%      
-%      [mp(k),n]=size(P)
-%      tcmp(:,:,k)=load('tcm.out');
-%%  %    tcmp(:,:,k)=tcmpl(1:slicefun,1:22,k);
-%      cd ..
-%%    %tcmp(1:mp(k),1:22,k)=[P(1:mp(k)),T(1:mp(k)),z(1:mp(k)),XH2(1:mp(k)),XHe(1:mp(k)),XH2S(1:mp(k)),XNH3(1:mp(k)),XH20(1:mp(k)),XCH4(1:mp(k)),XPH3(1:mp(k)),clouds(1:mp(k)),DNH4SH(1:mp(k)),DH2S(1:mp(k)),DNH3(1:mp(k)),DH2O(1:mp(k)),DCH4(1:mp(k)),DPH3(1:mp(k)),DSOL(1:mp(k)),g(1:mp(k)),mu(1:mp(k)),ref_w_o(1:mp(k)),ref_w(1:mp(k))];
-%  end
- % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
 load craft;
 Raydirection
 Rayorigin
@@ -148,9 +136,11 @@ select_ammonia_model=1;
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
 select_water_model=1;
+
+include_clouds=0;
  
-%Rayorigin=[4.2e10 0 0]
-%Sphereradius=ao;
+Rayorigin=[4.2e10 0 0]
+Sphereradius=ao;
 % theta=7.889
 
  for j=1:15
@@ -160,16 +150,22 @@ select_water_model=1;
          no_ph3=1;
      end
      [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM)
-     Tbeam(j)
      Model_names(j)
      residual(j)=Tbeam(j)-Tbeam_thesis(j)
-     clear maintam;
+     
  end
-%   theta=7.5
-%   Raydirection(1)=-cos(theta*(pi/180))
-%   Raydirection(2)=sin(theta*(pi/180))
-%   
-%   for j=1:15
-%       [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model);
-%   end
+    theta=7.5
+   Raydirection(1)=-cos(theta*(pi/180))
+   Raydirection(2)=sin(theta*(pi/180))
+   
+   for j=1:15
+       if(j==1)
+           no_ph3=0;
+       else
+           no_ph3=1;
+       end
+       [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM)
+       Model_names(j)
+       residual_seventy_five(j)=Tbeam_seventy_five-Tbeam_thesis_seventy_five(j)
+   end
   

@@ -12,7 +12,7 @@ extern char use_lindal, line[];
 extern int sol_cloud, NH4SH_cloud_base, AutoStep, CrossP0;
 extern double XCO,AutoStep_constant;
 static int n_lindal_pts, hereonout;
-
+extern float Hydrogen_Curve_Fit_Select;
 float gravity(int j);
 float specific_heat(int j, float T, float P);
 float sat_pressure(char component[], float T);
