@@ -45,6 +45,12 @@ Sphereradius=ao;
 Spherecenter=[0 0 0];
 Raydirection=[-1 0 0];
 
+%Get Beam parameters
+Nphi=3*31; %Number of samples in phi
+Ntheta=4*31; %Number of samples in theta
+BWHM=10; % Beamwidth Half-maximum
+
+
 % Juno bands
 f=[0.6,1.2,2.4,4.8,9.6,23]; %operating frequency in GHz
 
@@ -68,7 +74,7 @@ adams_suffix='j08';
   Raydirection(2)=sin(theta*(pi/180));
      for j=1:6
         no_ph3=0; 
-         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds);
+         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM);
           Tbeam_nadir
          clear maintamone;
      end
@@ -86,7 +92,7 @@ adams_suffix='j08';
   no_ph3=0;
   for j=1:6
       no_ph3=0;
-      [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds);
+      [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM);
       clear maintamone;
       Tbeam_limb
   end

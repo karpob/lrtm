@@ -1,6 +1,6 @@
 % Main 
 %load TCM.out
-function [Tbeam,jims_zenith,wfwa,intercepts_boresight,intercepts_b,intercepts_c,intercepts_d]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds)
+function [Tbeam,jims_zenith,wfwa,intercepts_boresight,intercepts_b,intercepts_c,intercepts_d]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM)
 global CRITICALFLAG
 CRITICALFLAG=0				% If is '1' then critical refraction reached for that ray
 USEBEAM=1;
@@ -236,7 +236,7 @@ end
 % tau_a is the tau of that layer, tau is the cumulative summations of those layers
 % Now do the beamspread and rotate beampattern to lookvector
 %load beamspread;
-[b1,b2,b3,b1w,b2w,b3w]=beamsample;
+[b1,b2,b3,b1w,b2w,b3w]=beamsample(Ntheta,Nphi,BWHM);
 [Vr1,Vr2,Vr3,Zr]=rotbeam(Raydirection,b1,b2,b3);
 %Raydirection
 %Zr

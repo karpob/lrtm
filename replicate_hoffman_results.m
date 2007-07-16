@@ -124,6 +124,11 @@ load craft;
 Raydirection
 Rayorigin
 
+%Beam pattern parameters
+Ntheta=4;
+BWHM=0.33;
+Nphi=3;
+
 f=13.78; %operating frequency in GHz
 
 %select_ammonia_model
@@ -136,50 +141,35 @@ f=13.78; %operating frequency in GHz
 % spilker correction factor C goes negative, giving negative absorption
 % coefficient
 
-select_ammonia_model=2;
+select_ammonia_model=1;
 
 %select_water_model
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
-select_water_model=2;
+select_water_model=1;
  
 %Rayorigin=[4.2e10 0 0]
 %Sphereradius=ao;
 % theta=7.889
-theta=7.889;
- Raydirection(1)=-cos(theta*(pi/180))
- Raydirection(3)=sin(theta*(pi/180))
- Raydirection(2)=0;
- figure(1)
-ellipsoid(0,0,0,ao,bo,co)
-pp=(6*ao)*[Rayorigin(1) 0 0;Raydirection(1) Raydirection(2) Raydirection(3)]
-plot3(pp(:,1),pp(:,2),pp(:,3))
 
-% % ao=6.0268e9; % along x
-% %bo=ao;       % along y
-% %co=5.4364e9; % along z
-% %tcmp(1:me(1),3,1)
-% for j=1:15
-%     if(j==1)
-%         no_ph3=0;
-%     else
-%         no_ph3=1;
-%     end
-% %    me(k)
-%     [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model);
-%     Tbeam(j)
-%     Model_names(j)
-%     residual(j)=Tbeam(j)-Tbeam_thesis(j)
-%     clear maintam;
-% end
-% end 
-%  theta=7.5
-%  Raydirection(1)=-cos(theta*(pi/180))
-%  Raydirection(2)=sin(theta*(pi/180))
-%  
-%  for j=1:15
-%      [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model);
-%  end
-% %plot_replicate_hoffman_results
-% jims_zenith_seventy_five
+ for j=1:15
+     if(j==1)
+         no_ph3=0;
+     else
+         no_ph3=1;
+     end
+     [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM)
+     Tbeam(j)
+     Model_names(j)
+     residual(j)=Tbeam(j)-Tbeam_thesis(j)
+     clear maintam;
+ end
+%   theta=7.5
+%   Raydirection(1)=-cos(theta*(pi/180))
+%   Raydirection(2)=sin(theta*(pi/180))
+%   
+%   for j=1:15
+%       [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model);
+%   end
+  

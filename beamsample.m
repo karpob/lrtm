@@ -1,10 +1,10 @@
-function [b1,b2,b3,b1w,b2w,b3w]=beamsample
+function [b1,b2,b3,b1w,b2w,b3w]=beamsample(Ntheta_0,Nphi,BWHM)
 
 % For generating beam samples with 2pi symm in theta, with beamwidth of phi
 % N Number of original spacing in theta
-Ntheta_0=4*31;  % Ntheta- first rings number of points
-BWHM=10;
-Nphi=3*31;	% Number of total phi rings 
+%Ntheta_0=4*31;  % Ntheta- first rings number of points
+%BWHM=10;
+%Nphi=3*31;	% Number of total phi rings 
 dphi_degree=BWHM/Nphi;
 phi_degree=cumsum(dphi_degree.*ones(Nphi,1))
 n=phi_degree./dphi_degree % radius multiple from first ring
