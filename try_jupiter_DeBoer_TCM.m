@@ -61,13 +61,13 @@ f=[0.6,1.2,2.4,4.8,9.6,23]; %operating frequency in GHz
 %adams_suffix='jup_test';
 
 %For data as of June 12, 2007 "3 times Solar H_2O, and 3 times Solar NH_3"
-adams_data_directory='adams_model_3x';
-adams_suffix='j08';
+%adams_data_directory='adams_model_3x';
+%adams_suffix='j08';
 
 %For data as of June 12, 2007 "6 times Solar H_2O and 3 times Solar NH_3"
 %adams_data_directory='adams_model_6x'
 %adams_suffix='j09';
- [tcme,tcmp]=get_adams_data(oblateness_factor,adams_data_directory,adams_suffix);
+% [tcme,tcmp]=get_adams_data(oblateness_factor,adams_data_directory,adams_suffix);
 
  
 %Use DeBoer TCM
@@ -79,19 +79,19 @@ XCH4_rel_H2=5.5e-4;
 XPH3_rel_H2=5.14e-7;
 XAr_rel_H2=3.4e-06;
 XHe_rel_H2=0.194
-XH2=1/(1++XHe_rel_H2+XH2S_rel_H2+XNH3_rel_H2+XH2O_rel_H2+ XCH4_rel_H2+ XPH3_rel_H2 + XAr_rel_H2);
+XH2_i=1/(1+XHe_rel_H2+XH2S_rel_H2+XNH3_rel_H2+XH2O_rel_H2+ XCH4_rel_H2+ XPH3_rel_H2 + XAr_rel_H2);
 
-XH2S_i=3*XH2S_rel_H2*XH2
-XNH3_i=3*XNH3_rel_H2*XH2
-XH2O_i=3*XH2O_rel_H2*XH2
-XCH4_i=3*XCH4_rel_H2*XH2
-XPH3_i=3*XPH3_rel_H2*XH2
-XAr_i=3*XAr_rel_H2*XH2
-XHe_i=XHe_rel_H2*XH2
-XCO=0;
+XH2S_i=3*XH2S_rel_H2*XH2_i
+XNH3_i=3*XNH3_rel_H2*XH2_i
+XH2O_i=3*XH2O_rel_H2*XH2_i
+XCH4_i=3*XCH4_rel_H2*XH2_i
+XPH3_i=3*XPH3_rel_H2*XH2_i
+XAr_i=3*XAr_rel_H2*XH2_i
+XHe_i=XHe_rel_H2*XH2_i
+XCO=XAr_i;
 
-P_temp=500;
-T_temp=1081;
+P_temp=1000;
+T_temp=1300;
 
 g0_i=2417;
 
@@ -133,7 +133,8 @@ cd TCM_mex
 clear TCM;
 [me,n]=size(P);
 cd ..
-tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me)-XAr_i,XHe(1:me),XH2S(1:me),XNH3(1:me),XH20(1:me),XCH4(1:me),XPH3(1:me),clouds(1:me),DNH4SH(1:me),DH2S(1:me),DNH3(1:me),DH2O(1:me),DCH4(1:me),DPH3(1:me),DSOL(1:me),g(1:me),mu(1:me),ref_w_o(1:me),ref_w(1:me)];
+me=571;
+tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me),XHe(1:me),XH2S(1:me),XNH3(1:me),XH20(1:me),XCH4(1:me),XPH3(1:me),clouds(1:me),DNH4SH(1:me),DH2S(1:me),DNH3(1:me),DH2O(1:me),DCH4(1:me),DPH3(1:me),DSOL(1:me),g(1:me),mu(1:me),ref_w_o(1:me),ref_w(1:me)];
 tcmp(1:me,1:22)=[tcme(1:me,1:2),oblateness_factor.*tcme(1:me,3),tcme(1:me,4:22)];
  
   theta=0
