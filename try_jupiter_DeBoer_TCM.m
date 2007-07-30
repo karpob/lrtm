@@ -11,7 +11,7 @@ bo=ao;       % along y
 co=ao; % along z
 
 % Select a Filename
-output_filename='DeBoer_3x.mat';
+output_filename='give_me_a_cool_name.mat';
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -72,6 +72,11 @@ f=[0.6,1.2,2.4,4.8,9.6,23]; %operating frequency in GHz
  
 %Use DeBoer TCM
 
+%Water Enhancement
+H2O_enhancement=3;
+NH3_enhancement=3;
+
+%"Solar" Abundances
 XH2S_rel_H2=3.1e-5;
 XNH3_rel_H2=1.35e-4;
 XH2O_rel_H2=1.26e-3;
@@ -81,9 +86,10 @@ XAr_rel_H2=3.4e-06;
 XHe_rel_H2=0.194
 XH2_i=1/(1+XHe_rel_H2+XH2S_rel_H2+XNH3_rel_H2+XH2O_rel_H2+ XCH4_rel_H2+ XPH3_rel_H2 + XAr_rel_H2);
 
+%Get Mole Fractions
 XH2S_i=3*XH2S_rel_H2*XH2_i
-XNH3_i=3*XNH3_rel_H2*XH2_i
-XH2O_i=3*XH2O_rel_H2*XH2_i
+XNH3_i=NH3_enhancement*XNH3_rel_H2*XH2_i
+XH2O_i=H2O_enhancement*XH2O_rel_H2*XH2_i
 XCH4_i=3*XCH4_rel_H2*XH2_i
 XPH3_i=3*XPH3_rel_H2*XH2_i
 XAr_i=3*XAr_rel_H2*XH2_i
@@ -101,7 +107,7 @@ R0p_i=co;
 
 P0_i=1;
 
-T_targ_i=165
+T_targ_i=166;
 
 P_targ_i=1;
 
@@ -127,45 +133,72 @@ AutoStep_constant=8;
 
 fp=0.25;
 dz=1;
+n_lindal=38;
 
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Begin Thermo-chemical Modeling
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cd TCM_mex
-[P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,g,mu,ref_w_o,ref_w,z]=TCM(dz,XHe_i,XH2S_i,XNH3_i,XH2O_i,XCH4_i,XPH3_i,XCO,P_temp,T_temp,g0_i,R0e_i,P0_i,T_targ_i,P_targ_i,P_term_i,1,27,SuperSatSelf_H2S,SuperSatSelf_NH3,SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,supersatH2S,AutoStep_constant,fp);
+[P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,...
+    clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,...
+    g,mu,ref_w_o,ref_w,z]=TCM(dz,XHe_i,XH2S_i,XNH3_i,XH2O_i,XCH4_i,XPH3_i,XCO,...
+                              P_temp,T_temp,g0_i,R0e_i,P0_i,T_targ_i,P_targ_i,P_term_i,dz,n_lindal,...
+                              SuperSatSelf_H2S,SuperSatSelf_NH3,SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,supersatH2S,...
+                              AutoStep_constant,fp);
 clear TCM;
 [me,n]=size(P);
 cd ..
-me=571;
-tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me),XHe(1:me),XH2S(1:me),XNH3(1:me),XH20(1:me),XCH4(1:me),XPH3(1:me),clouds(1:me),DNH4SH(1:me),DH2S(1:me),DNH3(1:me),DH2O(1:me),DCH4(1:me),DPH3(1:me),DSOL(1:me),g(1:me),mu(1:me),ref_w_o(1:me),ref_w(1:me)];
-tcmp(1:me,1:22)=[tcme(1:me,1:2),oblateness_factor.*tcme(1:me,3),tcme(1:me,4:22)];
- 
-  theta=0
-  Raydirection(1)=-cos(theta*(pi/180));
-  Raydirection(2)=sin(theta*(pi/180));
-     for j=1:6
-        no_ph3=0; 
-         [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM);
-          Tbeam_nadir
-         clear maintamone;
-     end
 
-  theta=54.5910 %along z
- %theta=54.5912 %along y
- %theta=60;
- %Set Viewing Geometry
- 
- X_direction=-cos(theta*(pi/180));
- Y_direction=0;
- Z_direction=sin(theta*(pi/180));
- 
-  Raydirection=[X_direction Y_direction Z_direction];
-  no_ph3=0;
-  for j=1:6
-      no_ph3=0;
-      [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM);
-      clear maintamone;
-      Tbeam_limb
-  end
-  R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
+for i=1:me
+    if(clouds(i)<1)
+        DSOL(i)=0;
+    end
+end
+
+%Equatorial
+tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me),XHe(1:me),XH2S(1:me),XNH3(1:me),XH20(1:me),XCH4(1:me),XPH3(1:me),...
+                 clouds(1:me),DNH4SH(1:me),DH2S(1:me),DNH3(1:me),DH2O(1:me),DCH4(1:me),DPH3(1:me),DSOL(1:me),...
+                 g(1:me),mu(1:me),ref_w_o(1:me),ref_w(1:me)];
+%Polar
+tcmp(1:me,1:22)=[tcme(1:me,1:2),oblateness_factor.*tcme(1:me,3),tcme(1:me,4:22)];
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Set Spacecraft Orientation
+theta=0
+Raydirection(1)=-cos(theta*(pi/180));
+Raydirection(2)=sin(theta*(pi/180));
+
+%Run Radiative Transfer model for 6 frequencies
+for j=1:6
+    no_ph3=0; 
+    [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+                                                                                   tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
+                                                                                   select_water_model,include_clouds,Ntheta,Nphi,BWHM);
+    clear maintamone;
+end
+
+
+% Set Spacecraft Orientation
+
+theta=54.5910 %along z
+%theta=54.5912 %along y
+%theta=60;
+%Set Viewing Geometry
+
+X_direction=-cos(theta*(pi/180));
+Y_direction=0;
+Z_direction=sin(theta*(pi/180));
+Raydirection=[X_direction Y_direction Z_direction];
+
+%Run Radiative Transfer Model For 3 Frequencies.
+no_ph3=0;
+for j=1:6
+    [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+                                                                                tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
+                                                                                select_water_model,include_clouds,Ntheta,Nphi,BWHM);
+    clear maintamone;
+end
+
+R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
 
 save(output_filename);
-
-
