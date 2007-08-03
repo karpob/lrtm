@@ -11,7 +11,7 @@ bo=ao;       % along y
 co=ao; % along z
 
 % Select a Filename
-output_filename='give_me_a_cool_name.mat';
+output_filename='Goodman_6x.mat';
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -29,7 +29,7 @@ select_ammonia_model=2;
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
-select_water_model=2;
+select_water_model=3;
 
 %include cloud absorption?
 %1=yes
@@ -97,9 +97,9 @@ XHe_i=XHe_rel_H2*XH2_i
 XCO=XAr_i;
 
 P_temp=1000;
-T_temp=1300;
+T_temp=1303.349;
 
-g0_i=2417;
+g0_i=2330; %2417;
 
 R0e_i=ao;
 
@@ -133,7 +133,7 @@ AutoStep_constant=8;
 
 fp=0.25;
 dz=1;
-n_lindal=38;
+n_lindal=49;
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Begin Thermo-chemical Modeling
@@ -149,11 +149,66 @@ clear TCM;
 [me,n]=size(P);
 cd ..
 
+
+%Filter values for clouds, make sure that the "clouds" variable is
+%consistent with cloud bulk density
+
+SOL_filter='000001'; %makes sure cloud is a liquid cloud 
+H2Oice_filter='000002'; % makes sure cloud is a H2O ice cloud
+NH4SH_filter='000020'; %makes sure there is a NH4SH ice cloud
+NH3_filter='000200'; %makes sure there is a NH3 ice cloud
+H2S_filter='002000'; %makes sure there is a H2S ice cloud
+CH4_filter='020000'; %makes sure there is a CH4 ice cloud
+PH3_filter='200000'; %makes sure there is a PH3 ice cloud
+
+%
+%
 for i=1:me
-    if(clouds(i)<1)
+    cval=num2str(clouds(i)); %get cloud phase value can convert to string
+%   Do kludge to pad the "cloud vector" with zeros    
+    if(length(cval)==1)
+        cval1=strcat('00000',cval);
+    end
+    if(length(cval)==2)
+        cval1=strcat('0000',cval);
+    end
+    if(length(cval)==3)
+        cval1==strcat('000',cval);
+    end
+    if(length(cval)==4)
+        cval1==strcat('00',cval);
+    end
+    if(length(cval)==5)
+        cval1=strcat('0',cval);
+    end
+% end padding kludge    
+
+%  Now we check to make sure each cloud really exists, if it doesn't
+%  set the cloud density to zero. Hey, its ugly, but it works...I think
+    if(cval1(6)~=SOL_filter(6))
         DSOL(i)=0;
     end
+    if(cval1(5)~=NH4SH_filter(5))
+        DNH4SH(i)=0;
+    end
+
+   % if(cval1(4)~=NH3_filter(4))
+   %     DNH3(i)=0;
+   % end
+    
+    if(cval1(3)~=H2S_filter(3))
+        DH2S(i)=0;
+    end
+    
+    if(cval1(2)~=CH4_filter(2))
+        DCH4(i)=0;
+    end
+    if(cval1(1)~=PH3_filter(1))
+        DPH3(i)=0;
+    end
 end
+
+
 
 %Equatorial
 tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me),XHe(1:me),XH2S(1:me),XNH3(1:me),XH20(1:me),XCH4(1:me),XPH3(1:me),...
@@ -161,7 +216,7 @@ tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me),XHe(1:me),XH2S(1:me),XNH3(1:m
                  g(1:me),mu(1:me),ref_w_o(1:me),ref_w(1:me)];
 %Polar
 tcmp(1:me,1:22)=[tcme(1:me,1:2),oblateness_factor.*tcme(1:me,3),tcme(1:me,4:22)];
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Set Spacecraft Orientation
 theta=0
