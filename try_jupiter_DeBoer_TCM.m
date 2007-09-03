@@ -11,7 +11,7 @@ bo=ao;       % along y
 co=ao; % along z
 
 % Select a Filename
-output_filename='Goodman_6x.mat';
+output_filename='give_me_a_cool_name.mat';
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -29,7 +29,7 @@ select_ammonia_model=2;
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
-select_water_model=3;
+select_water_model=2;
 
 %include cloud absorption?
 %1=yes
@@ -46,10 +46,8 @@ Spherecenter=[0 0 0];
 Raydirection=[-1 0 0];
 
 %Get Beam parameters
-Nphi=3*31; %Number of samples in phi
-Ntheta=4*31; %Number of samples in theta
+N_ring_one=4; %Number of beams in first phi ring
 BWHM=10; % Beamwidth Half-maximum
-
 
 % Juno bands
 f=[0.6,1.2,2.4,4.8,9.6,23]; %operating frequency in GHz
@@ -228,7 +226,7 @@ for j=1:6
     no_ph3=0; 
     [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                                                                    tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
-                                                                                   select_water_model,include_clouds,Ntheta,Nphi,BWHM);
+                                                                                   select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
 end
 
@@ -246,11 +244,12 @@ Z_direction=sin(theta*(pi/180));
 Raydirection=[X_direction Y_direction Z_direction];
 
 %Run Radiative Transfer Model For 3 Frequencies.
-no_ph3=0;
+
 for j=1:6
+    no_ph3=0;
     [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                                                                 tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
-                                                                                select_water_model,include_clouds,Ntheta,Nphi,BWHM);
+                                                                                select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
 end
 

@@ -1,17 +1,16 @@
-function [b1,b2,b3,b1w,b2w,b3w]=beamsample(Ntheta_0,Nphi,BWHM)
+function [b1,b2,b3,b1w,b2w,b3w]=beamsample(N_ring_one,BWHM)
 
 % For generating beam samples with 2pi symm in theta, with beamwidth of phi
-% N Number of original spacing in theta
-%Ntheta_0=4*31;  % Ntheta- first rings number of points
-%BWHM=10;
-%Nphi=3*31;	% Number of total phi rings 
+% Nphi=3 !!! You're stuck with this, unless you change dimensions of Tb to
+% include phi ie., get rid of Ta,Tb,Tc,Td convention in maintamone
+Nphi=3; %Don't touch this unless you want a wrong answer.
 dphi_degree=BWHM/Nphi;
 phi_degree=cumsum(dphi_degree.*ones(Nphi,1))
 n=phi_degree./dphi_degree % radius multiple from first ring
-Ntheta=Ntheta_0.*(2*(n)-1); % number of samples for each ring
+Ntheta=N_ring_one.*(2*(n)-1); % number of samples for each ring
 
 % center phi on z-axis (around pi/2)
-%phip=phi_degree-phi_degree(2);
+
 phi_degree_norm=90+phi_degree;
 phi=phi_degree_norm*pi/180; % convert to radian
 
@@ -60,23 +59,3 @@ b1w=wt(1);
 b2w=wt(2);
 b3w=wt(3);
 
-f=1;
-
-% 
-% 
-% 
-% 
-% a1=zeros(size(x1));
-% h1=quiver3(a1,a1,a1,x1,y1,z1,0,'.')
-% hold on
-% a2=zeros(size(x2));
-% h2=quiver3(a2,a2,a2,x2,y2,z2,0,'r.')
-% a3=zeros(size(x3));
-% h3=quiver3(a3,a3,a3,x3,y3,z3,0,'g.')
-% 
-% 
-% plot3(x1,y1,z1,'b.')
-% plot3(x2,y2,z2,'g.')
-% plot3(x3,y3,z3,'y.')
-
-%axis([-1 1 -1 1 0 1])

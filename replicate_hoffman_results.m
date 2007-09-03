@@ -104,18 +104,18 @@ for k=1:15
     [me(k),n]=size(P);
     cd ..
     tcme(1:me(k),1:22,k)=[P(1:me(k)),T(1:me(k)),z(1:me(k)),XH2(1:me(k)),XHe(1:me(k)),XH2S(1:me(k)),XNH3(1:me(k)),XH20(1:me(k)),XCH4(1:me(k)),XPH3(1:me(k)),clouds(1:me(k)),DNH4SH(1:me(k)),DH2S(1:me(k)),DNH3(1:me(k)),DH2O(1:me(k)),DCH4(1:me(k)),DPH3(1:me(k)),DSOL(1:me(k)),g(1:me(k)),mu(1:me(k)),ref_w_o(1:me(k)),ref_w(1:me(k))];
+    tcmp(1:me(k),1:22,k)=[tcme(1:me(k),1:2,k),(co/ao).*tcme(1:me(k),3,k),tcme(1:me(k),4:22,k)];
 end
 
-tcmp(1:me(k),1:22,k)=[tcme(1:me(k),1:2,k),(co/ao).*tcme(1:me(k),3,k),tcme(1:me(k),4:22,k)];
 
-load craft;
-Raydirection
-Rayorigin
+
+%load craft;
+%Raydirection
+%Rayorigin
 
 %Beam pattern parameters
-Ntheta=4;
+N_ring_one=4;
 BWHM=0.33;
-Nphi=3;
 
 f=13.78; %operating frequency in GHz
 
@@ -141,6 +141,8 @@ include_clouds=0;
  
 Rayorigin=[4.2e10 0 0]
 Sphereradius=ao;
+Spherecenter=[0 0 0];
+Raydirection=[-1 0 0];
 % theta=7.889
 
  for j=1:15
@@ -149,8 +151,9 @@ Sphereradius=ao;
      else
          no_ph3=1;
      end
-     [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM)
+     [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM)
      Model_names(j)
+     me(j)
      residual(j)=Tbeam(j)-Tbeam_thesis(j)
      
  end
@@ -164,8 +167,8 @@ Sphereradius=ao;
        else
            no_ph3=1;
        end
-       [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,Ntheta,Nphi,BWHM)
+       [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM)
        Model_names(j)
-       residual_seventy_five(j)=Tbeam_seventy_five-Tbeam_thesis_seventy_five(j)
+       residual_seventy_five(j)=Tbeam_seventy_five(j)-Tbeam_thesis_seventy_five(j)
    end
   

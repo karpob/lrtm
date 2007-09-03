@@ -103,25 +103,25 @@ if(include_clouds==0)
     end
 end
 
-save alfs
+%save alfs
 kappa=[kappa_1'];	% (in 1/cm) if limb-have passed same pressure twice-masterindex keeps track
-kappa_old=kappa;
-save old_kappa kappa_old
-f_old=f;
-T_old=T;
-P_old=P;
-P_H2_old=P_H2;
-P_He_old=P_He;
-P_NH3_old=P_NH3;
-P_H2O_old=P_H2O;
-P_CH4_old=P_CH4;
-P_PH3_old=P_PH3;
-P_H2S_old=P_H2S;
-XH2_old=XH2;
-XHe_old=XHe;
-XNH3_old=XNH3;
-XH2O_old=XH2O;
-select_ammonia_model_old=select_ammonia_model;
-select_water_model_old=select_water_model;
-save old_kappa_conditions f_old T_old P_old P_H2_old P_He_old P_NH3_old P_H2O_old P_CH4_old P_PH3_old P_H2S_old XH2_old XHe_old XNH3_old XH2O_old select_ammonia_model_old select_water_model_old;
+%kappa_old=kappa;
+%save old_kappa kappa_old
+%f_old=f;
+%T_old=T;
+%P_old=P;
+%P_H2_old=P_H2;
+%P_He_old=P_He;
+%P_NH3_old=P_NH3;
+%P_H2O_old=P_H2O;
+%P_CH4_old=P_CH4;
+%P_PH3_old=P_PH3;
+%P_H2S_old=P_H2S;
+%XH2_old=XH2;
+%XHe_old=XHe;
+%XNH3_old=XNH3;
+%XH2O_old=XH2O;
+%select_ammonia_model_old=select_ammonia_model;
+%select_water_model_old=select_water_model;
+%save old_kappa_conditions f_old T_old P_old P_H2_old P_He_old P_NH3_old P_H2O_old P_CH4_old P_PH3_old P_H2S_old XH2_old XHe_old XNH3_old XH2O_old select_ammonia_model_old select_water_model_old;
 
