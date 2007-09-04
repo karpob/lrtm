@@ -34,7 +34,7 @@ select_water_model=2;
 %include cloud absorption?
 %1=yes
 %0=no
-include_clouds=1;
+include_clouds=0;
 
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %load craft;
@@ -46,7 +46,7 @@ Spherecenter=[0 0 0];
 Raydirection=[-1 0 0];
 
 %Get Beam parameters
-N_ring_one=4; %Number of beams in first phi ring
+N_ring_one=8; %Number of beams in first phi ring
 BWHM=10; % Beamwidth Half-maximum
 
 % Juno bands
@@ -133,81 +133,21 @@ fp=0.25;
 dz=1;
 n_lindal=49;
 
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Begin Thermo-chemical Modeling
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 cd TCM_mex
 [P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,...
-    clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL,...
+    clouds,DNH4SH_i,DH2S_i,DNH3_i,DH2O_i,DCH4_i,DPH3_i,DSOL_i,...
     g,mu,ref_w_o,ref_w,z]=TCM(dz,XHe_i,XH2S_i,XNH3_i,XH2O_i,XCH4_i,XPH3_i,XCO,...
-                              P_temp,T_temp,g0_i,R0e_i,P0_i,T_targ_i,P_targ_i,P_term_i,dz,n_lindal,...
+                              P_temp,T_temp,g0_i,R0e_i,P0_i,T_targ_i,P_targ_i,P_term_i,1,n_lindal,...
                               SuperSatSelf_H2S,SuperSatSelf_NH3,SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,supersatH2S,...
                               AutoStep_constant,fp);
 clear TCM;
 [me,n]=size(P);
 cd ..
-
-
-%Filter values for clouds, make sure that the "clouds" variable is
-%consistent with cloud bulk density
-
-SOL_filter='000001'; %makes sure cloud is a liquid cloud 
-H2Oice_filter='000002'; % makes sure cloud is a H2O ice cloud
-NH4SH_filter='000020'; %makes sure there is a NH4SH ice cloud
-NH3_filter='000200'; %makes sure there is a NH3 ice cloud
-H2S_filter='002000'; %makes sure there is a H2S ice cloud
-CH4_filter='020000'; %makes sure there is a CH4 ice cloud
-PH3_filter='200000'; %makes sure there is a PH3 ice cloud
-
-%
-%
-for i=1:me
-    cval=num2str(clouds(i)); %get cloud phase value can convert to string
-%   Do kludge to pad the "cloud vector" with zeros    
-    if(length(cval)==1)
-        cval1=strcat('00000',cval);
-    end
-    if(length(cval)==2)
-        cval1=strcat('0000',cval);
-    end
-    if(length(cval)==3)
-        cval1==strcat('000',cval);
-    end
-    if(length(cval)==4)
-        cval1==strcat('00',cval);
-    end
-    if(length(cval)==5)
-        cval1=strcat('0',cval);
-    end
-% end padding kludge    
-
-%  Now we check to make sure each cloud really exists, if it doesn't
-%  set the cloud density to zero. Hey, its ugly, but it works...I think
-    if(cval1(6)~=SOL_filter(6))
-        DSOL(i)=0;
-    end
-    if(cval1(5)~=NH4SH_filter(5))
-        DNH4SH(i)=0;
-    end
-
-   % if(cval1(4)~=NH3_filter(4))
-   %     DNH3(i)=0;
-   % end
-    
-    if(cval1(3)~=H2S_filter(3))
-        DH2S(i)=0;
-    end
-    
-    if(cval1(2)~=CH4_filter(2))
-        DCH4(i)=0;
-    end
-    if(cval1(1)~=PH3_filter(1))
-        DPH3(i)=0;
-    end
-end
-
-
-
+[DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL]=filter_clouds(clouds,DNH4SH_i,DH2S_i,DNH3_i,DH2O_i,DCH4_i,DPH3_i,DSOL_i);
 %Equatorial
 tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me),XHe(1:me),XH2S(1:me),XNH3(1:me),XH20(1:me),XCH4(1:me),XPH3(1:me),...
                  clouds(1:me),DNH4SH(1:me),DH2S(1:me),DNH3(1:me),DH2O(1:me),DCH4(1:me),DPH3(1:me),DSOL(1:me),...
@@ -228,6 +168,7 @@ for j=1:6
                                                                                    tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
                                                                                    select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
+    Tbeam_nadir
 end
 
 
@@ -251,6 +192,7 @@ for j=1:6
                                                                                 tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
                                                                                 select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
+    Tbeam_limb
 end
 
 R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
