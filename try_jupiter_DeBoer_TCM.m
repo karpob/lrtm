@@ -74,6 +74,11 @@ f=[0.6,1.2,2.4,4.8,9.6,23]; %operating frequency in GHz
 H2O_enhancement=3;
 NH3_enhancement=3;
 
+% Temperature forcing
+TP_list={'Seiff_Jupiter','Lindal_Jupiter','Lindal_Saturn','whatever_is_in_TCM_mex'}
+TP_force='Seiff_Jupiter'; %'Lindal'
+
+
 %"Solar" Abundances
 XH2S_rel_H2=3.1e-5;
 XNH3_rel_H2=1.35e-4;
@@ -94,66 +99,37 @@ XAr_i=3*XAr_rel_H2*XH2_i
 XHe_i=XHe_rel_H2*XH2_i
 XCO=XAr_i;
 
+%Misc DeBoer TCM inputs
 P_temp=1000;
 T_temp=1303.349;
-
 g0_i=2330; %2417;
-
 R0e_i=ao;
-
-R0p_i=co;
-
 P0_i=1;
-
 T_targ_i=166;
-
 P_targ_i=1;
-
 P_term_i=0.141;
-
 use_lindal='Y';
-
-n_lindal_pts=27;
-
 SuperSatSelf_H2S=0;
-
 SuperSatSelf_NH3=0;
-
 SuperSatSelf_PH3=0;
-
 SuperSatSelf_H2O=0;
-
 supersatNH3=0;
-
 supersatH2S=0;
-
 AutoStep_constant=8;
-
 fp=0.25;
 dz=1;
-n_lindal=49;
+
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% Begin Thermo-chemical Modeling
+% Thermo-chemical Modeling
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cd TCM_mex
-[P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,...
-    clouds,DNH4SH_i,DH2S_i,DNH3_i,DH2O_i,DCH4_i,DPH3_i,DSOL_i,...
-    g,mu,ref_w_o,ref_w,z]=TCM(dz,XHe_i,XH2S_i,XNH3_i,XH2O_i,XCH4_i,XPH3_i,XCO,...
-                              P_temp,T_temp,g0_i,R0e_i,P0_i,T_targ_i,P_targ_i,P_term_i,1,n_lindal,...
-                              SuperSatSelf_H2S,SuperSatSelf_NH3,SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,supersatH2S,...
-                              AutoStep_constant,fp);
-clear TCM;
-[me,n]=size(P);
-cd ..
-[DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL]=filter_clouds(clouds,DNH4SH_i,DH2S_i,DNH3_i,DH2O_i,DCH4_i,DPH3_i,DSOL_i);
-%Equatorial
-tcme(1:me,1:22)=[P(1:me),T(1:me),z(1:me),XH2(1:me),XHe(1:me),XH2S(1:me),XNH3(1:me),XH20(1:me),XCH4(1:me),XPH3(1:me),...
-                 clouds(1:me),DNH4SH(1:me),DH2S(1:me),DNH3(1:me),DH2O(1:me),DCH4(1:me),DPH3(1:me),DSOL(1:me),...
-                 g(1:me),mu(1:me),ref_w_o(1:me),ref_w(1:me)];
-%Polar
-tcmp(1:me,1:22)=[tcme(1:me,1:2),oblateness_factor.*tcme(1:me,3),tcme(1:me,4:22)];
+[me,tcme,tcmp]=DeBoer_TCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_i,XCH4_i,...
+                                XPH3_i,XHe_i,XCO,P_temp,T_temp, g0_i,R0e_i,...
+                                P0_i,T_targ_i,P_targ_i,P_term_i,...
+                                use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
+                                SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
+                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 % Set Spacecraft Orientation
@@ -184,7 +160,7 @@ Y_direction=0;
 Z_direction=sin(theta*(pi/180));
 Raydirection=[X_direction Y_direction Z_direction];
 
-%Run Radiative Transfer Model For 3 Frequencies.
+%Run Radiative Transfer Model For 6 Frequencies.
 
 for j=1:6
     no_ph3=0;
