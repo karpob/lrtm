@@ -78,7 +78,7 @@ output_filename=strcat(Selected_Model,cloudz,'.mat');
 
 
 %Abundances
-XH2S_rel_H2=7.7e-7;
+XH2S_rel_H2=7.7e-5;
 XNH3_rel_H2=[4.55e-4,4.55e-4,2.0e-4,7.1e-4,4.55e-4,4.55e-4,2.3e-4];
 XH2O_rel_H2=[6.3838e-3,6.3838e-3,6.3838e-3,6.3838e-3,2.5535e-3,1.0214e-2,6e-4];
 XCH4_rel_H2=2.1e-3;
