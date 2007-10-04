@@ -18,32 +18,32 @@ output_filename='Saturn_Rsat_2.mat'
 %Change Number of radii from 2-8
 number_of_saturn_radii=2 
 
-for cases=1:16
+for cases=1:4
     if(cases<=4)
         theta=17.15;
         BWHM=0.37;
-    elseif(cases<=8)
-        theta=16.52;
-        BWHM=1.0;
-    elseif(cases<=12)
-        theta=17.15;
-        BWHM=0.37;
-    elseif(cases<=16)
-        theta=16.52;
-        BWHM=1.0;
+    %elseif(cases<=8)
+    %    theta=16.52;
+    %    BWHM=1.0;
+    %elseif(cases<=12)
+    %    theta=17.15;
+    %    BWHM=0.37;
+    %elseif(cases<=16)
+    %    theta=16.52;
+    %    BWHM=1.0;
     end
     
-    if((cases==1)|(cases==2)|(cases==5)|(cases==6)|(cases==9)|(cases==10)|(cases==13)|(cases==14))
+    if((cases==1)|(cases==3))%((cases==1)|(cases==2)|(cases==5)|(cases==6)|(cases==9)|(cases==10)|(cases==13)|(cases==14))
         select_ammonia_model=2;
     else
         select_ammonia_model=3;
     end
-    if((cases==1)|(cases==3)|(cases==5)|(cases==7)|(cases==9)|(cases==11)|(cases==13)|(cases==15))
+    %if%((cases==1)|(cases==3)|(cases==9)|(cases==11)|(cases==13)|(cases==15))
         select_water_model=2;
-    else
-        select_water_model=3;
-    end
-    if(cases<9)
+    %else
+    %    select_water_model=3;
+    %end
+    if(cases<3)
         include_clouds=0;
     else
         include_clouds=1;
@@ -78,24 +78,20 @@ for cases=1:16
 %
 % Cases for Sept 2007 Modeling Study
 %
-    Model_names={'Mean','En_Ammonia','Dep_Ammonia','En_Water','Dep_Water',...
-              'En_Phosphine','Dep_Phosphine','Mean_p_warming','Dep_Ammonia_p_Warming','Absent_Ammonia'};
+    Model_names={'En_Ammonia','Mean','40%1.4bar','40%2bar','Mean_p_warming','10per','Depleted'};
 
 %Fractions relative to H2
 
     qHe=0.135;
     qH2S=2.5874e-04;
 
-    qNH3=[3.5e-4, 6e-4, 1e-4, 3.5e-4, 3.5e-4...
-      3.5e-4, 3.5e-4, 3.5e-4, 1e-4, 0.0 ];
+    qNH3=[6e-4,4.3e-4, 4.3e-4,4.3e-4, 4.3e-4,4.3e-4,2.6e-4];
   
-    qH2O=[3.6e-4, 3.6e-4, 3.6e-4, 5.5e-4 1.7e-4...
-      3.6e-4, 3.6e-4, 3.6e-4, 3.6e-4 3.6e-4 ];
+    qH2O=[3.6e-3, 3.6e-3, 3.6e-3, 3.6e-3,3.6e-3,3.6e-3,3.6e-3 ];
 
     qCH4=5.1e-3;
 
-    qPH3=[ 6.4e-6, 6.4e-6, 6.4e-6, 6.4e-6, 6.4e-6,...
-       7.4e-6, 3.9e-6, 6.4e-6, 6.4e-6, 6.4e-6 ];
+    qPH3=[6.4e-6, 6.4e-6, 6.4e-6, 6.4e-6, 6.4e-6,6.4e-6,6.4e-6 ];
 
 %Calculate Actual Mole Fraction of each species
     for i=1:length(qNH3)
@@ -163,7 +159,27 @@ for cases=1:16
                                     use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
                                     SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
                                     supersatH2S,AutoStep_constant,fp,dz,oblateness_factor);
-
+        if (k==3)
+            for jj=1:me(k)
+                if(tcme(jj,1,k)<1.4)
+                    tcme(jj,7,k)=0.40*tcme(jj,7,k);
+                end
+            end
+        end
+        if (k==4)
+            for jj=1:me(k)
+                if(tcme(jj,1,k)<3)
+                    tcme(jj,7,k)=0.40*tcme(jj,7,k);
+                end
+            end
+        end
+        if (k==6)
+            for jj=1:me(k)
+                if(tcme(jj,1,k)<3)
+                    tcme(jj,7,k)=0.10*tcme(jj,7,k);
+                end
+            end
+        end
     end
 
 
@@ -176,7 +192,7 @@ for cases=1:16
     no_ph3=1; %use PH3 decay
 
     for j=1:length(xHe)
-        [Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+        [xxPH3,Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                f,no_ph3,select_ammonia_model,select_water_model,...
                                include_clouds,N_ring_one,BWHM);
@@ -188,12 +204,14 @@ for cases=1:16
     Raydirection=[X_direction Y_direction Z_direction];
 
     for j=1:length(xHe)       
-        [Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+        [xxPH3,Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                     tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                     f,no_ph3,select_ammonia_model,select_water_model,...
                                     include_clouds,N_ring_one,BWHM);
+        tcme(1:me(j),10,j)=fliplr(xxPH3(1:me(j)));
+        clear xxPH3;
     end
-
+     
     R(:,cases)=100*(Tbeam_nadir(:,cases)-Tbeam_limb(:,cases))./Tbeam_nadir(:,cases);
 end
 save(output_filename);
