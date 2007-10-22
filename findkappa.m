@@ -1,4 +1,4 @@
-function kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_ammonia_model,select_water_model,include_clouds)
+function kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_h2h2_model,select_ammonia_model,select_water_model,include_clouds)
 
 % function kappa=findkappa(f,T,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3)
 % Finds the atmospheric absorption along the raypath
@@ -55,7 +55,21 @@ cd ..
 % Call Hydrogen
 cd h2
 for k=1:stopindex
-   alphah2(k)=falphah2(f,T(k),P_H2(k),P_He(k),P_CH4(k));
+   if(select_h2h2_model==1)
+       alphah2(k)=falphah2(f,T(k),P_H2(k),P_He(k),P_CH4(k));
+   end
+   if(select_h2h2_model==2)
+       alphah2(k)=falphah2_goodman(f,T(k),P_H2(k),P_He(k));
+   end
+   if(select_h2h2_model==3)
+       alphah2(k)=falphah2_goodman_by_joiner(f,T(k),P_H2(k),P_He(k));
+   end
+   if(select_h2h2_model==4)
+       alphah2(k)=falpha_borysow(f,T(k),P(k));
+   end
+   if(select_h2h2_model==5)
+       alphah2(k)=falpha_orton(f,T(k),P(k));
+   end
 end   
 cd ..
 % Call Water Vapor
@@ -105,6 +119,7 @@ end
 
 %save alfs
 kappa=[kappa_1'];	% (in 1/cm) if limb-have passed same pressure twice-masterindex keeps track
+save kappa
 %kappa_old=kappa;
 %save old_kappa kappa_old
 %f_old=f;

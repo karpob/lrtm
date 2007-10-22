@@ -55,6 +55,13 @@ for cases=1:4
 
     f=13.78; %operating frequency in GHz
 
+%select_h2h2_model
+%1=joiner
+%2=goodman
+%3=goodman by joiner
+%4=borysow
+%5=borysow with orton modification
+select_h2h2_model=5;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -194,7 +201,7 @@ for cases=1:4
     for j=1:length(xHe)
         [xxPH3,Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
-                               f,no_ph3,select_ammonia_model,select_water_model,...
+                               f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
                                include_clouds,N_ring_one,BWHM);
     end
 
@@ -206,7 +213,7 @@ for cases=1:4
     for j=1:length(xHe)       
         [xxPH3,Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                     tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
-                                    f,no_ph3,select_ammonia_model,select_water_model,...
+                                    f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
                                     include_clouds,N_ring_one,BWHM);
         tcme(1:me(j),10,j)=fliplr(xxPH3(1:me(j)));
         clear xxPH3;

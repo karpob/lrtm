@@ -10,7 +10,13 @@ ao=71492*100000; % along x (in centimeters)
 bo=ao;       % along y
 co=ao; % along z
 
-
+%select_h2h2_model
+%1=joiner
+%2=goodman
+%3=goodman by joiner
+%4=borysow
+%5=borysow with orton modification
+select_h2h2_model=4;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -49,8 +55,8 @@ N_ring_one=8; %Number of beams in first phi ring
 BWHM=10; % Beamwidth Half-maximum
 
 % Juno bands
-f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
-%f=[0.4:0.1:10,10:1:25];
+%f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
+f=[0.4:0.1:10,10:1:25];
 nfreq=length(f)
 Selected_Model='Mean_Lindal'
 
@@ -145,7 +151,7 @@ Raydirection(2)=sin(theta*(pi/180));
 for j=1:length(f)
     no_ph3=0; 
     [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
-                                                                                   tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
+                                                                                   tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
                                                                                    select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
     Tbeam_nadir
@@ -169,7 +175,7 @@ Raydirection=[X_direction Y_direction Z_direction];
 for j=1:length(f)
     no_ph3=0;
     [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
-                                                                                tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
+                                                                                tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
                                                                                 select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
     Tbeam_limb

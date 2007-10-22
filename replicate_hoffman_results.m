@@ -119,6 +119,14 @@ BWHM=0.33;
 
 f=13.78; %operating frequency in GHz
 
+%select_h2h2_model
+%1=joiner
+%2=goodman
+%3=goodman by joiner
+%4=borysow
+%5=borysow with orton modification
+select_h2h2_model=5;
+
 %select_ammonia_model
 %1 original hoffman coding of spilker
 %2 toms code joiner-steffes
@@ -151,7 +159,7 @@ Raydirection=[-1 0 0];
      else
          no_ph3=1;
      end
-     [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM)
+     [Tbeam(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM)
      Model_names(j)
      me(j)
      residual(j)=Tbeam(j)-Tbeam_thesis(j)
@@ -167,7 +175,7 @@ Raydirection=[-1 0 0];
        else
            no_ph3=1;
        end
-       [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM)
+       [Tbeam_seventy_five(j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,tcme(1:me(j),:,j),tcmp(1:me(j),:,j),ao,bo,co,f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM)
        Model_names(j)
        residual_seventy_five(j)=Tbeam_seventy_five(j)-Tbeam_thesis_seventy_five(j)
    end

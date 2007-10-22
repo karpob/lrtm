@@ -13,6 +13,14 @@ co=ao; % along z
 % Select a Filename
 output_filename='give_me_a_cool_name.mat';
 
+%select_h2h2_model
+%1=joiner
+%2=goodman
+%3=goodman by joiner
+%4=borysow
+%5=borysow with orton modification
+select_h2h2_model=5;
+
 %select_ammonia_model
 %1 original hoffman coding of spilker
 %2 toms code joiner-steffes
@@ -141,7 +149,7 @@ Raydirection(2)=sin(theta*(pi/180));
 for j=1:6
     no_ph3=0; 
     [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
-                                                                                   tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
+                                                                                   tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
                                                                                    select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
     Tbeam_nadir
@@ -165,7 +173,7 @@ Raydirection=[X_direction Y_direction Z_direction];
 for j=1:6
     no_ph3=0;
     [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
-                                                                                tcme,tcmp,ao,bo,co,f(j),no_ph3,select_ammonia_model,...
+                                                                                tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
                                                                                 select_water_model,include_clouds,N_ring_one,BWHM);
     clear maintamone;
     Tbeam_limb
