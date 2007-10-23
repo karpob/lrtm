@@ -28,6 +28,15 @@ elseif(strcmp(TP_list(3),TP_force))
     n_lindal=length(TP_in_directory);
 
 elseif(strcmp(TP_list(4),TP_force))
+    system('cp TCM_mex/TP.URN TCM_mex/TP.TCM');
+    TP_in_directory=load('TCM_mex/TP.TCM');
+    n_lindal=length(TP_in_directory);
+
+elseif(strcmp(TP_list(5),TP_force))
+    system('cp TCM_mex/TP.NEP TCM_mex/TP.TCM');
+    TP_in_directory=load('TCM_mex/TP.TCM');
+    n_lindal=length(TP_in_directory);
+elseif(strcmp(TP_list(6),TP_force))
     TP_in_directory=load('TCM_mex/TP.TCM');
     n_lindal=length(TP_in_directory);
 else

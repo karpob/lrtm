@@ -1,12 +1,19 @@
 % Go crazy! run it a whole bunch of times!
 %
 clear all;
-oblateness_factor=0.935;
-%oblateness_factor=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%Planet verticies                                   %
+%Planet verticies
+% Note all planet verticies are equal oblateness factor
+% applied inside DeBoer_TCM function
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-ao=71492*100000; % along x (in centimeters)
+%oblateness_factor=0.935; %Jupiter oblateness factor R_pole/R_equator
+%oblateness_factor=0.902; %Saturn oblateness factor
+oblateness_factor=0.977; %Uranus oblateness factor
+%oblateness_factor=0.983; %Neptune oblateness factor
+%ao=71492*100000; % along x (in centimeters) Jupiter
+%ao=60268*100000; %along x (in centimeters) Saturn
+ao=25559*100000; % along x (in centimeters) Uranus
+%ao=24764*100000; % along x (in centimeters) Neptune
 bo=ao;       % along y
 co=ao*oblateness_factor; % along z
 
@@ -45,7 +52,7 @@ include_clouds=0;
 %load craft;
 
 %spacecraft parameters
-Rayorigin=[ao+(4500*100000) 0 0];
+Rayorigin=[ao+2*ao 0 0];
 Sphereradius=ao;
 Spherecenter=[0 0 0];
 Raydirection=[-1 0 0];
@@ -56,23 +63,15 @@ BWHM=10; % Beamwidth Half-maximum
 
 % Juno bands
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
-f=[0.4:0.1:10,10:1:25];
+f=[10:10:225];
 nfreq=length(f)
 Selected_Model='Mean_Lindal'
 
-Model_Names={'Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',...
-             'Depleted_Water','Enhanced_Water','Hot_Spot'}
-
-
 
 % Temperature forcing
-TP_list={'Seiff_Jupiter','Lindal_Jupiter','Lindal_Saturn','whatever_is_in_TCM_mex'}
-if(strcmp(Selected_Model,Model_Names(2))|strcmp(Selected_Model,Model_Names(7)))
-    TP_force='Seiff_Jupiter';
-else
-    TP_force='Lindal_Jupiter';
-end
+TP_list={'Seiff_Jupiter','Lindal_Jupiter','Lindal_Saturn','Lindal_Uranus','Lindal_Neptune','whatever_is_in_TCM_mex'}
 
+TP_force='Lindal_Uranus';
 
 % Select a Filename
 if(include_clouds==1)
@@ -80,16 +79,17 @@ if(include_clouds==1)
 else
     cloudz='_No_Clouds';
 end
+Selected_Model='Uranus';
 output_filename=strcat(Selected_Model,cloudz,'.mat');
 
 
 %Abundances
-XH2S_rel_H2=7.7e-5;
-XNH3_rel_H2=[4.55e-4,4.55e-4,2.0e-4,7.1e-4,4.55e-4,4.55e-4,2.3e-4];
-XH2O_rel_H2=[6.3838e-3,6.3838e-3,6.3838e-3,6.3838e-3,2.5535e-3,1.0214e-2,6e-4];
-XCH4_rel_H2=2.1e-3;
-XPH3_rel_H2=6e-7;
-XHe_rel_H2=0.157;
+XH2S_rel_H2=1.18e-4;
+XNH3_rel_H2=1.53e-4;
+XH2O_rel_H2=1.213e-3;
+XCH4_rel_H2=2.0e-2;
+XPH3_rel_H2=4.297e-7;
+XHe_rel_H2=0.15;
 for i=1:length(XNH3_rel_H2)
     XH2(i)=1/(1+XHe_rel_H2+XH2S_rel_H2+XNH3_rel_H2(i)+XH2O_rel_H2(i)+ XCH4_rel_H2+ XPH3_rel_H2);
 
@@ -103,14 +103,14 @@ for i=1:length(XNH3_rel_H2)
 end
 
 %Misc DeBoer TCM inputs
-P_temp=1000;
-T_temp=1303.349;
-g0_i=2330; %2417;
+P_temp=500;
+T_temp=573;
+g0_i=870; %2417;
 R0e_i=ao;
 P0_i=1;
-T_targ_i=166;
-P_targ_i=1;
-P_term_i=0.141;
+T_targ_i=100.9;
+P_targ_i=2.309;
+P_term_i=0.001;
 use_lindal='Y';
 SuperSatSelf_H2S=0;
 SuperSatSelf_NH3=0;
@@ -124,14 +124,14 @@ dz=1;
 XCO=0;
  table_output=[XH2;XHe;(1e6)*XH2S;(1e6)*XNH3;(1e6)*XH2O;(1e6)*XCH4;(1e6)*XPH3];
     to_dlm=transpose(table_output);
-    dlmwrite('mole_fractions_jupiter.dat',to_dlm,'delimiter','&','precision','%.4f')
+    dlmwrite('mole_fractions_uranus.dat',to_dlm,'delimiter','&','precision','%.4f')
 
-for i=1:length(XNH3)
-    if(strcmp(Selected_Model,Model_Names(i)))
-        case_select=i;
-    end
-end
-
+%for i=1:length(XNH3)
+%    if(strcmp(Selected_Model,Model_Names(i)))
+%        case_select=i;
+%    end
+%end
+case_select=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Thermo-chemical Modeling
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -160,7 +160,7 @@ end
 
 % Set Spacecraft Orientation
 
-theta=54.5910 %along z
+theta=17 %along z
 %theta=54.5912 %along y
 %theta=60;
 %Set Viewing Geometry
