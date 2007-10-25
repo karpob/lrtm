@@ -16,7 +16,7 @@ co=ao*oblateness_factor; % along z
 %3=goodman by joiner
 %4=borysow
 %5=borysow with orton modification
-select_h2h2_model=4;
+select_h2h2_model=1;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -58,7 +58,7 @@ BWHM=10; % Beamwidth Half-maximum
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
 f=[0.4:0.1:10,10:1:25];
 nfreq=length(f)
-Selected_Model='Mean_Lindal'
+Selected_Model='Depleted_Ammonia'
 
 Model_Names={'Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',...
              'Depleted_Water','Enhanced_Water','Hot_Spot'}

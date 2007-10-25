@@ -15,6 +15,10 @@ function [intercept,internormal,d,limbflag]=rayellipseint(Rayorigin,Raydirection
 % Also can find the pathlength through the spherical shells model
 % In this case the ray origin is the last intercept point and the ray direction
 % must be found a priori from snells law for spherical shells and refractive index
+% 
+% Modification by Karpowicz. Include "negation" when ray origin is within the
+% ellipsoid to a tolerance of 1e-6. (if the equation for an ellipse is <1 to
+% a tolerance of 1e-6 or 0.9999....) 
 %fred=1
 
 % Put into notation of the Haines text (Ray tracing, Glassner ed)
@@ -37,6 +41,18 @@ a=1/(ellipse.a^2);	% ellipse x^2/a^2 + y^2/b^2 etc=> making a==1/a^2 instead (fa
 b=1/(ellipse.b^2);
 c=1/(ellipse.c^2);
 
+%added by BMK
+%
+% Check to see if ray originates from within ellipsoid
+% as per Mohammed, 2005
+
+origin_ellipse_val=((X0^2)*a)+((Y0^2)*b)+((Z0^2)*c);
+tolerance_roundoff=1e-6;
+flip_rnormal=0;
+if(origin_ellipse_val<1-tolerance_roundoff)
+    flip_rnormal=1
+   origin_ellipse_val
+end
 
 %%%%
 % End conversion of inputs
@@ -156,4 +172,8 @@ zn=delnormal_num(3)/delnormal_den;
 
 intercept=[xi yi zi];			% This is a vector location
 internormal=[xn yn zn];			% This is a vector direction
+%added by BMK to ensure conditions according to Mohammed
+if(flip_rnormal==1)
+    internormal=-1*internormal;
+end
 isone=(xi^2)*a+(zi^2)*c+(yi^2)*b;
