@@ -427,6 +427,7 @@ void new_layer(int j, float dz, int *eflag)
             {
                   dXH2O = layer[j].XH2O - layer[j-1].XH2O;
                   layer[j].DSOL = 1e6*( (1.0-C_sol_NH3)*AMU_H2O*dXH2O + C_sol_NH3*AMU_NH3*dXNH3)*P*P/(R*T*dP);
+                  layer[j].DSOL_NH3=1e6*(C_sol_NH3*AMU_NH3*dXNH3*P*P)/(R*T*dP);
                   layer[j].DH2O = ZERO;
                   if (layer[j].DSOL > COUNT_CLOUD)
                         layer[j].clouds+=1L;

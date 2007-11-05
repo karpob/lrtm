@@ -34,7 +34,7 @@ double  getMatlabScalar    (const mxArray* ptr);
 int getMatlabInt (const mxArray* ptr);
 double& createMatlabScalar (mxArray*& ptr);
 const int numInputArgs  = 26;
-const int numOutputArgs = 22;
+const int numOutputArgs = 23;
 float Hydrogen_Curve_Fit_Select;
 
 void mexFunction(int nlhs, mxArray *plhs[],
@@ -44,7 +44,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
       float P, T, T_err=100.0, f=1.0, T_bright, T_ob, W;
       float refr, refr2, dawf,z_offset;
       char outfile[15],use_lindal_i='Y';
-	  double *P_out,*T_out,*XH2_out,*XHe_out,*XH2S_out,*XNH3_out,*DH2S_out,*XH2O_out,*XCH4_out,*XPH3_out,*clouds_out,*DNH4SH_out,*DNH3_out,*DH2O_out,*DCH4_out,*DPH3_out,*DSOL_out,*g_out,*mu_out,*refr_w_o_out,*refr_w_out,*z_out;
+	  double *P_out,*T_out,*XH2_out,*XHe_out,*XH2S_out,*XNH3_out,*DH2S_out,*XH2O_out,*XCH4_out,*XPH3_out,*clouds_out,*DNH4SH_out,*DNH3_out,*DH2O_out,*DCH4_out,*DPH3_out,*DSOL_out,*g_out,*mu_out,*refr_w_o_out,*refr_w_out,*z_out,*DSOL_NH3_out;
 	  
       FILE *ofp1;
 	  
@@ -192,6 +192,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	  plhs[19] = mxCreateDoubleMatrix(top+1, 1, mxREAL);
 	  plhs[20] = mxCreateDoubleMatrix(top+1, 1, mxREAL);
 	  plhs[21] = mxCreateDoubleMatrix(top+1, 1, mxREAL);
+          plhs[22] = mxCreateDoubleMatrix(top+1, 1, mxREAL);
 	  /*1 2  3   4   5    6    7    8     9      10    11   12   13   14   15   16   17  18 19 20       21        */
      /*P T XH2 XHe XH2S XNH3 XH2O XCH4 XPH3  clouds DNH4SH DH2S DNH3 DH2O DCH4 DPH3 DSOL g mu refr_w/o refr_ w/  */
 	  P_out = mxGetPr(plhs[0]); //1
@@ -216,7 +217,8 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	  refr_w_o_out=mxGetPr(plhs[19]); //20
 	  refr_w_out=mxGetPr(plhs[20]); //21
 	  z_out=mxGetPr(plhs[21]); //22
-	  
+	  DSOL_NH3_out=mxGetPr(plhs[22]);;//23
+
 	   for (j =0 ;j<=top;++j)
       {     
             if(layer[j].P<P0 && !cross_my_P0)
@@ -251,7 +253,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 			DSOL_out[j]=layer[j].DSOL;
 			g_out[j]=layer[j].g;
 			mu_out[j]=layer[j].mu;
-			
+			DSOL_NH3_out[j]=layer[j].DSOL_NH3;
             refr = layer[j].XH2*REFR_H2  +layer[j].XHe*REFR_He  +layer[j].XH2S*REFR_H2S+layer[j].XPH3*REFR_PH3;
             refr+= layer[j].XNH3*REFR_NH3+layer[j].XCH4*REFR_CH4+layer[j].XH2O*REFR_H2O(T);
             refr*= ( P*(293.0/T) );
