@@ -1,8 +1,33 @@
 function [b1,b2,b3,b1w,b2w,b3w]=beamsample(N_ring_one,BWHM)
 
+% function beamsample
+% 
+%   This function samples a gaussian beam using 3 "rings" in the phi direction and equally spaced rays in theta. The number of
+%   samples in the first ray is supplied, and the other 2 rings are equally spaced according to Nrings_k=N_ring_one*(2*k-1)
+%   where k is either the second or third ring. This is called by maintamone.m.
+%
+%
+%    VARIABLE DEFINITIONS:
+%
+%               ->  INPUT:
+%
+%                       ->N_ring_one: number of samples in the first ring.
+%                       ->BWHM: Beamwidth half-maximum or the 3dB beamwidth of the gaussian antenna beam.
+%
+%               <-  OUTPUT: 
+% 
+%                       <-b1: Beamsamples for ring 1
+%                       <-b2: Beamsamples for ring 2
+%                       <-b3: Beamsamples for ring 3
+%                       <-b1w: Beamweight for ring 1
+%                       <-b2w: Beamweight for ring 2
+%                       <-b3w: Beamweight for ring 3
+
 % For generating beam samples with 2pi symm in theta, with beamwidth of phi
 % Nphi=3 !!! You're stuck with this, unless you change dimensions of Tb to
 % include phi ie., get rid of Ta,Tb,Tc,Td convention in maintamone
+
+
 Nphi=3; %Don't touch this unless you want a wrong answer.
 dphi_degree=BWHM/Nphi;
 phi_degree=cumsum(dphi_degree.*ones(Nphi,1))

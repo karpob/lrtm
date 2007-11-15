@@ -1,9 +1,37 @@
 function [intercept,internormal,d,t,masterindex,missflag]=findraypath(recordlength,refindex,P,ellipses,Rayorigin,Raydirection)
 
-% function [intercpt,internormal,d,t]=findraypath(recordlength,refindex,P,ellipses)
-% d is the raypath distance, t is the theta2,
-% ellipses is an object with ellipses.a/b/c for sizes of ellisphiod axes
-% Pmin/max are the min and max pressure stop values -tells when to terminate
+% function findraypath
+%        Flow: maintamone <-findraypath
+% 
+%        This function calculates the path (ds', neat way of avoiding the use of mu) and direction for all rays.
+%
+%        Variable Definitions:
+%                 
+%                     ->INPUT:
+%                             ->recordlength: number of layers
+%                             ->refindex: refractive index of the layer
+%                             ->P: layer(s) pressure(s) in bars
+%                             ->ellipses: dimensions for elliptical shells
+%                                  ellipses.a: dimensions for elliptical shells along X dimension
+%                                  ellipses.b: dimensions for elliptical shells along Y dimension
+%                                  ellipses.c: dimensions for elliptical shells along Z dimension
+%                             ->Rayorigin: X Y Z position of the spacecraft
+%                             ->Raydirection: X Y Z orientation of the spacecraft  
+%
+%                     <-OUTPUT:
+%                              <-intercept: intercept values of each ray with each elliptical shell
+%                              <-internormal: normal direction values for each ray/ellipse intersection
+%                              <-d: length of each ray (ds) for each layer
+%                              <-t: angle relative to normal for each bent ray (theta_2)
+%                              <-masterindex: index which maps ray direction arrays?
+%                              <-missflag: flag for when the ray misses the atmosphere
+
+
+
+%JPH function [intercpt,internormal,d,t]=findraypath(recordlength,refindex,P,ellipses)
+%JPH d is the raypath distance, t is the theta2,
+%JPH ellipses is an object with ellipses.a/b/c for sizes of ellisphiod axes
+%JPH Pmin/max are the min and max pressure stop values -tells when to terminate
 
 global CRITICALFLAG
 

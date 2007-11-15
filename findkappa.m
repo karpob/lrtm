@@ -1,13 +1,36 @@
 function kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_h2h2_model,select_ammonia_model,select_water_model,include_clouds)
 
 % function kappa=findkappa(f,T,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3)
-% Finds the atmospheric absorption along the raypath
-% File structure of TCM.out
-% P T XH2 XHe XH2S XNH3 XH2O XCH4 XPH3  clouds DNH4SH DH2S DNH3 DH2O DCH4 DPH3 DSOL g mu refr_w/o refr_ w/
-% Passes in should be in T(Kelvin), P(bars)
-% Some models require different units, but will be interpreted internally
+% Finds the atmospheric absorption at each pressure level.
+% 
+%
+%
+%            VARIABLE DEFINITIONS:
+%
+%                        -->INPUT:
+%                               ->f: Frequency in GHz
+%                               ->T; Temperature Profile (K)
+%                               ->P: Pressure Profile (bars)
+%                               ->P_H2: Partial pressure of hydrogen/H2 (bars)
+%                               ->P_He: Partial pressure of helium (bars)
+%                               ->P_NH3: Partial pressure of ammonia (bars)
+%                               ->P_H2S: Partial pressure of hydrogen sulfide (bars)
+%                               ->XH2: absolute Mole fraction of hydrogen/H2 
+%                               ->XHe: absolute Mole fraction of He
+%                               ->XNH3: absolute Mole fraction ammonia
+%                               ->XH2O: absolute mole fraction of water
+%                               ->DNH4SH: cloud density of ammonium hydrosulfide cloud (g/cm^3)
+%                               ->DNH3: cloud density of ammonia ice (g/cm^3)
+%                               ->DH2O: cloud density of water ice (g/cm^3)
+%                               ->DSOL: cloud density of water ammonia solution (g/cm^3)
+%                               ->select_h2h2_model: select hydrogen continuum absorption model (1=Joiner Model, 2=Goodman, 3=Goodman by Joiner, 4=Borysow, 5=Borysow Orton modification
+%                               ->select_ammonia_model: select ammonia absorption model (1=Spilker original Hoffman coding,2=Joiner Steffes 3=Berge Gulkis 4=Mohammed Steffes KA_band 5=Spilker Model
+%                               ->select_water_model: select water absorption model (1=DeBoer Original, 2=DeBoer Corrected, 3=Goodman)
+%                               ->include_clouds: select whether or not to include cloud absorption (1=Yes, 0=No)
+%                        <--OUTPUT:
+%                               <-kappa:layer(s) absorption coefficient in cm^-1
 % Output shoud be in optical depths per centimeter
-% This puts out optical depths per kilometer
+
 % THIS VERSION USED FOR IMAGING DOES ALL PRESSURE LEVELS-TO BE USED MULTIPLE TIMES FOR
 % THE DIFFERENT LOOK ANGLES
 

@@ -1,6 +1,24 @@
 function refindex=findrefindex(T,P_H2,P_He)
-% NOT ITERATIVE -FINDS REFRACTIVE INDEX PROFILE
-% P must be in bars, T in kelvin
+%
+% function findrefindex
+%
+% Calculate the refractive index of each layer. Note refractive index only accounts for H2 and He.
+% 
+%             VARIABLE DEFINITIONS:
+%
+%                        -->  INPUT:
+%
+%                             ->T: temperature of the layer in K
+%                             ->P_H2: Partial pressure of Hydrogen (H2) in bars
+%                             ->P_He: Partial pressure of Helium in bars
+%
+%                        <-- OUTPUT:
+%
+%                              <--Refractive index of the layer
+
+
+%JPH NOT ITERATIVE -FINDS REFRACTIVE INDEX PROFILE
+%JPH P must be in bars, T in kelvin
 
 
 Nr.H2=124.4.*P_H2.*(293./T);

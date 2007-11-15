@@ -1,13 +1,30 @@
 function [Tatm,wlayers]=ftam(T,tau,tau_a,masterindex)
 
-% function Tatm=ftam(T,tau,tau_a)
-% T is the vector from ?top to bottom of thermal temperatures
-% tau is the vector of integrated absorptions from top to bottom ?
-% tau_a is the vector of absorptions for each layer top to bottom
-% Units are kelvin and opdepths
-% The first layer is the ray from the craft to the surface
-% its tau, tau_a, T, are zero
-% So T(1) should always be zero
+% function ftam
+%
+%
+%            Calculate the brightness temperature, and weighting function for a given ray.
+%            
+%            VARIABLE DEFINITIONS:
+%                        
+%                         ->INPUT:
+%                              ->  T: physical temperature of the layer
+%                              ->tau: total optical depth from bottom to current layer
+%                           -> tau_a: optical depth of each layer across ds
+%                     ->  masterindex: layer index
+%
+%                        <-OUTPUT:
+%                          <-Tatm: Brightiness temperature for each ray
+%                          <-wlayers: weighting function for each ray    
+
+%JPH function Tatm=ftam(T,tau,tau_a)
+%JPH T is the vector from ?top to bottom of thermal temperatures
+%JPH tau is the vector of integrated absorptions from top to bottom ?
+%JPH tau_a is the vector of absorptions for each layer top to bottom
+%JPH Units are kelvin and opdepths
+%JPH The first layer is the ray from the craft to the surface
+%JPH its tau, tau_a, T, are zero
+%JPH So T(1) should always be zero
 
 loss=exp(-tau);
 emit=T(masterindex).*(1-exp(-tau_a));

@@ -1,6 +1,9 @@
 function wght=fwght(layers,masterindex)
 
-
+% function fwght
+%
+% This function checks to see that double contributions are included in the weighting functions
+%
 
 
 sl=size(layers,2);

@@ -1,4 +1,24 @@
 function [DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL]=filter_clouds(clouds,DNH4SH,DH2S,DNH3,DH2O,DCH4,DPH3,DSOL)
+% function filter_clouds 
+%
+% This function is used by DeBoer_TCM.m to ensure that clouds exist above DeBoer's threshold values defined by his long int 
+% "clouds" which states the cloud type, phase at each altitude.
+%
+%     Variable Definitions:
+%               
+%      ---->INPUT:         clouds: Long int taken from DeBoer's C program which gives cloud types and phase present at each
+%                                  pressure level.
+%     <---->INPUT/OUTPUT   DNH4SH: cloud density of the ammonium hydrosulfide cloud (g/cm^3)
+%                          DH2S: cloud density of the hydrogen sulfide cloud (g/cm^3)
+%                          DNH3: cloud density of the ammonia ice cloud (g/cm^3)
+%                          DH2O: cloud density of the water ice cloud (g/cm^3)
+%                          DCH4: cloud density of the methane cloud (g/cm^3)
+%                          DPH3: cloud density of the phosphine cloud (g/cm^3)
+%                          DSOL: cloud density of the ammonia-water solution cloud (g/cm^3)
+%
+%            
+%
+%
 %Filter values for clouds, make sure that the "clouds" variable is
 %consistent with cloud bulk density
 
