@@ -44,8 +44,8 @@ include_clouds=0;
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
 %
-% refractivity_source=0; % No bending due to refraction n=1.0D0
- refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
+ refractivity_source=0; % No bending due to refraction n=1.0D0
+% refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,7 +65,7 @@ BWHM=10; % Beamwidth Half-maximum
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
 f=[0.4:0.1:10,10:1:25];
 nfreq=length(f)
-Selected_Model='Mean_Lindal'
+Selected_Model='Enhanced_Water'
 
 Model_Names={'Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',...
              'Depleted_Water','Enhanced_Water','Hot_Spot'}

@@ -31,7 +31,7 @@ if (reference_select==0)
 end
 
 if (reference_select==1)
-	Nr.H2=124.43.*P_H2.*(293./T);
+	Nr.H2=124.4.*P_H2.*(293./T); % Note Hoffman truncated/rounded to the nearest tenth
 	Nr.He=35.83.*P_He.*(293./T);
 end
 
