@@ -2,7 +2,7 @@ function [Tbeam,jims_zenith,wfwa,...
           intercepts_boresight,intercepts_b,...
           intercepts_c,intercepts_d]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                                  tcme,tcmp,ao,bo,co,f,no_ph3,...
-                                          select_h2h2_model,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM)
+                                          select_h2h2_model,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM,refractivity_source)
 global CRITICALFLAG
 CRITICALFLAG=0				% If is '1' then critical refraction reached for that ray
 USEBEAM=1;
@@ -68,7 +68,7 @@ sph3=size(P_PH3);
 
 
 % Find the refractive index profile
-refindex=findrefindex(T,P_H2,P_He);
+refindex=findrefindex(T,P_H2,P_He,refractivity_source);
 
 % Find the elliptical shells used by 'findraypath' (major/minor) are vectors of how radius changes with each index
 ellipses=findellipseradiusvector(ao,bo,co,major,minor);

@@ -41,6 +41,13 @@ select_water_model=2;
 %0=no
 include_clouds=0;
 
+% refractivity_source
+% Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
+%
+% refractivity_source=0; % No bending due to refraction n=1.0D0
+ refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
+% refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
+% refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %load craft;
 
@@ -58,7 +65,7 @@ BWHM=10; % Beamwidth Half-maximum
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
 f=[0.4:0.1:10,10:1:25];
 nfreq=length(f)
-Selected_Model='Depleted_Ammonia'
+Selected_Model='Mean_Lindal'
 
 Model_Names={'Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',...
              'Depleted_Water','Enhanced_Water','Hot_Spot'}
@@ -152,7 +159,7 @@ for j=1:length(f)
     no_ph3=0; 
     [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                                                                    tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
-                                                                                   select_water_model,include_clouds,N_ring_one,BWHM);
+                                                                                   select_water_model,include_clouds,N_ring_one,BWHM,refractivity_source);
     clear maintamone;
     Tbeam_nadir
 end
@@ -176,7 +183,7 @@ for j=1:length(f)
     no_ph3=0;
     [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                                                                 tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
-                                                                                select_water_model,include_clouds,N_ring_one,BWHM);
+                                                                                select_water_model,include_clouds,N_ring_one,BWHM,refractivity_source);
     clear maintamone;
     Tbeam_limb
 end
