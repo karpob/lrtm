@@ -6,7 +6,7 @@
 
 #define nbgetc()        bioskey(0) & 0xFF
 
-#define MAXLAYERS       1200
+#define MAXLAYERS       100000
 #define R               8.3143E7    /* Universal gas constant [erg/K/mol] */
 #define AMU             1.66056E-24 /* Atomic Mass Unit in grams */
 #define AMU_H2          2.016

@@ -3,7 +3,8 @@ function [me,tcme,tcmp,DSOL_NH3]=DeBoer_TCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_
                                 P0_i,T_targ_i,P_targ_i,P_term_i,...
                                 use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
                                 SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
-                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor)
+                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,...
+                                dP_init,dP_fine,P_fine_start,P_fine_stop)
 % function DeBoer_TCM is a matlab wrapper for the DeBoer Thermo chemical model. The function TCM is a mex
 % module which must be compiled. The source/mex module is located in TCM_mex. TCM module is compiled by:
 % >mex *.C -o TCM
@@ -41,6 +42,12 @@ function [me,tcme,tcmp,DSOL_NH3]=DeBoer_TCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_
 %               ->       fp: ortho-para hydrogen selector 0.0=equilibrium,  -1.0=intermediate, 0.25 = normal
 %               ->       dz: altitude step, if you go with autostep, set this to 0
 %               ->       oblateness_factor: ratio of polar to equitorial radius
+%               ->       use_dz: Set this to 1 if you want to step using a step in altitude, if you want a step in
+%                                pressure set this to 0
+%               ->       dP_init: initial coarse pressure step
+%               ->       dP_fine: fine pressure step
+%               ->       P_fine_start: Pressure level to start stepping with fine dP
+%               ->       P_fine_stop: Pressure level to stop stepping with fine dP 
 %
 %  OUTPUT
 %              <-        me:length of the tcme array (number of pressure levels)
@@ -126,7 +133,7 @@ cd TCM_mex
                               P_temp,T_temp,g0_i,R0e_i,P0_i,T_targ_i,P_targ_i,P_term_i,1,n_lindal,...
                               SuperSatSelf_H2S,SuperSatSelf_NH3,SuperSatSelf_PH3,...
                               SuperSatSelf_H2O,supersatNH3,supersatH2S,...
-                              AutoStep_constant,fp);
+                              AutoStep_constant,fp,dP_init,dP_fine,P_fine_start,P_fine_stop,use_dz);
 clear TCM;
 [me,n]=size(P);
 cd ..

@@ -9,8 +9,9 @@ extern struct ATM_LAYER *layer;
 extern float P_targ, T_targ, P_term, g0, R0, P0, zP0, supersatNH3, supersatH2S;
 extern float *TfL, *PfL, lawf[];
 extern char use_lindal, line[];
-extern int sol_cloud, NH4SH_cloud_base, AutoStep, CrossP0;
+extern int sol_cloud, NH4SH_cloud_base, AutoStep, CrossP0,jj;
 extern double XCO,AutoStep_constant;
+extern int use_dz;
 static int n_lindal_pts, hereonout;
 extern float Hydrogen_Curve_Fit_Select;
 float gravity(int j);
@@ -19,7 +20,8 @@ float sat_pressure(char component[], float T);
 float solution_cloud(float T, float PNH3, float PH2O, float *SPNH3, float *SPH2O);
 float h2s_dissolve(int j, float *SPH2S);
 float latent_heat(char component[], float T);
-float get_dP(int j, int *eflag, float dz);
+float get_dP_using_dz(int j, int *eflag, float dz);
+float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
 float get_dT(int j, float T, float P, float dP, float *LX, float *L2X);
 float SuperSatSelf[5];
 
@@ -72,7 +74,6 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
 	  
 	  //***************** Write values to layer.out file *******************************//  
    //fio   fprintf(lfp,"XH2S=%g XNH3=%g XPH3=%g XH2O=%g XCH4=%g XHE=%g\n",layer[n].XH2S,layer[n].XNH3,layer[n].XPH3,layer[n].XH2O,layer[n].XCH4,layer[n].XHe);
-      
 	//fio  fprintf(lfp,"T(deep)=%g P(deep)=%g T(targ)=%g P(targ)=%g P(term)=%g\n",layer[n].T,layer[n].P,T_targ,P_targ,P_term);
 	  
    //fio   fprintf(lfp,"Supersat:  NH3=%g\tH2S=%g\n",supersatNH3,supersatH2S);
@@ -143,7 +144,7 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
       return (1);
 }
 
-void new_layer(int j, float dz, int *eflag)
+void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, float P_fine_stop)
 {
       int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0;
       float LX[6]={0.0,0.0,0.0,0.0,0.0,0.0}, L2X[6]={0.0,0.0,0.0,0.0,0.0,0.0};
@@ -162,7 +163,13 @@ void new_layer(int j, float dz, int *eflag)
       layer[j].clouds=0L;
       if (j==1) hereonout=0;
       /*  Get new P,dP and T,dT values  */
-      dP = get_dP(j,eflag,dz);
+
+      if (use_dz)
+      {
+      	dP = get_dP_using_dz(j,eflag,dz);
+      }
+      else dP=get_dP_using_dP(j, eflag, dP_init, dP_fine, P_fine_start, P_fine_stop);
+
       dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X); /*dry adiabat*/
       P  = layer[j].P;
       T  = layer[j].T;
@@ -506,7 +513,7 @@ void new_layer(int j, float dz, int *eflag)
       return;
 }
 
-float get_dP(int j, int *eflag, float dz)
+float get_dP_using_dz(int j, int *eflag, float dz)
 {
       float P, T, H, dP;
 
@@ -545,6 +552,54 @@ float get_dP(int j, int *eflag, float dz)
            CrossP0 = 1;
       }
 
+      return (dP);
+}
+
+float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop)
+{
+      float dz, P, T, H, dP, new_P_fine, new_P_coarse;
+      H = R*layer[j-1].T/(layer[j-1].mu*layer[j-1].g);
+      new_P_fine=layer[j-1].P - dP_fine;
+      new_P_coarse=layer[j-1].P - dP_init;
+      
+      
+      if((new_P_fine > P_fine_start)||(new_P_coarse > P_fine_start))
+      {
+       dP= -1.0*dP_init;
+       P= layer[j-1].P + dP;
+      }
+      else if((new_P_fine <= P_fine_start)&&(new_P_fine > P_targ))
+      {
+          dP= -1.0*dP_fine;
+          P= layer[j-1].P + dP;
+      }
+      else if (P<= P_targ && *eflag != 97)
+      {
+           *eflag = 98;
+           P = P_targ;
+           dP = PfL[1]-P_targ;
+           jj=j;
+      }
+      else if (P <=P_targ)
+      {
+           dP=PfL[j-jj+1]-layer[j-1].P;
+           P=layer[j-1].P+dP;
+          
+      }
+      if(P <= P_term)
+      {
+           *eflag = 99;
+           P= P_term;
+           dP=P - layer[j-1].P;
+      }
+      dz= -1.0*dP/((layer[j-1].P/H)*(1e5));
+      layer[j].P = P;
+      layer[j].z = layer[j-1].z + dz;
+      if(P<P0 && !CrossP0)
+      {
+           zP0= layer[j].z;
+           CrossP0=1;
+      }
       return (dP);
 }
 

@@ -39,13 +39,13 @@ select_water_model=2;
 %include cloud absorption?
 %1=yes
 %0=no
-include_clouds=0;
+include_clouds=1;
 
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
 %
- refractivity_source=0; % No bending due to refraction n=1.0D0
-% refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
+% refractivity_source=0; % No bending due to refraction n=1.0D0
+ refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -65,7 +65,7 @@ BWHM=10; % Beamwidth Half-maximum
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
 f=[0.4:0.1:10,10:1:25];
 nfreq=length(f)
-Selected_Model='Enhanced_Water'
+Selected_Model='Mean_Lindal'
 
 Model_Names={'Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',...
              'Depleted_Water','Enhanced_Water','Hot_Spot'}
@@ -129,6 +129,12 @@ AutoStep_constant=8;
 fp=0.25;
 dz=1;
 XCO=0;
+use_dz=0;
+dP_init=1;
+dP_fine=0.0001;
+P_fine_start=10;
+P_fine_stop=1;
+
  table_output=[XH2;XHe;(1e6)*XH2S;(1e6)*XNH3;(1e6)*XH2O;(1e6)*XCH4;(1e6)*XPH3];
     to_dlm=transpose(table_output);
     dlmwrite('mole_fractions_jupiter.dat',to_dlm,'delimiter','&','precision','%.4f')
@@ -147,7 +153,7 @@ end
                                 P0_i,T_targ_i,P_targ_i,P_term_i,...
                                 use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
                                 SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
-                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor);
+                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,dP_init,dP_fine,P_fine_start,P_fine_stop);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set Spacecraft Orientation
 theta=0
