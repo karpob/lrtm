@@ -297,3 +297,4 @@ weightingfactor=(wfwa+sumb+sumc+sumd)/(1+b1w+b2w+b3w);
 % need to pad the wfw's somehow to be same length-need to average the
 % multiple beams together
 % need to take of care the zeros that come from limb sound-screws wieght
+

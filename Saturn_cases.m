@@ -61,7 +61,7 @@ for cases=1:4
 %3=goodman by joiner
 %4=borysow
 %5=borysow with orton modification
-select_h2h2_model=5;
+select_h2h2_model=1;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -73,14 +73,22 @@ select_h2h2_model=5;
 % spilker correction factor C goes negative, giving negative absorption
 % coefficient
 
-%select_ammonia_model=3;
+%select_ammonia_model=2;
 
 %select_water_model
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 goodman 1969 water vapor model
-%select_water_model=3;
+%select_water_model=2;
 
+% refractivity_source
+% Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
+%
+% refractivity_source=0; % No bending due to refraction n=1.0D0
+ refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
+% refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
+% refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
+% %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
 % Cases for Sept 2007 Modeling Study
@@ -123,12 +131,12 @@ select_h2h2_model=5;
     xCO=0;
     P_temp=70;
     T_temp=489.5;
-    g0=900.0;
-    R0=ao;
-    P0=1.0
-    T_targ=146.2;
-    P_targ=1.29848
-    P_term=0.0631;
+    g0_i=900.0;
+    R0e_i=ao;
+    P0_i=1.0
+    T_targ_i=146.2;
+    P_targ_i=1.29848
+    P_term_i=0.0631;
     use_lindal='Y';
     n_lindal_pts=27;
     SuperSatSelf_H2S=0.0;
@@ -141,6 +149,12 @@ select_h2h2_model=5;
     dz=1;
     TP_list={'Seiff_Jupiter','Lindal_Jupiter','Lindal_Saturn','whatever_is_in_TCM_mex'}
     AutoStep_constant=8;
+    use_dz=1;
+    dP_init=1;
+    dP_fine=0.0001;
+    P_fine_start=10;
+    P_fine_stop=1;
+
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %   Run TCM, and arrange variables for maintam      %
@@ -161,11 +175,11 @@ select_h2h2_model=5;
         end
     
     [me(k),tcme(1:me(k),:,k),tcmp(1:me(k),:,k)]=DeBoer_TCM(TP_list,TP_force,xH2S(k),xNH3(k),xH2O(k),xCH4(k),...
-                                    xPH3(k),xHe(k),xCO,P_temp,T_temp, g0,R0,...
-                                    P0,T_targ,P_targ,P_term,...
-                                    use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
-                                    SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
-                                    supersatH2S,AutoStep_constant,fp,dz,oblateness_factor);
+                                xPH3(k),xHe(k),xCO,P_temp,T_temp, g0_i,R0e_i,...
+                                P0_i,T_targ_i,P_targ_i,P_term_i,...
+                                use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
+                                SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
+                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,dP_init,dP_fine,P_fine_start,P_fine_stop);
         if (k==3)
             for jj=1:me(k)
                 if(tcme(jj,1,k)<1.4)
@@ -199,10 +213,10 @@ select_h2h2_model=5;
     no_ph3=1; %use PH3 decay
 
     for j=1:length(xHe)
-        [xxPH3,Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+        [Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
-                               include_clouds,N_ring_one,BWHM);
+                               include_clouds,N_ring_one,BWHM,refractivity_source);
     end
 
     X_direction=-cos(theta*(pi/180));
@@ -211,12 +225,24 @@ select_h2h2_model=5;
     Raydirection=[X_direction Y_direction Z_direction];
 
     for j=1:length(xHe)       
-        [xxPH3,Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+        [Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                     tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                     f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
-                                    include_clouds,N_ring_one,BWHM);
-        tcme(1:me(j),10,j)=fliplr(xxPH3(1:me(j)));
-        clear xxPH3;
+                                    include_clouds,N_ring_one,BWHM,refractivity_source);
+                               clear ph3decay;
+                               
+                             % Sorry! ugly piece to flip around PH3 so you
+                             % can plot it nicely against P.
+                               xxxPH3=tcme(1:me(j),10,j);   % Get the value of PH3 from tcm matrix
+                               ph3_size=size(xxxPH3,1);     % get the size of the PH3 vector
+                               kk=(0:ph3_size-1);           % create a reverse index of kk
+                               xxPH3=[0;xxxPH3(ph3_size-kk)]; % flip the phosphine vector and add a zero (hangover from hoffman code)
+                               P=tcme(1:me(j),1,j);           % Get the pressure vector
+                               Pp=[0;P(ph3_size-kk)];         % add zero and flip Pressure vector
+                               decay=ph3decay(Pp,xxPH3);      % run the phosphine decay routine
+                               close_ph3=decay(ph3_size-kk);  % flip the phosphine back
+                               ph3_flipped=fliplr(close_ph3);  % flip it again
+                               tcme(1:me(j),10,j)=ph3_flipped; % save it as a vector
     end
      
     R(:,cases)=100*(Tbeam_nadir(:,cases)-Tbeam_limb(:,cases))./Tbeam_nadir(:,cases);
