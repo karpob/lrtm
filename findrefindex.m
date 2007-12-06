@@ -1,4 +1,4 @@
-function refindex=findrefindex(T,P_H2,P_He,reference_select)
+function refindex=findrefindex(T,P_H2,P_He,P_CH4,P_H2O,reference_select)
 %
 % function findrefindex
 %
@@ -10,7 +10,8 @@ function refindex=findrefindex(T,P_H2,P_He,reference_select)
 %
 %                             ->T: temperature of the layer in K
 %                             ->P_H2: Partial pressure of Hydrogen (H2) in bars
-%                             ->P_He: Partial pressure of Helium in bars
+%                             ->P_He: Partial pressure of Helium (He) in bars
+%                             ->P_CH4: Partial pressure of Methane (CH4) in bars 
 %                             ->reference_select: Select reference source
 %                                               0=No refraction ie. n=1.0D0
 %                                               1=Original DeBoer/Hoffman He/H2
@@ -42,10 +43,16 @@ end
 if (reference_select==3)
         Nr.H2=136.*(P_H2./1.01325).*(273./T);
         Nr.He=35.*(P_He./1.01325).*(273./T);
+        Nr.CH4=440.*(P_CH4./1.01325).*(273./T);
+        Nr.H2O=3.73e5.*(P_H2O.*1000).*(1./(T.*T));
 %      Add some other cool/hot gases at some point
 end
-
-Nr.tot=Nr.He+Nr.H2;
+if(reference_select<3)
+    Nr.tot=Nr.He+Nr.H2;
+else
+    Nr.tot=Nr.He+Nr.H2+Nr.CH4+Nr.H2O;
+end
 n=(Nr.tot./10^6)+1;
 refindex=[n;1];
-% last digit just a dummy for the raypath loop
+% last digit just a dummy for the raypath loop where pressure is zero. ie.
+% a place for cold space P=0 T=2.7 K
