@@ -47,7 +47,8 @@ include_clouds=1;
 % refractivity_source=0; % No bending due to refraction n=1.0D0
 % refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
- refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
+% refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
+ refractivity_source=4; % Karpowicz H2, He, CH4 etc.. using Essen, and other source
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %load craft;
 

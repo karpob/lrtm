@@ -68,7 +68,7 @@ sph3=size(P_PH3);
 
 
 % Find the refractive index profile
-refindex=findrefindex(T,P_H2,P_He,P_CH4,P_H2O,refractivity_source);
+refindex=findrefindex(T,P_H2,P_He,P_CH4,P_H2O,DSOL,f,refractivity_source);
 
 % Find the elliptical shells used by 'findraypath' (major/minor) are vectors of how radius changes with each index
 ellipses=findellipseradiusvector(ao,bo,co,major,minor);
