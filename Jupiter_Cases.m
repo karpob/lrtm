@@ -44,11 +44,11 @@ include_clouds=1;
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
 %
-% refractivity_source=0; % No bending due to refraction n=1.0D0
+ refractivity_source=0; % No bending due to refraction n=1.0D0
 % refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
- refractivity_source=4; % Karpowicz H2, He, CH4 etc.. using Essen, and other source
+% refractivity_source=4; % Karpowicz H2, He, CH4 etc.. using Essen, and other source
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %load craft;
 
@@ -128,11 +128,11 @@ supersatNH3=0;
 supersatH2S=0;
 AutoStep_constant=8;
 fp=0.25;
-dz=1;
+dz=0;
 XCO=0;
 use_dz=1;
 dP_init=1;
-dP_fine=0.0001;
+dP_fine=0.01;
 P_fine_start=10;
 P_fine_stop=1;
 
