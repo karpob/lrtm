@@ -19,7 +19,8 @@ function refindex=findrefindex(T,P_H2,P_He,P_CH4,P_H2O,D_SOL,f,reference_select)
 %                                               0=No refraction ie. n=1.0D0
 %                                               1=Original DeBoer/Hoffman He/H2
 %                                               2=Karpowicz He/H2
-%                                               3=Karpowicz Everything (He,H2,NH3, etc..)
+%                                               3=Karpowicz (H2,He,CH4,H2O,No Clouds) 
+%                                               4=Karpowicz (H2,He,CH4,H2O, Solution Cloud)
 %
 %                        <-- OUTPUT:
 %
@@ -62,9 +63,15 @@ if (reference_select==4)
 end
 if(reference_select<3)
     Nr.tot=Nr.He+Nr.H2;
-else
+end
+if(reference_select==3)
     Nr.tot=Nr.He+Nr.H2+Nr.CH4+Nr.H2O;
 end
+if(reference_select==4)
+    Nr.tot=Nr.He+Nr.H2+Nr.CH4+Nr.H2O+Nr.Solution_Cloud;
+end
+
+
 n=(Nr.tot./10^6)+1;
 refindex=[n;1];
 % last digit just a dummy for the raypath loop where pressure is zero. ie.
