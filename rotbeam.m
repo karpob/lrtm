@@ -1,4 +1,4 @@
-function  [Vr1,Vr2,Vr3,Zr]=rotbeam(Raydirection,b1,b2,b3) 
+function  [Vr1,Zr]=rotbeam(Raydirection,b1) 
 x=[1 0 0];
 z=[0 0 1];
 
@@ -73,8 +73,8 @@ Rz=[cos(rang_e) -sin(rang_e) 0;
 %   p=[x1 y1 z1];
 Zr=(Rx*Ry*Rz*inv(Ry)*inv(Rx)*z');
 Vr1=(Rx*Ry*Rz*inv(Ry)*inv(Rx)*b1);
-Vr2=(Rx*Ry*Rz*inv(Ry)*inv(Rx)*b2);
-Vr3=(Rx*Ry*Rz*inv(Ry)*inv(Rx)*b3);
+%Vr2=(Rx*Ry*Rz*inv(Ry)*inv(Rx)*b2);
+%Vr3=(Rx*Ry*Rz*inv(Ry)*inv(Rx)*b3);
 
 %   p=(Rx*Ry*Rz*inv(Ry)*inv(Rx)*p');
 %   pp=[0 0 0;p'];

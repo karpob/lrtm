@@ -1,8 +1,7 @@
 function [Tbeam,jims_zenith,wfwa,refindex,...
-          intercepts_boresight,intercepts_b,...
-          intercepts_c,intercepts_d]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+          intercepts_boresight,intercepts_b]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
                                                  tcme,tcmp,ao,bo,co,f,no_ph3,...
-                                          select_h2h2_model,select_ammonia_model,select_water_model,include_clouds,N_ring_one,BWHM,refractivity_source)
+                                          select_h2h2_model,select_ammonia_model,select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source)
 global CRITICALFLAG
 CRITICALFLAG=0				% If is '1' then critical refraction reached for that ray
 USEBEAM=1;
@@ -130,21 +129,16 @@ end
 % tau_a is the tau of that layer, tau is the cumulative summations of those layers
 % Now do the beamspread and rotate beampattern to lookvector
 
-[b1,b2,b3,b1w,b2w,b3w]=beamsample(N_ring_one,BWHM);
+[beamz,beam_weightz,beam_weighted_ave]=beamsample(Nphi,N_ring_one,BWHM);
 
-[Vr1,Vr2,Vr3,Zr]=rotbeam(Raydirection,b1,b2,b3);
+[Vr1,Zr]=rotbeam(Raydirection,beamz);
 
 % initialize wlayersa,b,c,d
 wlayersb=zeros(length(P),length(Vr1));
-wlayersc=zeros(length(P),length(Vr2));
-wlayersd=zeros(length(P),length(Vr3));
+
 % masterindex for wght fnctns
 windexb=zeros(length(P),length(Vr1));
-windexc=zeros(length(P),length(Vr2));
-windexd=zeros(length(P),length(Vr3));
 missb=0;
-missc=0;
-missd=0;
 
 VRONE=0
 for p=1:length(Vr1);
@@ -174,118 +168,41 @@ for p=1:length(Vr1);
       
    end
 end
-VRTWO=0
-for p=1:length(Vr2)
-   bs=bs+1;						% bs-beamspread- keeps track of beamspread samples
-   Raydirection=[Vr2(:,p)]';
-   [intercept,internormal,d,t,masterindexc,missflag]=findraypath(recordlength,refindex,P,ellipses,Rayorigin,Raydirection);
-   windexc(1:size(masterindexc,1),p)=masterindexc;
-   disc=d;
-   if missflag==1
-      disp('This beam-sample(c) Misses Planet')
-      Tatmc(p)=2.7;
-      wlayersc(:,p)=0;
-      crap=12;
-      surc(p,:)=[0 0 0];
-      missc=missc+1;
-   elseif CRITICALFLAG==1;
-      disp('Critical Refraction')
-      [tau_a,tau]=ftau(kappa,d,masterindexc);	% Comes out with deepest first
-      [Tatmc(p),wtemp]=ftam(T,tau,tau_a,masterindexc);
-      wlayersc(1:size(wtemp,1),p)=wtemp;
-      surc(p,:)=intercept(1,:);
-      CRITICALFLAG=0;
-   else
-      [tau_a,tau]=ftau(kappa,d,masterindexc);	% Comes out with deepest first
-      [Tatmc(p),wlayersc(:,p)]=ftam(T,tau,tau_a,masterindexc);
-      surc(p,:)=intercept(1,:);
-      intercepts_c(p,:,:)=intercept;
-   end
-end
-VRTHREE=0   
-for p=1:length(Vr3)
-   bs=bs+1;						% bs-beamspread- keeps track of beamspread samples
-   Raydirection=[Vr3(:,p)]';
-   [intercept,internormal,d,t,masterindexd,missflag]=findraypath(recordlength,refindex,P,ellipses,Rayorigin,Raydirection);
-   windexd(1:size(masterindexd,1),p)=masterindexd;
-   disd=d;
-   if missflag==1
-      disp('This beam-sample (d) Misses Planet')
-      Raydirection
-      Tatmd(p)=2.7;
-      wlayersd(:,p)=0;
-      surd(p,:)=[0 0 0];
-      missd=missd+1;
 
-   elseif CRITICALFLAG==1;
-      disp('Critical Refraction')
-      [tau_a,tau]=ftau(kappa,d,masterindexd);	% Comes out with deepest first
-      [Tatmd(p),wtemp]=ftam(T,tau,tau_a,masterindexd);
-      wlayersd(1:size(wtemp,1),p)=wtemp;
-      surd(p,:)=intercept(1,:);
-      CRITICALFLAG=0;
-      
-   else
-      [tau_a,tau]=ftau(kappa,d,masterindexd);	% Comes out with deepest first
-      [Tatmd(p),wlayersd(:,p)]=ftam(T,tau,tau_a,masterindexd);
-      surd(p,:)=intercept(1,:);
-      intercepts_d(p,:,:)=intercept;
-   end
-end
 
 % Apply Beam weights (Beam coupling)
 % T=sum(1,N)Tn*(exp(-2.76*(deltabw/3db)^2))
-b1w
-b2w
-b3w
+
 Na=length(Tatma);
 Nb=length(Tatmb);
-Nc=length(Tatmc);
-Nd=length(Tatmd);
-
-numa=sum(Tatma.*1);
-dena=sum(Na*1);
-numb=sum(Tatmb.*b1w);
-denb=sum(Nb*b1w);
-numc=sum(Tatmc.*b2w);
-denc=sum(Nc*b2w);
-numd=sum(Tatmd.*b3w);
-dend=sum(Nd*b3w);
-
+size(beam_weightz);
 Twa=sum(Tatma)*1./Na;
-Twb=sum(Tatmb)*b1w./Nb;
-Twc=sum(Tatmc)*b2w./Nc;
-Twd=sum(Tatmd)*b3w./Nd;
-Tbeam=(Twa+Twb+Twc+Twd)/(1+b1w+b2w+b3w);
+Twb=sum(Tatmb*beam_weightz');
+
+
+Tbeam=(Twa+Twb)/(1+beam_weighted_ave);%2;%/(1+beam_weight_total);
 
 % Find weighting function
 wfa=1.*fwght(wlayersa,masterindexa);
-wfb=b1w.*fwght(wlayersb,windexb);
-wfc=b2w.*fwght(wlayersc,windexc);
-wfd=b3w.*fwght(wlayersd,windexd);
+%wfb=beam_weightz.*fwght(wlayersb,windexb);
 
 % To make Matlab happy-make all the weight vectors the same size by padding with zeros
 % to the size of the Pressure vector
 sP=size(P,1);
 sa=zeros(sP-size(wfa,1),1);
-sb=zeros(sP-size(wfb,1),1);
-sc=zeros(sP-size(wfc,1),1);
-sd=zeros(sP-size(wfd,1),1);
+%sb=zeros(sP-size(wfb,1),1);
+
 
 % wfwa is already only 1 column
 wfwa=[wfa;sa];
 % turn into columns
-wfwb=[wfb;sb];
-wfwc=[wfc;sc];
-wfwd=[wfd;sd];
+%wfwb=[wfb;sb];
 
 
-sumb=sum(wfwb,2)./(size(Vr1,2)-missb);
-sumc=sum(wfwc,2)./(size(Vr2,2)-missc);
-sumd=sum(wfwd,2)./(size(Vr3,2)-missd);
+%sumb=sum(wfwb,2)./(size(Vr1,2)-missb);
 
 
-weightingfactor=(wfwa+sumb+sumc+sumd)/(1+b1w+b2w+b3w);
+%weightingfactor=(wfwa+sumb)/(1+b1w);
 
 
 % find out how many 

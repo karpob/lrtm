@@ -73,6 +73,4 @@ end
 
 
 n=(Nr.tot./10^6)+1;
-refindex=[n;1];
-% last digit just a dummy for the raypath loop where pressure is zero. ie.
-% a place for cold space P=0 T=2.7 K
+refindex=n;

@@ -38,18 +38,7 @@ global CRITICALFLAG
 % Initiate Matrices
 intercept=zeros((recordlength+1),3);
 internormal=zeros((recordlength+1),3);
-%d=zeros((recordlength+1),1);
-%t=d;
 rd=zeros((recordlength),3);
-
-% Generate a Pressure vector that can be tested for the loop with a unphysical stop value
-Ppad1=-1;					% Stop value for min pressure
-Ppad2=1e6;					% Stop value for max pressure
-Ptemp=[P;Ppad2];			% Adding STOP Value to highest-to be stripped off later
-Pmax=Ppad2;
-Pmin=Ppad1;
-
-
 
 % Does spacecraft see the planet intitially???
 
@@ -82,33 +71,32 @@ end
 
 
 % HEY-NOW NEED TO PRECALC RADIUS OF PLANET SHELLS
-%masterindex=1;
-k=1;
-P_ray=Ptemp(k);					% initialize
+
 masterindex=[];
-while P_ray<Pmax
-   %k;
+for k=1:length(P)
+   P_ray=P(k);
    ellipse.a=ellipses.a(k);
    ellipse.b=ellipses.b(k);
    ellipse.c=ellipses.c(k);
-   %ellipse
-   %Rayorigin
-   %Raydirection
+
    [A,B,C,limbflag]=rayellipseint(Rayorigin,Raydirection,ellipse);
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%  If we get a limb flag meaning the ray is tangent to the ellipsoid otherwise skip this bit
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
    if limbflag==1
-      sprintf('Ray has passed out of atmosphere at k= %.0f\n',k)
+      sprintf('Limb sounding? Ray has passed out of atmosphere at k= %.0f\n',k)
       m=k-1;									% decrement k back to pre-limb case
-      Ptemp=[Ppad1;P];						% Add STOP value for min Pressure
-      while P_ray>Pmin   %might need to change???include pmin?
-         % All stays same but sphere-to be tested is now larger one (from previous k)
-         %[k,m]
+      kk=k;						% Value of k from outer loop
+      while P_ray >= min(P)   
+         % All stays same but sphere-to be tested is now larger one (from previous k)    
          ellipse.a=ellipses.a(m);
          ellipse.b=ellipses.b(m);
          ellipse.c=ellipses.c(m);
          [A,B,C,limbflag]=rayellipseint(Rayorigin,Raydirection,ellipse);
-         intercept(k,:)=A;					% k has still be incremented-keep as index?
-         internormal(k,:)=B;
-         d(k)=C;
+         intercept(kk,:)=A;					% k has still be incremented-keep as index?
+         internormal(kk,:)=B;
+         d(kk)=C;
          eta1=refindex(m);
          eta2=refindex(m-1);
          % Using regular snells  -taken care of sphere with ray-sphere intersection test
@@ -121,38 +109,37 @@ while P_ray<Pmax
             return %this should kick back to maintam
          end
          
-         t(k)=theta2;		% saves value of theta2-mostly for debugging
+         t(kk)=theta2;		% saves value of theta2-mostly for debugging
          % New Rayorigin is current intercept
-         Rayorigin=intercept(k,:);
+         Rayorigin=intercept(kk,:);
          % New Raydirection is 'transmitted'
          Raydirection=transmitted;
                   
-         rd(k,:)=Raydirection;		% saving ray directions
-         % Sphereradius=Sphereradius-dz(k);		% Should be in meters
-         %sr(k)=Sphereradius;			% saving sphere radius
-         Psave(k)=P_ray; 
-         
-         k=k+1;							% Still increment k, even tho limb sound-will use as master index
-       
-         m=m-1;
+         rd(kk,:)=Raydirection;		% saving ray directions
+        
+         Psave(kk)=P_ray; 
+           
+         m=m-1;    %step backward in m (or in pressure)
          masterindex=[masterindex;m]; 
-         P_ray=Ptemp(m)	;			% Pressure profile-out of planet
+         P_ray=P(m);			% Pressure profile-out of planet
       end
       % Done with limb sounding-strip and return
-      d=d';
-      %d=[d,d(1)]';
-      Ptemp_length=size(Ptemp,1);
-      Ptemp=Ptemp(2:(Ptemp_length-1));	% Strip both hi-low Stop values
-      
+      d=d'; 
       return
    end
-   % Not yet limb sounding
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+% Back to normal (not 90 tangent to ellipsoid)
    intercept(k,:)=A;
    internormal(k,:)=B;
      
    d(k)=C;% Found intercept now find new direction
    eta1=refindex(k);
-   eta2=refindex(k+1);
+   if(k<length(P))
+       eta2=refindex(k+1);
+   else
+       eta2=refindex(k);refindex(k);%refindex(k);
+   end
    % Using regular snells  -taken care of sphere with ray-sphere intersection test
    [theta2,transmitted]=snells(eta1,eta2,internormal(k,:),Raydirection);
    t(k)=theta2;		% saves value of theta2-mostly for debugging
@@ -161,16 +148,9 @@ while P_ray<Pmax
    % New Raydirection is 'transmitted'
    Raydirection=transmitted;
    rd(k,:)=Raydirection;		% saving ray directions
-   %Sphereradius=Sphereradius-dz(k);		% Should be in meters
-   %sr(k)=Sphereradius;			% saving sphere radius
    Psave(k)=P_ray;				% Debug-saves pressure profile
    masterindex=[masterindex;k];
-   k=k+1;							% increase index (not limb (yet))
-   
-
-   P_ray=Ptemp(k);				% increments pressure profile deeper
 end
-Ptemplength=size(Ptemp,1);
-Ptemp=Ptemp(1:(Ptemplength-1));	% Only need to strip highest Stop value
+
 d=d';
-% comes out with shallowest first
+% comes out with shallowest first (top->bottom)
