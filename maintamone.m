@@ -1,14 +1,42 @@
-function [Tbeam,jims_zenith,wfwa,refindex,...
-          intercepts_boresight,intercepts_b]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
-                                                 tcme,tcmp,ao,bo,co,f,no_ph3,...
-                                          select_h2h2_model,select_ammonia_model,select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source)
+function [Tbeam,zenith,wfwa,refindex,...
+          intercepts_boresight,intercepts_b]= maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,...
+                                          select_h2h2_model,select_ammonia_model,select_water_model,...
+                                          include_clouds,N_ring_one,Nphi,BWHM,refractivity_source)
+%  maintamone.m -> main routine for LRTM function calculates Tb, and
+%                  weighting functions
+%
+%                           Input:
+%                                 -->Raydirection: Direction of Beam in
+%                                                  terms of unit vector [X Y Z]
+%                                 -->Rayorigin: Position of spacecraft in [X Y Z]
+%                                 -->tcme: Thermochemical model values for Equatorial region (values not squished in altitude (z))
+%                                 -->tcmp: Themrochemical model values for Polar region (values squished in altitude (z))
+%                                 -->ao: Ellipse (cm) value along X
+%                                 -->bo: Ellipse (cm) value along Y
+%                                 -->co: Ellipse (cm) value along Z
+%                                 -->f: Frequency in GHz
+%                                 -->no_ph3: Flag to include/exclude Hoffman Phosphine decay module 
+%                                           no_PH3=1-->active will decay phosphine
+%                                           no_PH3=0-->inactive, will use PH3 profile provided by TCM
+%                                 -->select_h2h2_model: Select model for collisionally induced absorption by H2
+%                                 -->select_ammonia_model: Select model for ammonia absorption
+%                                 -->select_water_model: Select model for water absorption
+%                                 -->include_clouds: Include or exclude absorption by clouds
+%                                 -->N_ring_one: Number of rays in first ring of beam battern (sampling param)
+%                                 -->Nphi: Number of phi rings (sampling param)
+%                                 -->BWHM: Beamwidth half maximum in degrees (3dB beamwidth of antenna)
+%                                 -->refractivity_source: Select between original refractivity, and all inclusive refractivity options                     
+%
+%                            
+                                      
 global CRITICALFLAG
 CRITICALFLAG=0				% If is '1' then critical refraction reached for that ray
 USEBEAM=1;
 
-% Want to flip order from low atltitude to high over to top-down
+% Flip order from low atltitude to high over to top-down
 recordlength1=size(tcme,1);
 recordlength2=size(tcmp,1);
+
 if(recordlength1>recordlength2)
     recordlength=recordlength2;
 end
@@ -18,10 +46,11 @@ end
 if(recordlength1==recordlength2)
     recordlength=recordlength1;
 end
+
 k=(0:recordlength-1);
 %
 % Extract Prameters, flip around
-% Add a zero for space
+% Add a zero for space (as in No atmosphere P=0)
 P=[0;(tcme(recordlength-k,1))];
 T=[2.7;(tcme(recordlength-k,2))];
 % third is the dR vector -handled elsewhere since need two
@@ -42,19 +71,20 @@ DH2O=[0;(tcme(recordlength-k,15))];
 DSOL=[0;(tcme(recordlength-k,18))];
 
 % % cause ph3 decay (photolyse)
-  if (no_ph3>0)
-      look_out_for_decaying_ph3=1
-      xPH3(1)=xPH3(1);
-      xPH3(recordlength);
-      decay=ph3decay(P,xPH3);
-      xPH3=decay;
+if (no_ph3>0)
+    look_out_for_decaying_ph3=1;
+    disp('Computing Phosphine Decay.')
+    xPH3(1)=xPH3(1);
+    xPH3(recordlength);
+    decay=ph3decay(P,xPH3);
+    xPH3=decay;
   end
 
 smallestdr=min(length(major),length(minor));
 minor=minor(1:smallestdr);		% unify lengths
 major=major(1:smallestdr);    % unify lengths
 
-% Convert to partial pressures
+% Convert mole fraction to partial pressures
 P_H2=P.*xH2;
 P_He=P.*xHe;
 P_H2S=P.*xH2S;
@@ -83,26 +113,27 @@ if missflag==1
    Tbeam=2.7;
    weightingfactor=0;
    return				% This will help with full imaging (if this file becomes a function
-   % that gets passed various raydirection(boresights)
+   % that gets passed various raydirection (boresights)
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%  Calculate Jim's zenith
+%  Calculate Zenith Angle
 %
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% what Jim Hoffman calls zenith is the angle between normal to the surface,
+% what Hoffman calls zenith is the angle between normal to the surface,
 % and observer. Not what you'd think when he talks about nadir, and
-% zenith. Quite confusing if you ask me.
+% zenith. This is typically what one thinks of from a "ground-based"
+% observation.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-jims_zenith=acos(dot(-internormal(1,:),Raydirection))*(180/pi)
+zenith=acos(dot(-internormal(1,:),Raydirection))*(180/pi)
 
 %Calculate absorption coeff as a function of TP 
 kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,...
                 xH2,xHe,xNH3,xH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,...
                 select_h2h2_model,select_ammonia_model,select_water_model,include_clouds);
-done_with_abs_coeff=0
+ disp('Absorption coefficients computed.')
 
-%  Check Boresight
+% Calculate Ta (Ray brightness temperature at boresight)
 if CRITICALFLAG==1;
    disp('Critical Refraction')
    disa=d;
@@ -122,25 +153,28 @@ else
 end   
 
 % BORESIGHT DIDN'T MISS
-% Now its worth calculating kappas to get taus
 
 % d is the pathlength, t is theta, masterindex are the indices of the raypaths
 % Need to gets tau's
 % tau_a is the tau of that layer, tau is the cumulative summations of those layers
-% Now do the beamspread and rotate beampattern to lookvector
+% Now do the beamspread and rotate beampattern towards planet along look
+% vector
 
 [beamz,beam_weightz,beam_weighted_ave]=beamsample(Nphi,N_ring_one,BWHM);
 
 [Vr1,Zr]=rotbeam(Raydirection,beamz);
 
-% initialize wlayersa,b,c,d
+% initialize wlayers
 wlayersb=zeros(length(P),length(Vr1));
 
 % masterindex for wght fnctns
 windexb=zeros(length(P),length(Vr1));
 missb=0;
 
-VRONE=0
+% Calculate Optical Depth values, brightness temperature and weighting
+% function along each ray path.
+%VRONE=0
+disp('Raypaths calculated, calculating brightness temperatures along rays.')
 for p=1:length(Vr1);
    bs=bs+1;						% bs-beamspread- keeps track of beamspread samples
    Rd=[Vr1(:,p)]';
@@ -170,17 +204,14 @@ for p=1:length(Vr1);
 end
 
 
-% Apply Beam weights (Beam coupling)
-% T=sum(1,N)Tn*(exp(-2.76*(deltabw/3db)^2))
-
+% Apply Beam weights (Beam coupling) from beamsample.m
+disp('Applying beamweights.')
 Na=length(Tatma);
 Nb=length(Tatmb);
 size(beam_weightz);
 Twa=sum(Tatma)*1./Na;
 Twb=sum(Tatmb*beam_weightz');
-
-
-Tbeam=(Twa+Twb)/(1+beam_weighted_ave);%2;%/(1+beam_weight_total);
+Tbeam=(Twa+Twb)/(1+beam_weighted_ave);
 
 % Find weighting function
 wfa=1.*fwght(wlayersa,masterindexa);
@@ -197,21 +228,3 @@ sa=zeros(sP-size(wfa,1),1);
 wfwa=[wfa;sa];
 % turn into columns
 %wfwb=[wfb;sb];
-
-
-%sumb=sum(wfwb,2)./(size(Vr1,2)-missb);
-
-
-%weightingfactor=(wfwa+sumb)/(1+b1w);
-
-
-% find out how many 
-% example of how to index the Pressure with the wf (using plot)
-% plot(P(1:max(masterindexa)),wfa)
-
-
-
-% need to pad the wfw's somehow to be same length-need to average the
-% multiple beams together
-% need to take of care the zeros that come from limb sound-screws wieght
-

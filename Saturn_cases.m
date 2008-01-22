@@ -50,7 +50,8 @@ for cases=1:4
     end
 
 %Beam pattern parameters
-    N_ring_one=8;
+    N_ring_one=8;% First ring has 8 rays
+    Nphi=3; % 3 rings
 
 
     f=13.78; %operating frequency in GHz
@@ -88,6 +89,7 @@ select_h2h2_model=1;
  refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
+%refractivity_source=4; % Karpowicz w/Clouds H2, He, CH4 etc.. using Essen, and other sources
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %
@@ -205,18 +207,16 @@ select_h2h2_model=1;
 
 
 %Spacecraft Parameters
-    Rayorigin=[(number_of_saturn_radii+1)*ao 0 0]
-    Sphereradius=ao;
-    Spherecenter=[0 0 0];
+    Rayorigin=[(number_of_saturn_radii+1)*ao 0 0];
     Raydirection=[-1 0 0];
 
     no_ph3=1; %use PH3 decay
 
     for j=1:length(xHe)
-        [Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+        [Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Raydirection,Rayorigin,...
                                tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
-                               include_clouds,N_ring_one,BWHM,refractivity_source);
+                               include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
     end
 
     X_direction=-cos(theta*(pi/180));
@@ -225,10 +225,10 @@ select_h2h2_model=1;
     Raydirection=[X_direction Y_direction Z_direction];
 
     for j=1:length(xHe)       
-        [Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+        [Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Raydirection,Rayorigin,...
                                     tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                     f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
-                                    include_clouds,N_ring_one,BWHM,refractivity_source);
+                                    include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
                                clear ph3decay;
                                
                              % Sorry! ugly piece to flip around PH3 so you

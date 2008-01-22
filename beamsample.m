@@ -27,8 +27,8 @@ function [Beamz,Beam_weightz,beam_weighted_ave]=beamsample(Nphi_rings,N_ring_one
 
 
 dphi_degree=BWHM/Nphi_rings;
-phi_degree=cumsum(dphi_degree.*ones(Nphi_rings,1))
-n=phi_degree./dphi_degree % radius multiple from first ring
+phi_degree=cumsum(dphi_degree.*ones(Nphi_rings,1));
+n=phi_degree./dphi_degree; % radius multiple from first ring
 Ntheta=N_ring_one.*(2*(n)-1); % number of samples for each ring
 
 % center phi on z-axis (around pi/2)

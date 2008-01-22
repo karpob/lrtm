@@ -54,8 +54,6 @@ include_clouds=1;
 
 %spacecraft parameters
 Rayorigin=[ao+(4500*100000) 0 0];
-Sphereradius=ao;
-Spherecenter=[0 0 0];
 Raydirection=[-1 0 0];
 
 %Get Beam parameters
@@ -133,7 +131,7 @@ dz=1;
 XCO=0;
 use_dz=0;
 dP_init=1;
-dP_fine=0.01;
+dP_fine=0.1;
 P_fine_start=10;
 P_fine_stop=1;
 
@@ -165,7 +163,7 @@ Raydirection(2)=sin(theta*(pi/180));
 %Run Radiative Transfer model for all frequencies
 for j=1:length(f)
     no_ph3=0; 
-    [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j),refractive_index(:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+    [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j),refractive_index(:,j)]= maintamone(Raydirection,Rayorigin,...
                                                                                    tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
                                                                                    select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
     clear maintamone;
@@ -189,7 +187,7 @@ Raydirection=[X_direction Y_direction Z_direction];
 
 for j=1:length(f)
     no_ph3=0;
-    [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Spherecenter,Sphereradius,Raydirection,Rayorigin,...
+    [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j)]= maintamone(Raydirection,Rayorigin,...
                                                                                 tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
                                                                                 select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
     clear maintamone;
