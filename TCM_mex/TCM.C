@@ -20,7 +20,8 @@ int use_dz,jj;
 /*set 0 to turn off, 1 to turn on*/
 #define USE_SOL_CLOUD  1      /*consider its formation?*/
 double P_temp,T_temp;
-void new_layer(int j, float dz, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
+void new_layer(int j, float dz, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop, float frain,float select_ackerman);
+void new_layer_original(int j, float dz, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
 float specific_heat(int j, float T, float P);
 int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3,double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i,float supersatNH3_i,float supersatH2S_i);
 void init_soln_cloud(int mode);
@@ -34,7 +35,7 @@ char getMatlabCharacter(const mxArray* ptr);
 double  getMatlabScalar    (const mxArray* ptr);
 int getMatlabInt (const mxArray* ptr);
 double& createMatlabScalar (mxArray*& ptr);
-const int numInputArgs  = 31;
+const int numInputArgs  = 33;
 const int numOutputArgs = 23;
 float Hydrogen_Curve_Fit_Select;
 
@@ -89,11 +90,14 @@ void mexFunction(int nlhs, mxArray *plhs[],
           float P_fine_start=getMatlabScalar(prhs[28]);
           float P_fine_stop=getMatlabScalar(prhs[29]);
           use_dz=getMatlabScalar(prhs[30]);
+          float frain=getMatlabScalar(prhs[31]);
+          float select_ackerman=getMatlabScalar(prhs[32]);
   	  //************************************************//
 	  
 	  //**************** Send value to matlab **********//
 	  //double& outXHe=createMatlabScalar(plhs[0]);
-	  //************************************************//		
+	  //************************************************//
+          printf("Starting DeBoer/Steffes/Karpowicz Thermo-chemical Model\n");		
 	  layer = (struct ATM_LAYER *) calloc(MAXLAYERS, sizeof(struct ATM_LAYER));
       if (layer==NULL) {printf("Insufficient memory.\n");return;}
 	  
@@ -105,7 +109,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	  
       if (USE_SOL_CLOUD)
             init_soln_cloud(1);
-
+      
       //printf("Input the altitude increment, dz, in km (0 for auto):  ");
       //scanf("%f",&dz);
 	  if (dz==0.0) {printf("Using AutoStep.\n"); AutoStep=1;}
@@ -127,18 +131,18 @@ void mexFunction(int nlhs, mxArray *plhs[],
 			
             for(j=1;eflag!=99 && j<MAXLAYERS;++j)           
             {                                               
-              //fio    fprintf(lfp,"\n\n***layer: %d\t",j);		       
-                  new_layer(j,dz,&eflag, dP_init, dP_fine, P_fine_start, P_fine_stop);
-				                    
-                  P = layer[j].P;
+              //fio    fprintf(lfp,"\n\n***layer: %d\t",j);
+              new_layer(j,dz,&eflag, dP_init, dP_fine, P_fine_start, P_fine_stop, frain,select_ackerman);
+              P = layer[j].P;
+                  
                  // printf("%d:  P = %.3f, T = %.3f          \r",j,P,layer[j].T);
                   if (eflag == 98)  /* check target temperature */
                   {                                         /* eflag       P      */
                         eflag = 97;                         /*  97      < P_targ  */
                         T = layer[j].T;                     /*  99      <=P_term  */
                         T_err = 100.0*(T - T_targ)/T_targ;  /*  98      <=P_targ  */
-                        printf("\tActual: T(P=%g)=%g\tTarget: T(P=%g)=%g\n\t==>  Error=%6.2g%%\n",P,T,P_targ,T_targ,T_err);
-printf("You enjoy jj=%d \n",jj);
+                //        printf("\tActual: T(P=%g)=%g\tTarget: T(P=%g)=%g\n\t==>  Error=%6.2g%%\n",P,T,P_targ,T_targ,T_err);
+//printf("You enjoy jj=%d \n",jj);
                 //fio        fprintf(lfp,"\n\n\tActual: T(P=%g)=%g\t\tTarget: T(P=%g)=%g\n\t==>  Error=%6.2g%%\n",P,T,P_targ,T_targ,T_err);
                 //fio        fprintf(lfp,"T=%g T_targ=%g T_err=%g T_old=%g ",T,T_targ,T_err,layer[0].T);
                         if (fabs(T_err)>TLIMIT)
@@ -155,7 +159,7 @@ printf("You enjoy jj=%d \n",jj);
             }
 			
       }
-      printf("Tropopause reached:  P = %.3f, T = %.3f          \n",P,layer[j-1].T);
+  //    printf("Tropopause reached:  P = %.3f, T = %.3f          \n",P,layer[j-1].T);
       if (P > P_term)
       {
              printf("Abnormal termination. P= %f bigger than Pterm=%f                       \n",P,P_term);
@@ -166,7 +170,7 @@ printf("You enjoy jj=%d \n",jj);
       top = j-1;
       if (USE_SOL_CLOUD)
             init_soln_cloud(0);
-      printf("Thermo-chemical modeling complete.\n");
+  //    printf("Thermo-chemical modeling complete.\n");
       //fio fprintf(lfp,"\nThermo-chemical modeling complete.\n\n");
       //fio fprintf(lfp,"---------------------------------------------------------\n\n");
 
@@ -176,6 +180,7 @@ printf("You enjoy jj=%d \n",jj);
             free(TfL);
       }
       printf("Sending Data your way via Matlab mex! \n \n");
+      
       ofp1=fopen("tcm.out","w");
       //printf("              ");
 	  funoutput = (double *) malloc(top*sizeof(double));
@@ -233,14 +238,14 @@ printf("You enjoy jj=%d \n",jj);
             if(layer[j].P<P0 && !cross_my_P0)
             {
                   z_offset=layer[j].z;
-                  printf("offset is %f \n",z_offset);
+                 // printf("offset is %f \n",z_offset);
 				  cross_my_P0=1;
             }
       }
 
       for(j = 0;j<=top;++j)
       {
-            //printf("\b\b\b\b%3.0f%%",100.0*((float) j/(float) top));
+            
             T = layer[j].T;
             P = layer[j].P;
 			P_out[j]=P;
@@ -279,7 +284,7 @@ printf("You enjoy jj=%d \n",jj);
             fprintf(ofp1,"%g\t%g\t%g\t%g\n",layer[j].g,layer[j].mu,refr,refr2);
       }
 	 fclose(ofp1);
-      printf("...Done.\n\n");
+      printf("End of Thermo-chemical model, return to Matlab.\n\n");
 	  
 }
 

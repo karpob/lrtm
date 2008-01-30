@@ -1,3 +1,4 @@
+
 /*This version of layers deals with H2O, NH3 and H2S as a solution system*/
 
 /****************************layers.c**************************************/
@@ -23,6 +24,7 @@ float latent_heat(char component[], float T);
 float get_dP_using_dz(int j, int *eflag, float dz);
 float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
 float get_dT(int j, float T, float P, float dP, float *LX, float *L2X);
+float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain);
 float SuperSatSelf[5];
 
 int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3,double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i, float supersatNH3_i, float supersatH2S_i)    /*set deepest layer*/
@@ -144,9 +146,9 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
       return (1);
 }
 
-void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, float P_fine_stop)
+void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, float P_fine_stop,float frain, float select_ackerman)
 {
-      int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0;
+      int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0,kludge=0;
       float LX[6]={0.0,0.0,0.0,0.0,0.0,0.0}, L2X[6]={0.0,0.0,0.0,0.0,0.0,0.0};
       float P, T, dT, dP, PNH3p, PH2Sp, freeze;
       float PH2, PHe, PH2S, PNH3, PH2O, PCH4, PPH3;
@@ -154,7 +156,8 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       float SPH2O=1E6, SPCH4=1E6, SPH2S=1E6, SPNH3=1E6, SPPH3=1E6, KNH4SH;
       float LH2S, LNH3, LNH4SH, LH2O, LCH4, LPH3;
       float dXH2S, dXNH3, dXNH4SH, dXH2O, dXCH4, dXPH3;
-      float H, alr, tdppa, C_sol_NH3, C_sol_H2S;
+      float H, alr, tdppa, C_sol_NH3, C_sol_H2S,dry_adiabatic_lapse_rate,wet_adiabatic_lapse_rate,Teff,boltz_sigma,cp_temp,mu_temp;
+      float q_c,q_v,q_v_nh3,q_c_nh3,q_c_nh3_ice;
       static float diff_P_base;
       char phase_H2S[21], phase_NH3[21], phase_PH3[21];
       char phase_H2O[21], phase_CH4[21];
@@ -185,6 +188,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       PH2Sp= PH2S - supersatH2S*P;
       H = R*T/(layer[j-1].mu*layer[j-1].g);
       alr = 1e5*dT/(dP*H/P);
+      dry_adiabatic_lapse_rate=alr;
  //fio     fprintf(lfp,"dry adiabatic lapse rate %g K/km\n",alr);
  //fio     fprintf(lfp,"dry new T:  %g + %g = %g\n",layer[j-1].T,dT,T);
 
@@ -347,6 +351,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             T = layer[j].T;
             H = R*T/(layer[j-1].mu*layer[j-1].g);
             alr = 1e5*dT/(dP*H/P);
+            wet_adiabatic_lapse_rate=alr;
     //fio        fprintf(lfp,"wet adiabatic lapse rate %g K/km\n",alr);
     //fio        fprintf(lfp,"wet new T:  %g + %g = %g\n",layer[j-1].T,dT,T);
       }
@@ -411,8 +416,23 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             }
             else
             {
-                  dXNH3 = (LNH3*layer[j-1].XNH3)*dT/(R*T*T) - layer[j-1].XNH3*dP/P;
-                  layer[j].DNH3 = 1e6*AMU_NH3*P*P*dXNH3/(R*T*dP);
+                  dXNH3 =(LNH3*layer[j-1].XNH3)*dT/(R*T*T) - layer[j-1].XNH3*dP/P;
+                  if(select_ackerman==2 || select_ackerman==3)
+                  {
+                  dXNH3= -dXNH3;
+                  Teff=124; //in Kelvin
+                  q_c_nh3_ice=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
+                                                layer[j-1].z, layer[j-1].q_c_nh3_ice,layer[j-1].XNH3,layer[j].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
+                                                XCH4, XPH3, dXNH3, frain);
+                  layer[j].DNH3 = 1e6*AMU_NH3*P*P*q_c_nh3_ice/(R*T*-dP);
+                  layer[j].q_c_nh3_ice=q_c_nh3_ice;
+                  layer[j].first_nh3=1;
+                  }
+                  else
+                  {
+                  layer[j].DNH3=1e6*AMU_NH3*P*P*dXNH3/(R*T*dP);
+                  }
+                  
                   if (layer[j].DNH3 > COUNT_CLOUD)
                   {
                         if (T > TRIPLEPT_NH3) layer[j].clouds+=100L;
@@ -433,8 +453,28 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             if (sol_cloud)
             {
                   dXH2O = layer[j].XH2O - layer[j-1].XH2O;
+                  //Insert Ackerman & Marley Procedure Here
+                  
+                  if(select_ackerman==1 || select_ackerman==3)
+                  {
+                  Teff=124; //Kelvin                  
+                  q_c=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
+                                                layer[j-1].z, layer[j-1].q_c,layer[j-1].XH2O,layer[j].XH2O, XH2, XHe, XH2S, XNH3, XH2O,\
+                                                XCH4, XPH3, (-1)*dXH2O*(1-C_sol_NH3), frain);
+                  q_c_nh3=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
+                                                layer[j-1].z, layer[j-1].q_c_nh3,layer[j-1].XNH3,layer[j].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
+                                                XCH4, XPH3,(-1)*dXNH3*C_sol_NH3, frain);
+                  layer[j].DSOL =1e6*((q_c*AMU_H2O+q_c_nh3*AMU_NH3)*P*P)/(R*T*-dP);
+                  layer[j].DSOL_NH3=1e6*(q_c_nh3*AMU_NH3*P*P)/(R*T*-dP);
+                  layer[j].q_c_nh3=q_c_nh3;
+                  layer[j].q_c=q_c;
+                  layer[j].first=1;
+                  }
+                  else
+                  {
                   layer[j].DSOL = 1e6*( (1.0-C_sol_NH3)*AMU_H2O*dXH2O + C_sol_NH3*AMU_NH3*dXNH3)*P*P/(R*T*dP);
                   layer[j].DSOL_NH3=1e6*(C_sol_NH3*AMU_NH3*dXNH3*P*P)/(R*T*dP);
+                  }
                   layer[j].DH2O = ZERO;
                   if (layer[j].DSOL > COUNT_CLOUD)
                         layer[j].clouds+=1L;
@@ -499,7 +539,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       if(layer[j].XPH3 < GONE) layer[j].XPH3 = ZERO;
 
       XHe  = layer[j].XHe;
-      XH2S = layer[j].XH2S;
+      XH2S = layer[j].XH2S;layer[j].DH2O = ZERO;
       XNH3 = layer[j].XNH3;
       XH2O = layer[j].XH2O;
       XCH4 = layer[j].XCH4;
@@ -636,3 +676,54 @@ float gravity(int j)
       b = g0 + gamma;
       return  0.5*( b + sqrt( SQ(b) - SQ(gamma) ) );
 }
+
+
+float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain)
+{
+                  float boltz_sigma=0,Flux=0,cp_temp=0,mu_temp=0,GAMMA_TEMP=0,mixing_L=0,rho_temp=0,Eddy_Diffusion_Coef=0,my_dz=0,wstar=0;
+                  float q_c_old=0,q_v_old=0,Qv=0,q_v=0,q_c=0;
+                                    
+                  
+                  boltz_sigma=5.6704e-8; // W/m^2/K^4
+                  Flux=boltz_sigma*(pow(Teff,4));// W/m^2
+                  cp_temp=specific_heat(j,T,P);
+                  mu_temp=AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3; //  g/mol
+                  
+                  
+                  if((wet_adiabatic_lapse_rate/dry_adiabatic_lapse_rate)>0.1)
+                  {
+                  	GAMMA_TEMP=(wet_adiabatic_lapse_rate/dry_adiabatic_lapse_rate);
+                  }
+
+                  GAMMA_TEMP=0.1;
+                  mixing_L=H*GAMMA_TEMP;
+                  rho_temp=P/(R*T);
+                  Eddy_Diffusion_Coef=(H/3)*pow(mixing_L/H,(4/3))*pow((1e-3)*(R*Flux)/(mu_temp*rho_temp*cp_temp),1/3);
+                  
+                  if(Eddy_Diffusion_Coef<1e5)
+                  {
+                        Eddy_Diffusion_Coef=1e5;
+                        
+                  }
+                  my_dz=1e5*(layer[j].z-layer[j-1].z);
+                  wstar=Eddy_Diffusion_Coef/mixing_L;
+
+
+                  if(layer[j-1].first!=1)
+                  {
+                    q_c_old=delta_q_c;//(-1)*dXH2O*(1-C_sol_NH3);
+                    q_v_old=previous_q_v;
+                  }
+                  else
+                  {
+                    q_c_old=previous_q_c; 
+                    q_v_old=previous_q_v;                    
+                  }
+      
+                  q_v=current_q_v;
+                  Qv=(-Eddy_Diffusion_Coef*q_v-q_v_old)/my_dz;
+                  q_c=(Eddy_Diffusion_Coef*q_c_old-Qv*my_dz)/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
+                  
+                  return q_c;
+}
+

@@ -69,4 +69,9 @@ struct ATM_LAYER {
       float g;                /* gravity             */
       float mu;               /* average mass        */
       double DSOL_NH3;        /*in g/cm^3 density of cloud that is composed of NH3 */
+      int first;
+      float q_c;
+      float q_c_nh3;
+      float q_c_nh3_ice;
+      int first_nh3;
                   };

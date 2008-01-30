@@ -126,7 +126,7 @@ SuperSatSelf_H2O=0;
 supersatNH3=0;
 supersatH2S=0;
 AutoStep_constant=8;
-fp=0.25;
+fp=-1;
 dz=1;
 XCO=0;
 use_dz=0;
@@ -134,6 +134,8 @@ dP_init=1;
 dP_fine=0.1;
 P_fine_start=10;
 P_fine_stop=1;
+frain=10;
+select_ackerman=2;
 
  table_output=[XH2;XHe;(1e6)*XH2S;(1e6)*XNH3;(1e6)*XH2O;(1e6)*XCH4;(1e6)*XPH3];
     to_dlm=transpose(table_output);
@@ -153,7 +155,7 @@ end
                                 P0_i,T_targ_i,P_targ_i,P_term_i,...
                                 use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
                                 SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
-                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,dP_init,dP_fine,P_fine_start,P_fine_stop);
+                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,dP_init,dP_fine,P_fine_start,P_fine_stop,frain,select_ackerman);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % Set Spacecraft Orientation
 theta=0

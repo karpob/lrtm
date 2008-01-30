@@ -156,6 +156,8 @@ select_h2h2_model=1;
     dP_fine=0.0001;
     P_fine_start=10;
     P_fine_stop=1;
+    frain=0;
+    select_ackerman=0;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -181,7 +183,7 @@ select_h2h2_model=1;
                                 P0_i,T_targ_i,P_targ_i,P_term_i,...
                                 use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,...
                                 SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,...
-                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,dP_init,dP_fine,P_fine_start,P_fine_stop);
+                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,dP_init,dP_fine,P_fine_start,P_fine_stop,frain,select_ackerman);
         if (k==3)
             for jj=1:me(k)
                 if(tcme(jj,1,k)<1.4)
