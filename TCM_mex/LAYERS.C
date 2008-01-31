@@ -422,7 +422,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   dXNH3= -dXNH3;
                   Teff=124; //in Kelvin
                   q_c_nh3_ice=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
-                                                layer[j-1].z, layer[j-1].q_c_nh3_ice,layer[j-1].XNH3,layer[j].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
+                                                layer[j-1].z, layer[j-1].q_c_nh3_ice,layer[j].XNH3,layer[j-1].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
                                                 XCH4, XPH3, dXNH3, frain);
                   layer[j].DNH3 = 1e6*AMU_NH3*P*P*q_c_nh3_ice/(R*T*-dP);
                   layer[j].q_c_nh3_ice=q_c_nh3_ice;
@@ -459,12 +459,12 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   {
                   Teff=124; //Kelvin                  
                   q_c=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
-                                                layer[j-1].z, layer[j-1].q_c,layer[j-1].XH2O,layer[j].XH2O, XH2, XHe, XH2S, XNH3, XH2O,\
+                                                layer[j-1].z, layer[j-1].q_c,layer[j].XH2O,layer[j-1].XH2O, XH2, XHe, XH2S, XNH3, XH2O,\
                                                 XCH4, XPH3, (-1)*dXH2O*(1-C_sol_NH3), frain);
                   q_c_nh3=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
-                                                layer[j-1].z, layer[j-1].q_c_nh3,layer[j-1].XNH3,layer[j].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
+                                                layer[j-1].z, layer[j-1].q_c_nh3,layer[j].XNH3,layer[j-1].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
                                                 XCH4, XPH3,(-1)*dXNH3*C_sol_NH3, frain);
-                  layer[j].DSOL =1e6*((q_c*AMU_H2O+q_c_nh3*AMU_NH3)*P*P)/(R*T*-dP);
+                  layer[j].DSOL =1e6*((q_c*AMU_H2O+q_c_nh3)*P*P)/(R*T*-dP);
                   layer[j].DSOL_NH3=1e6*(q_c_nh3*AMU_NH3*P*P)/(R*T*-dP);
                   layer[j].q_c_nh3=q_c_nh3;
                   layer[j].q_c=q_c;
@@ -681,7 +681,7 @@ float gravity(int j)
 float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain)
 {
                   float boltz_sigma=0,Flux=0,cp_temp=0,mu_temp=0,GAMMA_TEMP=0,mixing_L=0,rho_temp=0,Eddy_Diffusion_Coef=0,my_dz=0,wstar=0;
-                  float q_c_old=0,q_v_old=0,Qv=0,q_v=0,q_c=0;
+                  float q_c_old=0,q_v_old=0,Qv=0,q_v=0,q_c=0,gamma=0,F=0,Htemp=0;
                                     
                   
                   boltz_sigma=5.6704e-8; // W/m^2/K^4
@@ -694,11 +694,14 @@ float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, floa
                   {
                   	GAMMA_TEMP=(wet_adiabatic_lapse_rate/dry_adiabatic_lapse_rate);
                   }
-
+                  else
+                  {
                   GAMMA_TEMP=0.1;
+                  }
                   mixing_L=H*GAMMA_TEMP;
-                  rho_temp=P/(R*T);
-                  Eddy_Diffusion_Coef=(H/3)*pow(mixing_L/H,(4/3))*pow((1e-3)*(R*Flux)/(mu_temp*rho_temp*cp_temp),1/3);
+                  rho_temp=(mu_temp*P)/(R*T);
+                  F=(gamma-1.0)/gamma;
+                  Eddy_Diffusion_Coef=(H)*F*pow(mixing_L/H,(4.0/3.0))*pow((1e-3)*(R*Flux)/(mu_temp*rho_temp*cp_temp),1.0/3.0);
                   
                   if(Eddy_Diffusion_Coef<1e5)
                   {
@@ -721,8 +724,9 @@ float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, floa
                   }
       
                   q_v=current_q_v;
-                  Qv=(-Eddy_Diffusion_Coef*q_v-q_v_old)/my_dz;
-                  q_c=(Eddy_Diffusion_Coef*q_c_old-Qv*my_dz)/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
+                  q_c=-(Eddy_Diffusion_Coef*(q_v-q_v_old-q_c_old))/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
+                  //Qv=(-Eddy_Diffusion_Coef*(q_v-q_v_old))/my_dz;
+                  //q_c=(Eddy_Diffusion_Coef*q_c_old-Qv*my_dz)/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
                   
                   return q_c;
 }
