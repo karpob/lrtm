@@ -2,19 +2,7 @@
 /*This version of layers deals with H2O, NH3 and H2S as a solution system*/
 
 /****************************layers.c**************************************/
-#include "model.h"
-
-/*extern struct ATM_LAYER layer[MAXLAYERS];*/
-extern struct ATM_LAYER *layer;
-//fio extern FILE *lfp;
-extern float P_targ, T_targ, P_term, g0, R0, P0, zP0, supersatNH3, supersatH2S;
-extern float *TfL, *PfL, lawf[];
-extern char use_lindal, line[];
-extern int sol_cloud, NH4SH_cloud_base, AutoStep, CrossP0,jj;
-extern double XCO,AutoStep_constant;
-extern int use_dz;
-static int n_lindal_pts, hereonout;
-extern float Hydrogen_Curve_Fit_Select;
+#include "layers.h"
 float gravity(int j);
 float specific_heat(int j, float T, float P);
 float sat_pressure(char component[], float T);
@@ -27,18 +15,57 @@ float get_dT(int j, float T, float P, float dP, float *LX, float *L2X);
 float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain);
 float SuperSatSelf[5];
 
-int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3,double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i, float supersatNH3_i, float supersatH2S_i)    /*set deepest layer*/
+/****************************************************************************************************/
+/***************************************************************************************************/
+//  Initialize the bottom of the atmosphere data structure (in details in model.h) with initial values
+//  int init_atm()
+//           Inputs:
+//              --> int n: number of layers in the atmosphere
+//              --> double XHe: Deep Abundance (Mole fraction) of Helium 
+//              --> double XH2S: Deep Abundance (Mole fraction) of Hydrogen Sulfide
+//              --> double XNH3: Deep Abundance (Mole fraction) of Ammonia
+//              --> double XH2O: Deep Abundance (Mole fraction) of Water
+//              --> double XCH4: Deep Abundance (Mole fraction) of Methane
+//              --> double XPH3: Deep Abundance (Mole fraction) of Phosphine
+//              --> double P_temp: Deep Pressure (in bars) of the bottom layer
+//              --> double T_temp: Temperature of the bottom layer (in K)
+//              --> float g0_i: Acceleration due to gravity  at pressure level P0_i
+//              --> float R0_i: Altitude (km) associated with P0_i
+//              --> float P0_i: Pressure value associated with P0_i (bars)
+//              --> char use_lindal_i: select whether or not to use initial Temp/pressure from input file
+//              --> float T_targ_i: Temperature Target value (K)
+//              --> float P_targ_i: Target pressure level associated with T_targ_i (bars)
+//              --> float P_term_i: Top of atmosphere (TOA) value in bars
+//              --> int n_lindal_pts: number of values specificed in reference TP profile input file
+//              --> float SuperSatSelf1_i: Amount of supersaturation associated with H2S
+//              --> float SuperSatSelf2_i: Amount of supersaturation associated with NH3
+//              --> float SuperSatSelf3_i: Amount of supersaturation associated with PH3
+//              --> float SuperSatSelf4_i: Amount of supersaturation associated with water
+//              --> float supersatNH3_i: Amount of supersaturation with respect to NH3 associated with NH4SH cloud
+//              --> float supersatH2S_i: Amount of supersaturation with respect to H2S associated with NH4SH cloud
+//
+//        Output:
+//              <-- Returns a value of 1 when complete
+//              <-- Initialized values in layer data structure (see model.h)
+/****************************************************************************************************/
+/****************************************************************************************************/
+
+int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3, \
+             double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, \
+            float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i, \
+            float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i, float supersatNH3_i, \
+            float supersatH2S_i)   
 {
 
-	  int cntr, i;
-      double XH2,temp;
-      char c, tp_file[15], tmp[151];
-	  FILE *pfp;
-	  g0=g0_i; 
-	  R0=R0_i; 
-	  P0=P0_i;
-	  // ***** place abundances in layer data structure *****//	  
-	  layer[n].XHe  = XHe;
+     int cntr, i;
+     double XH2,temp;
+     char c, tp_file[15], tmp[151];
+     FILE *pfp;
+     g0=g0_i; 
+     R0=R0_i; 
+     P0=P0_i;
+// ***** place abundances in layer data structure *****//	  
+      layer[n].XHe  = XHe;
       layer[n].XH2S = XH2S;
       layer[n].XNH3 = XNH3;
       layer[n].XH2O = XH2O;
@@ -55,32 +82,27 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
       layer[n].DSOL = ZERO;
       XH2 = layer[n].XH2;
       layer[n].z = 0.0;
-	  //*****************************************************//
-	  //******* Fix deep Temperature and Pressure ********//
-	  layer[n].T=T_temp;
-	  layer[n].P=P_temp;
-      //*******************************************************************************//
+//*****************************************************//
+//******* Fix deep Temperature and Pressure ********//
+      layer[n].T=T_temp;
+      layer[n].P=P_temp;
+//*************************************************//
+
+//**** Calculate average molecular weight of the atmosphere often called Mu ****//
+       layer[n].mu   = AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + \
+                      AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3;
+
+       layer[n].g = gravity(n); //calculate gravity and put in datastructure
+
 	  
-	  //**** Place abundances in data structure ****//
-      layer[n].mu   = AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3;
-      layer[n].g = gravity(n); //calculate gravity and put in datastructure
-      //*******************************************//
+//******* Initialize Read in Lindal?, target Temp, target pressure, end pressure level ******//
+       use_lindal=use_lindal_i;
+       T_targ=T_targ_i;
+       P_targ=P_targ_i;
+       P_term=P_term_i;
+       n_lindal_pts=n_lindal_pts_i;
+//********************************************************************************//
 	  
-	  //******* Initialize Read in Lindal?, target Temp, target pressure, end pressure level ******//
-	  use_lindal=use_lindal_i;
-	  T_targ=T_targ_i;
-	  P_targ=P_targ_i;
-	  P_term=P_term_i;
-	  n_lindal_pts=n_lindal_pts_i;
-	  //********************************************************************************//
-	  
-	  //***************** Write values to layer.out file *******************************//  
-   //fio   fprintf(lfp,"XH2S=%g XNH3=%g XPH3=%g XH2O=%g XCH4=%g XHE=%g\n",layer[n].XH2S,layer[n].XNH3,layer[n].XPH3,layer[n].XH2O,layer[n].XCH4,layer[n].XHe);
-	//fio  fprintf(lfp,"T(deep)=%g P(deep)=%g T(targ)=%g P(targ)=%g P(term)=%g\n",layer[n].T,layer[n].P,T_targ,P_targ,P_term);
-	  
-   //fio   fprintf(lfp,"Supersat:  NH3=%g\tH2S=%g\n",supersatNH3,supersatH2S);
-   //fio   fprintf(lfp,"Use Lindal? %c\t\t", use_lindal);
-	  //********************************************************************************//
 	  
       if (use_lindal == 'Y')
       {
@@ -88,38 +110,31 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
             TfL = (float *) malloc(n_lindal_pts*sizeof(float));
             PfL = (float *) malloc(n_lindal_pts*sizeof(float));
 			
-			//** print filename, and number of points in the layers.out file ** //
-    //fio        fprintf(lfp,"file used:  %s   points used:  %d\n","TP.SAT",n_lindal_pts);
-            //******************************************************************//
-			
 			if (TfL == NULL || PfL == NULL)
             {
                   printf("Error:  Out of memory...needed %d bytes\n",2*sizeof(float)*n_lindal_pts);
                   return(2);
             }
 			
-        //    printf("Reading T-P profile from '%s'...","TP.SAT"); //print name of TP file to console
-			
-			//****** Read in temperature pressure profile ******//
+        		
+            //****** Read in temperature pressure profile ******//
             for(cntr=0;cntr < n_lindal_pts; ++cntr)
                   fscanf(pfp,"%f %f\n",PfL+cntr,TfL+cntr);
 			//	  printf("%d",cntr);
             printf("Done.\n"); //print Done to the console
-			//**************************************************//
-      
-		    P_targ=PfL[0]; //set P_target to first element
+            P_targ=PfL[0]; //set P_target to first element
             T_targ=TfL[0]; // set T_taget to first element
             P_term=PfL[n_lindal_pts-1]; //set final pressure to final element
       }
-	  
-	  supersatNH3=supersatNH3_i;
-	  supersatH2S=supersatH2S_i;
+      // Initialize variables with correct values for super saturation
+      supersatNH3=supersatNH3_i;
+      supersatH2S=supersatH2S_i;
       SuperSatSelf[0]=SuperSatSelf1_i;
-	  SuperSatSelf[1]=SuperSatSelf2_i;
-	  SuperSatSelf[2]=SuperSatSelf3_i;
-	  SuperSatSelf[3]=SuperSatSelf4_i;
+      SuperSatSelf[1]=SuperSatSelf2_i;
+      SuperSatSelf[2]=SuperSatSelf3_i;
+      SuperSatSelf[3]=SuperSatSelf4_i;
 	  
-	    if ((SuperSatSelf[0]+SuperSatSelf[1]+SuperSatSelf[2]+SuperSatSelf[3])>0.0)
+      if ((SuperSatSelf[0]+SuperSatSelf[1]+SuperSatSelf[2]+SuperSatSelf[3])>0.0)
       {
       	printf("Self supersaturations:\t"); //print values to console
          for (i=0;i<4;++i)
@@ -130,23 +145,46 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
       {
       	printf("No self superaturation.\n"); //print no values to console
       }
-	  
-	  /* ...flag value */
-	  sol_cloud=1;
-	  /********************/
-	  
+      sol_cloud=1;
+
       printf("\nDo %s consider solution (windex) cloud formation.\n",sol_cloud?"":"not"); //print sol_cloud to console
       
-//fio	  fputc('\n',lfp); //write carriage return to layers.out file
       
-	  fclose(pfp);  // close planet file or TP profile 
+      fclose(pfp);  // close planet file or TP profile 
 	  
       CrossP0=0;
 	  
       return (1);
 }
+/*******************************************************************************/
+/*******************************************************************************/
+/*******************************************************************************/
 
-void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, float P_fine_stop,float frain, float select_ackerman)
+
+
+/********************************************************************************/
+/********************************************************************************/
+// void new_layer() 
+//                 This function each calculates how much of a constituent
+//                 is, or isn't condensed for a given atmospheric layer j 
+//                 values are stored in the layer data structure (in model.h)
+//         Inputs:
+//              -->int j : layer index assiociated with layer data structure (see model.h)
+//              -->float dz : altitude step, if one chooses stepping in altitude
+//              -->int *eflag: flag which will cause function to return to main
+//              -->float dP_init: initial pressure step (if one chooses to step in pressure)
+//              -->float dP_fine: pressure step after P_start (if one chooses to step in pressure)
+//              -->float P_fine_start: pressure level to begin stepping with dP_fine
+//              -->float P_fine_stop: pressure level to stop stepping with dP_fine (step with reference input file after this)
+//              -->float frain: Ackerman and Marley value for f_rain loss mechanism
+//              -->float select_ackerman: select whether or not and where to apply Ackerman & Marley cloud loss mechanism 
+//
+//        Output:
+//              <-- values in layer data structure (see model.h)
+/*******************************************************************************/
+/*******************************************************************************/
+void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, \
+               float P_fine_stop,float frain, float select_ackerman)
 {
       int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0,kludge=0;
       float LX[6]={0.0,0.0,0.0,0.0,0.0,0.0}, L2X[6]={0.0,0.0,0.0,0.0,0.0,0.0};
@@ -156,7 +194,8 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       float SPH2O=1E6, SPCH4=1E6, SPH2S=1E6, SPNH3=1E6, SPPH3=1E6, KNH4SH;
       float LH2S, LNH3, LNH4SH, LH2O, LCH4, LPH3;
       float dXH2S, dXNH3, dXNH4SH, dXH2O, dXCH4, dXPH3;
-      float H, alr, tdppa, C_sol_NH3, C_sol_H2S,dry_adiabatic_lapse_rate,wet_adiabatic_lapse_rate,Teff,boltz_sigma,cp_temp,mu_temp;
+      float H, alr, tdppa, C_sol_NH3, C_sol_H2S,dry_adiabatic_lapse_rate,wet_adiabatic_lapse_rate,\
+            Teff,boltz_sigma,cp_temp,mu_temp;
       float q_c,q_v,q_v_nh3,q_c_nh3,q_c_nh3_ice;
       static float diff_P_base;
       char phase_H2S[21], phase_NH3[21], phase_PH3[21];
@@ -164,6 +203,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       FILE *alrfp;
 
       layer[j].clouds=0L;
+
       if (j==1) hereonout=0;
       /*  Get new P,dP and T,dT values  */
 
@@ -171,12 +211,12 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       {
       	dP = get_dP_using_dz(j,eflag,dz);
       }
+
       else dP=get_dP_using_dP(j, eflag, dP_init, dP_fine, P_fine_start, P_fine_stop);
 
       dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X); /*dry adiabat*/
       P  = layer[j].P;
       T  = layer[j].T;
- //fio     fprintf(lfp,"New pressure:  %g + %g = %g\n",layer[j-1].P,dP,P);
       PH2  = layer[j-1].XH2*P;
       PHe  = layer[j-1].XHe*P;
       PH2S = layer[j-1].XH2S*P;
@@ -189,13 +229,16 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       H = R*T/(layer[j-1].mu*layer[j-1].g);
       alr = 1e5*dT/(dP*H/P);
       dry_adiabatic_lapse_rate=alr;
- //fio     fprintf(lfp,"dry adiabatic lapse rate %g K/km\n",alr);
- //fio     fprintf(lfp,"dry new T:  %g + %g = %g\n",layer[j-1].T,dT,T);
 
       /* For the solution clouds see:  Weidenschilling and Lewis 1973, Icarus 20:465.
             Lewis 1969, Icarus 10:365. Briggs and Sackett 1989, Icarus 80:77.
             Atreya and Romani 1985, Recent Advances in Planetary Meteorology.
             Atreya 1986, Atmospheres and Ionospheres of the Outer Planets. */
+
+
+/********************** If the user selects the solution cloud***********************************
+*************************************************************************************************/
+
       if (sol_cloud)
       {
             C_sol_NH3 = solution_cloud(T,PNH3,PH2O,&SPNH3,&SPH2O);
@@ -209,7 +252,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             if (T < freeze)
             {
                   sol_cloud = 0;  /*Water starts to freeze*/
-//fio                  fprintf(lfp,"Reached solution cloud top:  %g concentrate.\n",C_sol_NH3);
             }
             else if (C_sol_NH3 == -1.0)
                   C_sol_zero=0;
@@ -221,25 +263,25 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   if (C_sol_NH3!=0.0)
                   {
                         CNH3 = 1;
-/* Comment out if don't want H2S in solution cloud */
+                   /* Comment out if don't want H2S in solution cloud */
                         C_sol_H2S = h2s_dissolve(j,&SPH2S);
                         if (C_sol_H2S != 0.0)
                         {
                               CH2S = 1;
-   //fio                           fprintf(lfp,"Solution cloud H2S content:  %g\n",C_sol_H2S);
                         }
-/****************************************************/
                   }
                   LH2O = C_sol_NH3*(4949.75+2022.11*(SQ(C_sol_NH3)-2.0*C_sol_NH3));
                   LH2O+= (1.0-C_sol_NH3)*(5540.48+2022.11*SQ(C_sol_NH3));
                   LH2O*= R/(1.0-C_sol_NH3);
                   LX[3]  = LH2O*layer[j-1].XH2O;
                   L2X[3] = LX[3]*LH2O/(R*T*T);
-    //fio              fprintf(lfp,"Solution cloud:  %g concentrate.  LSOL=%g\n",C_sol_NH3,LH2O);
-    //fio              fprintf(lfp,"SPH2O=%g\tPH2O=%g\tSPNH3=%g\tPNH3=%g\n",SPH2O,PH2O,SPNH3,PNH3);
             }
       }
+/***************************************************************************************************/
 
+/*       If the user specifies no solution cloud, or the value for the solution cloud is zero.
+          Calculate the saturation vapor pressures for each type of cloud that could form 
+***************************************************************************************************/ 
       if(!sol_cloud || C_sol_zero)
       {
             layer[j].DSOL = ZERO;
@@ -263,32 +305,26 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   strcpy(phase_NH3,"NH3_over_liquid_NH3");
             SPNH3 = sat_pressure(phase_NH3,T);
 
-            if(PH2O - SuperSatSelf[3] > SPH2O)
+            if(PH2O - P*SuperSatSelf[3] > SPH2O)
             {
                   CH2O = 1;
                   LH2O = latent_heat(phase_H2O,T);
-     //fio             fprintf(lfp,"%s:  ",phase_H2O);
-      //fio            fprintf(lfp,"PH2O=%g  SPH2O=%g  LH2O=%g\n",PH2O,SPH2O,LH2O);
                   LX[3] = LH2O*layer[j-1].XH2O;
                   L2X[3]= LX[3]*LH2O/(R*T*T);
             }
 
-            if(PH2S - SuperSatSelf[0] > SPH2S)
+            if(PH2S - P*SuperSatSelf[0] > SPH2S)
             {
                   CH2S = 1;
                   LH2S = latent_heat(phase_H2S,T);
-       //fio           fprintf(lfp,"%s:  ",phase_H2S);
-       //fio           fprintf(lfp,"PH2S=%g  SPH2S=%g  LH2S=%g\n",PH2S,SPH2S,LH2S);
                   LX[1] = LH2S*layer[j-1].XH2S;
                   L2X[1]= LX[1]*LH2S/(R*T*T);
             }
 
-            if(PNH3 - SuperSatSelf[1] > SPNH3)
+            if(PNH3 - P*SuperSatSelf[1] > SPNH3)
             {
                   CNH3 = 1;
                   LNH3 = latent_heat(phase_NH3,T);
-        //fio          fprintf(lfp,"%s:  ",phase_NH3);
-        //fio          fprintf(lfp,"PNH3=%g  SPNH3=%g  LNH3=%g\n",PNH3,SPNH3,LNH3);
                   LX[2] = LNH3*layer[j-1].XNH3;
                   L2X[2]= LX[2]*LNH3/(R*T*T);
             }
@@ -316,9 +352,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             }
             CNH4SH = 1;
             LNH4SH = 9.312E11; /* Atreya book.  1.6E12 Briggs and Sackett */
-     //fio       fprintf(lfp,"NH4SH cloud:  ");
-     //fio       fprintf(lfp,"PNH3PH2S=%g  KNH4SH=%g  LNH4SH=%g",PH2Sp*PNH3p,KNH4SH,LNH4SH);
-     //fio       fprintf(lfp,"  XNH3=%g  XNH3p=%g  XH2S=%g  XH2Sp=%g\n",layer[j-1].XNH3,PNH3p/P,layer[j-1].P,PH2Sp);
             LX[0] = 2.0*LNH4SH*PH2Sp*PNH3p/(P*(PH2Sp+PNH3p));
             L2X[0]= LX[0]*5417.0/(T*T);
       }
@@ -327,24 +360,20 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       {
             CCH4 = 1;
             LCH4 = latent_heat(phase_CH4,T);
-     //fio       fprintf(lfp,"%s:  ",phase_CH4);
-     //fio       fprintf(lfp,"PCH4=%g  SPCH4=%g  LCH4=%g\n",PCH4,SPCH4,LCH4);
             LX[4] = LCH4*layer[j-1].XCH4;
             L2X[4]= LX[4]*LCH4/(R*T*T);
       }
 
-      if(PPH3 - SuperSatSelf[2] > SPPH3)
+      if(PPH3 - P*SuperSatSelf[2] > SPPH3)
       {
             CPH3 = 1;
             LPH3 = latent_heat(phase_PH3,T);
-     //fio       fprintf(lfp,"%s:  ",phase_PH3);
-      //fio      fprintf(lfp,"PPH3=%g  SPPH3=%g  LPH3=%g\n",PPH3,SPPH3,LPH3);
             LX[5] = LPH3*layer[j-1].XPH3;
             L2X[5]= LX[5]*LPH3/(R*T*T);
       }
 
       C = CNH4SH + CH2S + CNH3 + CH2O + CCH4 + CPH3;
-      /*  New temperature:  wet adiabat if C != 0 */
+      /*  New temperature:  wet adiabat if any of the above clouds condense */
       if (C)
       {
             dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X);
@@ -352,8 +381,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             H = R*T/(layer[j-1].mu*layer[j-1].g);
             alr = 1e5*dT/(dP*H/P);
             wet_adiabatic_lapse_rate=alr;
-    //fio        fprintf(lfp,"wet adiabatic lapse rate %g K/km\n",alr);
-    //fio        fprintf(lfp,"wet new T:  %g + %g = %g\n",layer[j-1].T,dT,T);
       }
 
       if (use_lindal=='Y' && layer[j].P==P_targ && !hereonout) hereonout=1;
@@ -378,7 +405,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].XH2S = layer[j-1].XH2S;
             layer[j].XNH3 = layer[j-1].XNH3;
       }
-    //fio  fprintf(lfp,"dXNH4SH = %g  ",dXNH4SH);
 
       if(CH2S)
       {
@@ -404,7 +430,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             dXH2S = 0.0;
             layer[j].DH2S = ZERO;
       }
-      //fio fprintf(lfp,"dXH2S = %g  ",dXH2S);
 
       if(CNH3)
       {
@@ -445,7 +470,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             dXNH3 = 0.0;
             layer[j].DNH3 = ZERO;
       }
-     //fio fprintf(lfp,"dXNH3 = %g  ",dXNH3);
 
       if(CH2O)
       {
@@ -493,7 +517,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].XH2O = layer[j-1].XH2O;
             layer[j].DH2O = ZERO;
       }
-    //fio  fprintf(lfp,"dXH2O = %g  ",dXH2O);
 
       if(CCH4)
       {
@@ -512,7 +535,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].XCH4 = layer[j-1].XCH4;
             layer[j].DCH4 = ZERO;
       }
-    //fio  fprintf(lfp,"dXCH4 = %g  ",dXCH4);
 
       if(CPH3)
       {
@@ -528,7 +550,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].XPH3 = layer[j-1].XPH3;
             layer[j].DPH3 = ZERO;
       }
-     //fio fprintf(lfp,"dXPH3 = %g\n",dXPH3);
 
       layer[j].XHe=layer[j-1].XHe;
 
@@ -549,185 +570,18 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 
       layer[j].mu = AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3;
       layer[j].g = gravity(j);
-   //fio   fprintf(lfp,"cloud structure %06ld",layer[j].clouds);
       return;
 }
-
-float get_dP_using_dz(int j, int *eflag, float dz)
-{
-      float P, T, H, dP;
-
-      if (AutoStep)
-      { 
-            /*dz = log10(layer[j-1].P + 1.6); */
-           /* dz = log10(layer[j-1].P + 5.0); */
-		   printf("%f",AutoStep_constant);
-		   dz=log10(layer[j-1].P + AutoStep_constant );  //what dave actually uses for Priscilla's stuff
-            if (dz > 2.0) dz=2.0;
-      }
-
-  //fio    fprintf(lfp,"\tdz = %f km\n",dz);
-      H = R*layer[j-1].T/(layer[j-1].mu*layer[j-1].g);
-      dP = -1.0*(layer[j-1].P/H)*(1.0E5*dz);
-      P  = layer[j-1].P + dP;
-
-      if (P <= P_term)
-      {
-            *eflag = 99;
-            P = P_term;
-            dP = P - layer[j-1].P;
-      }
-      else if ( P <= P_targ && *eflag != 97 )
-      {
-            *eflag = 98;
-            P = P_targ;
-            dP = P - layer[j-1].P;
-      }
-
-      layer[j].P = P;
-      layer[j].z = layer[j-1].z + dz;
-      if (P<P0 && !CrossP0) 
-      {
-           zP0 = layer[j].z;
-           CrossP0 = 1;
-      }
-
-      return (dP);
-}
-
-float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop)
-{
-      float dz, P, T, H, dP, new_P_fine, new_P_coarse;
-      H = R*layer[j-1].T/(layer[j-1].mu*layer[j-1].g);
-      new_P_fine=layer[j-1].P - dP_fine;
-      new_P_coarse=layer[j-1].P - dP_init;
-      
-      
-      if((new_P_fine > P_fine_start)||(new_P_coarse > P_fine_start))
-      {
-       dP= -1.0*dP_init;
-       P= layer[j-1].P + dP;
-      }
-      else if((new_P_fine <= P_fine_start)&&(new_P_fine > P_targ))
-      {
-          dP= -1.0*dP_fine;
-          P= layer[j-1].P + dP;
-      }
-      else if (P<= P_targ && *eflag != 97)
-      {
-           *eflag = 98;
-           P = P_targ;
-           dP = PfL[1]-P_targ;
-           jj=j;
-      }
-      else if (P <=P_targ)
-      {
-           dP=PfL[j-jj+1]-layer[j-1].P;
-           P=layer[j-1].P+dP;
-          
-      }
-      if(P <= P_term)
-      {
-           *eflag = 99;
-           P= P_term;
-           dP=P - layer[j-1].P;
-      }
-      dz= -1.0*dP/((layer[j-1].P/H)*(1e5));
-      layer[j].P = P;
-      layer[j].z = layer[j-1].z + dz;
-      if(P<P0 && !CrossP0)
-      {
-           zP0= layer[j].z;
-           CrossP0=1;
-      }
-      return (dP);
-}
+/********************************************************************************************/
+/********************************************************************************************/
+/********************************************************************************************/
 
 
-float get_dT(int j, float T, float P, float dP, float *LX, float *L2X)
-{
-      int i;
-      float m, b, Cp, dT_num, dT_den, dT; 
-
-      if (hereonout)   /*linear interpolation from Lindal's points*/
-      {
-            for (i=0; P <= PfL[i]; ++i)  ;
-            m = (TfL[i] - TfL[i-1])/(PfL[i] - PfL[i-1]);
-            b = TfL[i] - m*PfL[i];
-            layer[j].T = m*P + b;
-            dT = layer[j].T - layer[j-1].T;
-      }
-      else
-      {
-            Cp = specific_heat(j, T, P);
-            dT_num = (R*T + LX[0]+LX[1]+LX[2]+LX[3]+LX[4]+LX[5])*dP;
-            dT_den = P*(Cp + L2X[0]+L2X[1]+L2X[2]+L2X[3]+L2X[4]+L2X[5]);
-            dT = dT_num/dT_den;
-            layer[j].T = layer[j-1].T + dT;
-      }
-      return (dT);
-}
-
-float gravity(int j)
-{
-      float gamma, b;
-
-      gamma = 2.0*log(layer[j].P/P0)*(R*layer[j].T)/(R0*layer[j].mu);
-      b = g0 + gamma;
-      return  0.5*( b + sqrt( SQ(b) - SQ(gamma) ) );
-}
 
 
-float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain)
-{
-                  float boltz_sigma=0,Flux=0,cp_temp=0,mu_temp=0,GAMMA_TEMP=0,mixing_L=0,rho_temp=0,Eddy_Diffusion_Coef=0,my_dz=0,wstar=0;
-                  float q_c_old=0,q_v_old=0,Qv=0,q_v=0,q_c=0,gamma=0,F=0,Htemp=0;
-                                    
-                  
-                  boltz_sigma=5.6704e-8; // W/m^2/K^4
-                  Flux=boltz_sigma*(pow(Teff,4));// W/m^2
-                  cp_temp=specific_heat(j,T,P);
-                  mu_temp=AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3; //  g/mol
-                  
-                  
-                  if((wet_adiabatic_lapse_rate/dry_adiabatic_lapse_rate)>0.1)
-                  {
-                  	GAMMA_TEMP=(wet_adiabatic_lapse_rate/dry_adiabatic_lapse_rate);
-                  }
-                  else
-                  {
-                  GAMMA_TEMP=0.1;
-                  }
-                  mixing_L=H*GAMMA_TEMP;
-                  rho_temp=(mu_temp*P)/(R*T);
-                  F=(gamma-1.0)/gamma;
-                  Eddy_Diffusion_Coef=(H)*F*pow(mixing_L/H,(4.0/3.0))*pow((1e-3)*(R*Flux)/(mu_temp*rho_temp*cp_temp),1.0/3.0);
-                  
-                  if(Eddy_Diffusion_Coef<1e5)
-                  {
-                        Eddy_Diffusion_Coef=1e5;
-                        
-                  }
-                  my_dz=1e5*(layer[j].z-layer[j-1].z);
-                  wstar=Eddy_Diffusion_Coef/mixing_L;
 
 
-                  if(layer[j-1].first!=1)
-                  {
-                    q_c_old=delta_q_c;//(-1)*dXH2O*(1-C_sol_NH3);
-                    q_v_old=previous_q_v;
-                  }
-                  else
-                  {
-                    q_c_old=previous_q_c; 
-                    q_v_old=previous_q_v;                    
-                  }
-      
-                  q_v=current_q_v;
-                  q_c=-(Eddy_Diffusion_Coef*(q_v-q_v_old-q_c_old))/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
-                  //Qv=(-Eddy_Diffusion_Coef*(q_v-q_v_old))/my_dz;
-                  //q_c=(Eddy_Diffusion_Coef*q_c_old-Qv*my_dz)/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
-                  
-                  return q_c;
-}
+
+
+
 

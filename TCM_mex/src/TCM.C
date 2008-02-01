@@ -75,7 +75,6 @@ void mexFunction(int nlhs, mxArray *plhs[],
 	  float P_targ_i=getMatlabScalar(prhs[14]);
 	  float P_term_i=getMatlabScalar(prhs[15]);
 	  float use_lindal_in=getMatlabScalar(prhs[16]);
-	//  char use_lindal_i=getMatlabCharacter(prhs[16]);
 	  int n_lindal_pts_i=getMatlabInt(prhs[17]);
 	  float SuperSatSelf1_i=getMatlabScalar(prhs[18]);
 	  float SuperSatSelf2_i=getMatlabScalar(prhs[19]);
@@ -100,52 +99,39 @@ void mexFunction(int nlhs, mxArray *plhs[],
           printf("Starting DeBoer/Steffes/Karpowicz Thermo-chemical Model\n");		
 	  layer = (struct ATM_LAYER *) calloc(MAXLAYERS, sizeof(struct ATM_LAYER));
       if (layer==NULL) {printf("Insufficient memory.\n");return;}
-	  
-	  // any thing with //fo removes file output 
-      //lfp = fopen("layers.out","w");
-	 // if(use_lindal_in==0) use_lindal_i='Y';
-	 // if(use_lindal_in==1) use_lindal_i='N';
-      found = init_atm(0, XHe_i,XH2S_i,XNH3_i,XH2O_i,XCH4_i,XPH3_i,P_temp,T_temp,g0_i, R0_i, P0_i,use_lindal_i, T_targ_i, P_targ_i, P_term_i,n_lindal_pts_i,SuperSatSelf1_i,SuperSatSelf2_i,SuperSatSelf3_i,SuperSatSelf4_i,supersatNH3_i,supersatH2S_i);
+      
+      found = init_atm(0, XHe_i,XH2S_i,XNH3_i,XH2O_i,XCH4_i,XPH3_i,P_temp,T_temp,g0_i, R0_i, \
+                      P0_i,use_lindal_i, T_targ_i, P_targ_i, P_term_i,n_lindal_pts_i,\
+                      SuperSatSelf1_i,SuperSatSelf2_i,SuperSatSelf3_i,SuperSatSelf4_i,\
+                      supersatNH3_i,supersatH2S_i);
 	  
       if (USE_SOL_CLOUD)
             init_soln_cloud(1);
       
-      //printf("Input the altitude increment, dz, in km (0 for auto):  ");
-      //scanf("%f",&dz);
-	  if (dz==0.0) {printf("Using AutoStep.\n"); AutoStep=1;}
+      if (dz==0.0) {printf("Using AutoStep.\n"); AutoStep=1;}
       else AutoStep=0;
 	  
-      //fio fprintf(lfp,"---------------------------------------------------------\n\n");
-	  
+        
       while (fabs(T_err) > TLIMIT && jcntr < MAXTRIES)
       {
             eflag = 0;
             jj=0;
             ++jcntr;
-           //fio fprintf(lfp,"****************iteration: %d*****************\n",jcntr);
-			
+           		
             printf("iteration: %d      \n",jcntr);
-            
-           //fio fprintf(lfp,"***layer:  0    T=%g P=%g\n",layer[0].T,layer[0].P);
-           //fio fprintf(lfp,"H2=%g%% He=%g%% H2S=%g%% NH3=%g%% H2O=%g%% CH4=%g%% PH3=%g%%\n",100.0*layer[0].XH2,100.0*layer[0].XHe,100.0*layer[0].XH2S,100.0*layer[0].XNH3,100.0*layer[0].XH2O,100.0*layer[0].XCH4,100.0*layer[0].XPH3);
-			
+            		
             for(j=1;eflag!=99 && j<MAXLAYERS;++j)           
             {                                               
-              //fio    fprintf(lfp,"\n\n***layer: %d\t",j);
+              
               new_layer(j,dz,&eflag, dP_init, dP_fine, P_fine_start, P_fine_stop, frain,select_ackerman);
               P = layer[j].P;
                   
-                 // printf("%d:  P = %.3f, T = %.3f          \r",j,P,layer[j].T);
                   if (eflag == 98)  /* check target temperature */
                   {                                         /* eflag       P      */
                         eflag = 97;                         /*  97      < P_targ  */
                         T = layer[j].T;                     /*  99      <=P_term  */
                         T_err = 100.0*(T - T_targ)/T_targ;  /*  98      <=P_targ  */
-                //        printf("\tActual: T(P=%g)=%g\tTarget: T(P=%g)=%g\n\t==>  Error=%6.2g%%\n",P,T,P_targ,T_targ,T_err);
-//printf("You enjoy jj=%d \n",jj);
-                //fio        fprintf(lfp,"\n\n\tActual: T(P=%g)=%g\t\tTarget: T(P=%g)=%g\n\t==>  Error=%6.2g%%\n",P,T,P_targ,T_targ,T_err);
-                //fio        fprintf(lfp,"T=%g T_targ=%g T_err=%g T_old=%g ",T,T_targ,T_err,layer[0].T);
-                        if (fabs(T_err)>TLIMIT)
+                      if (fabs(T_err)>TLIMIT)
                         {
                               layer[0].T = layer[0].T - (T - T_targ)*2.0;
                               P = layer[0].P;
@@ -153,27 +139,22 @@ void mexFunction(int nlhs, mxArray *plhs[],
                               sol_cloud = USE_SOL_CLOUD;
                               NH4SH_cloud_base = 0;
                         }
-                     //fio   fprintf(lfp,"T_new=%g\n",layer[0].T);
-                     //fio   fprintf(lfp,"H2=%g%% He=%g%% H2S=%g%% NH3=%g%% H2O=%g%% CH4=%g%% PH3=%g%%\n",100.0*layer[j].XH2,100.0*layer[j].XHe,100.0*layer[j].XH2S,100.0*layer[j].XNH3,100.0*layer[j].XH2O,100.0*layer[j].XCH4,100.0*layer[j].XPH3);
+                     
                   }
             }
 			
       }
-  //    printf("Tropopause reached:  P = %.3f, T = %.3f          \n",P,layer[j-1].T);
+  
       if (P > P_term)
       {
              printf("Abnormal termination. P= %f bigger than Pterm=%f                       \n",P,P_term);
              printf("jj val %d",jj);
-             //fio fprintf(lfp,"Abnormal termination.\n");
              return ;
       }
       top = j-1;
       if (USE_SOL_CLOUD)
             init_soln_cloud(0);
-  //    printf("Thermo-chemical modeling complete.\n");
-      //fio fprintf(lfp,"\nThermo-chemical modeling complete.\n\n");
-      //fio fprintf(lfp,"---------------------------------------------------------\n\n");
-
+  
       if (use_lindal == 'Y' || use_lindal == 'y')
       {
             free(PfL);
@@ -182,8 +163,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
       printf("Sending Data your way via Matlab mex! \n \n");
       
       ofp1=fopen("tcm.out","w");
-      //printf("              ");
-	  funoutput = (double *) malloc(top*sizeof(double));
+  	  funoutput = (double *) malloc(top*sizeof(double));
 	  plhs[0] = mxCreateDoubleMatrix(top+1, 1, mxREAL);
 	  plhs[1] = mxCreateDoubleMatrix(top+1, 1, mxREAL);
 	  plhs[2] = mxCreateDoubleMatrix(top+1, 1, mxREAL);
@@ -238,8 +218,7 @@ void mexFunction(int nlhs, mxArray *plhs[],
             if(layer[j].P<P0 && !cross_my_P0)
             {
                   z_offset=layer[j].z;
-                 // printf("offset is %f \n",z_offset);
-				  cross_my_P0=1;
+                  cross_my_P0=1;
             }
       }
 
