@@ -1,12 +1,13 @@
 /****************************sp_heat.c**************************************/
-#include "model.h"
+#include "layers.h"
+//#include "model.h"
 //#define  NUMBER_H2  16
 //#define  fp         0.0  /* Para fraction.  0.0=equilibrium,  -1.0=intermediate
 //                                            0.25 = normal     */
 
 /*extern struct ATM_LAYER layer[MAXLAYERS];*/
-extern struct ATM_LAYER *layer;
-extern float Hydrogen_Curve_Fit_Select;
+//extern struct ATM_LAYER *layer;
+//extern float Hydrogen_Curve_Fit_Select;
 
 float specific_heat(int j, float T, float P)
 {

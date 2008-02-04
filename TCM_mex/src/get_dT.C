@@ -15,11 +15,12 @@ float specific_heat(int j, float T, float P);
 //            --> *L2X: Array of latent heats squared times mole fraction (see DeBoer eqn 3.19)
 /********************************************************************************************/
 
-float get_dT(int j, float T, float P, float dP, float *LX, float *L2X)
+float get_dT(int j, float T, float P, float dP, float *LX, float *L2X, int hereonout)
 {
       int i;
       float m, b, Cp, dT_num, dT_den, dT; 
-
+      
+      extern float *TfL, *PfL, lawf[];
       if (hereonout)   /*linear interpolation from Lindal's points*/
       {
             for (i=0; P <= PfL[i]; ++i)  ;
@@ -30,6 +31,7 @@ float get_dT(int j, float T, float P, float dP, float *LX, float *L2X)
       }
       else
       {
+            
             Cp = specific_heat(j, T, P);
             dT_num = (R*T + LX[0]+LX[1]+LX[2]+LX[3]+LX[4]+LX[5])*dP;
             dT_den = P*(Cp + L2X[0]+L2X[1]+L2X[2]+L2X[3]+L2X[4]+L2X[5]);
@@ -38,6 +40,14 @@ float get_dT(int j, float T, float P, float dP, float *LX, float *L2X)
       }
       return (dT);
 }
+
+
+
+
+
+
+
+
 /********************************************************************************************/
 /********************************************************************************************/
 /********************************************************************************************/

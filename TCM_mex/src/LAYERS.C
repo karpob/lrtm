@@ -4,16 +4,17 @@
 /****************************layers.c**************************************/
 #include "layers.h"
 float gravity(int j);
-float specific_heat(int j, float T, float P);
+//float specific_heat(int j, float T, float P);
 float sat_pressure(char component[], float T);
 float solution_cloud(float T, float PNH3, float PH2O, float *SPNH3, float *SPH2O);
 float h2s_dissolve(int j, float *SPH2S);
 float latent_heat(char component[], float T);
 float get_dP_using_dz(int j, int *eflag, float dz);
 float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
-float get_dT(int j, float T, float P, float dP, float *LX, float *L2X);
+float get_dT(int j, float T, float P, float dP, float *LX, float *L2X,int hereonout);
 float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain);
 float SuperSatSelf[5];
+extern float *TfL, *PfL, lawf[];
 
 /****************************************************************************************************/
 /***************************************************************************************************/
@@ -214,7 +215,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 
       else dP=get_dP_using_dP(j, eflag, dP_init, dP_fine, P_fine_start, P_fine_stop);
 
-      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X); /*dry adiabat*/
+      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout); /*dry adiabat*/
       P  = layer[j].P;
       T  = layer[j].T;
       PH2  = layer[j-1].XH2*P;
@@ -376,7 +377,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       /*  New temperature:  wet adiabat if any of the above clouds condense */
       if (C)
       {
-            dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X);
+            dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout);
             T = layer[j].T;
             H = R*T/(layer[j-1].mu*layer[j-1].g);
             alr = 1e5*dT/(dP*H/P);
@@ -575,13 +576,5 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 /********************************************************************************************/
 /********************************************************************************************/
 /********************************************************************************************/
-
-
-
-
-
-
-
-
 
 

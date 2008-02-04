@@ -134,8 +134,8 @@ dP_init=1;
 dP_fine=0.1;
 P_fine_start=10;
 P_fine_stop=1;
-frain=50;
-select_ackerman=1;
+frain=1;
+select_ackerman=2;
 
  table_output=[XH2;XHe;(1e6)*XH2S;(1e6)*XNH3;(1e6)*XH2O;(1e6)*XCH4;(1e6)*XPH3];
     to_dlm=transpose(table_output);
