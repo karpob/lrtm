@@ -214,7 +214,8 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       }
 
       else dP=get_dP_using_dP(j, eflag, dP_init, dP_fine, P_fine_start, P_fine_stop);
-
+      
+    /* Calculated Partial pressures of previous step*/
       dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout); /*dry adiabat*/
       P  = layer[j].P;
       T  = layer[j].T;
@@ -239,7 +240,17 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 
 /********************** If the user selects the solution cloud***********************************
 *************************************************************************************************/
+/************************************************************************************************
+  And so it begins....the endless maze of nested if statements.
+  The first set of cases are checking to see whether or not a cloud may form, and calculating the necessary
+  values for latent heat and coefficients specified in DeBoer's Thesis
+  The next set will be denoted by "Updating Mixing Ratios"
+***************************************************************************************************/
 
+
+
+/********************** If the user selects the solution cloud***********************************
+*************************************************************************************************/
       if (sol_cloud)
       {
             C_sol_NH3 = solution_cloud(T,PNH3,PH2O,&SPNH3,&SPH2O);
@@ -369,8 +380,8 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       {
             CPH3 = 1;
             LPH3 = latent_heat(phase_PH3,T);
-            LX[5] = LPH3*layer[j-1].XPH3;
-            L2X[5]= LX[5]*LPH3/(R*T*T);
+            LX[5] = LPH3*layer[j-1].XPH3;// LX part of the numerator of DeBoer's Thesis eqn (3.19)
+            L2X[5]= LX[5]*LPH3/(R*T*T);//L2X is part of the denominator of DeBoer's Thesis eqn (3.19)
       }
 
       C = CNH4SH + CH2S + CNH3 + CH2O + CCH4 + CPH3;
@@ -385,7 +396,14 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       }
 
       if (use_lindal=='Y' && layer[j].P==P_targ && !hereonout) hereonout=1;
-      /*  Update mixing ratios  */
+/*******************************************************  Updating Mixing Ratios  **************************************************
+   Once the latent heat values and coefficients are computed, the cloud density values and saturated abundances of the precursor
+  (remaining gas) are calculated. To find the end of this maze of if statements, look for "End phosphine condensate case"
+/********************************************************************************************************************************/
+
+/************************************************************************************************************************************
+                                                Ammonium Hydrosulfide cloud case
+*************************************************************************************************************************************/
       if(CNH4SH)
       {
             dXNH4SH = PH2Sp*PNH3p/(P*(PH2Sp+PNH3p))*(10834.0*dT/T/T - 2.0*dP/P);
@@ -406,7 +424,12 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].XH2S = layer[j-1].XH2S;
             layer[j].XNH3 = layer[j-1].XNH3;
       }
+/*************************************************   End Ammonium hydrosulfide      ********************************************/
 
+
+/************************************************************************************************************************************
+                                                Hydrogen Sulfide cloud case
+*************************************************************************************************************************************/
       if(CH2S)
       {
             layer[j].XH2S = (double) SPH2S/(double) P + SuperSatSelf[0];
@@ -431,6 +454,13 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             dXH2S = 0.0;
             layer[j].DH2S = ZERO;
       }
+
+/*************************************************   End Hydrogen Sulfide      ********************************************/
+
+
+/************************************************************************************************************************************
+                            Ammonia condensate case (sub cases of solution cloud, and ammonia ice cloud)
+*************************************************************************************************************************************/
 
       if(CNH3)
       {
@@ -472,12 +502,19 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].DNH3 = ZERO;
       }
 
+/*************************************************   End Ammonia condensate     ********************************************/
+
+
+/**************************************************************************************************************************
+                            Water condensate clould (sub case of solution cloud, and ice cloud)
+***************************************************************************************************************************/
+
       if(CH2O)
       {
             layer[j].XH2O = (double) SPH2O/(double) P + SuperSatSelf[3];
             if (sol_cloud)
             {
-                  dXH2O = layer[j].XH2O - layer[j-1].XH2O-(SuperSatSelf[3]*SPH2O)/P;
+                  dXH2O = layer[j].XH2O - layer[j-1].XH2O;
                   //Insert Ackerman & Marley Procedure Here
                   
                   if(select_ackerman==1 || select_ackerman==3) //If frain is applied to solution cloud, or both solution cloud and ammonia ice
@@ -510,7 +547,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                       wet_adiabatic_lapse_rate=alr;
                     }
 
-                   layer[j].first=1;
+                   layer[j].first=1;//Set the first flag to indicate that this is NOT the first level we've seen a solution cloud.
                   
                   }
                   else
@@ -519,6 +556,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                     layer[j].DSOL_NH3=1e6*(C_sol_NH3*AMU_NH3*dXNH3*P*P)/(R*T*dP);
                   }
                   layer[j].DH2O = ZERO;
+                  //if we're above the cloud threshould put this "cloud mask address" in layer[j].clouds
                   if (layer[j].DSOL > COUNT_CLOUD)
                         layer[j].clouds+=1L;
             }
@@ -530,14 +568,19 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                         layer[j].clouds+=2L;
             }
       }
-      else
+      else    //If there isn't a water condensate...Don't Make one via numerical error! Keep mole fraction for next level.
       {
             dXH2O = 0.0;
             layer[j].XH2O = layer[j-1].XH2O;
             layer[j].DH2O = ZERO;
       }
 
-      if(CCH4)
+/*************************************************      End water condensate case          ********************************************/
+
+/************************************************************************************************************************************
+                                                       Methane condensate case
+*************************************************************************************************************************************/
+      if(CCH4) //If a methane cloud condensate forms. No supersaturation here!
       {
             dXCH4 = (LCH4*layer[j-1].XCH4)*dT/(R*T*T) - layer[j-1].XCH4*dP/P;
             layer[j].XCH4 = (double) SPCH4/(double) P;
@@ -548,12 +591,18 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   else layer[j].clouds+=20000L;
             }
       }
-      else
+      else //If it doesn't don't make one vial numerical error! Keep mole fraction for next level.
       {
             dXCH4 = 0.0;
             layer[j].XCH4 = layer[j-1].XCH4;
             layer[j].DCH4 = ZERO;
       }
+
+/***************************************************** End Methane condensate case **************************************************/
+
+/************************************************************************************************************************************
+                                                       Phosphine condensate case
+*************************************************************************************************************************************/
 
       if(CPH3)
       {
@@ -569,9 +618,11 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].XPH3 = layer[j-1].XPH3;
             layer[j].DPH3 = ZERO;
       }
+/***************************************************** End phosphine condensate case **************************************************/
 
+      //This last piece updates the value for Helium (doesn't condense, so use the previous step)
       layer[j].XHe=layer[j-1].XHe;
-
+      // Check to see if the condensible species are above the "Gone" threshold.
       if(layer[j].XNH3 < GONE) layer[j].XNH3 = ZERO;
       if(layer[j].XH2S < GONE) layer[j].XH2S = ZERO;
       if(layer[j].XCH4 < GONE) layer[j].XCH4 = ZERO;
@@ -579,18 +630,17 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       if(layer[j].XPH3 < GONE) layer[j].XPH3 = ZERO;
 
       XHe  = layer[j].XHe;
-      XH2S = layer[j].XH2S;layer[j].DH2O = ZERO;
+      XH2S = layer[j].XH2S;
       XNH3 = layer[j].XNH3;
       XH2O = layer[j].XH2O;
       XCH4 = layer[j].XCH4;
       XPH3 = layer[j].XPH3;
+   //calculated the abundance of H2 as the remainder of the other constituents.
       layer[j].XH2  = (1.0-XH2S-XNH3-XH2O-XCH4-XPH3-XHe-XCO);
       XH2  = layer[j].XH2;
-
+     //Calculate the molecular weight (mu in Deboer's thesis chapter 3, not to be confused with cos(theta)) of the "Air"
       layer[j].mu = AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3;
-      layer[j].g = gravity(j);
-      return;
+      layer[j].g = gravity(j);//calculated the acceleration due to gravity cm/sec^2
+      return; //Go back to main function in TCM.C returning nothing, but having updated values in layers data structure (see model.h)
 }
-/********************************************************************************************/
-/********************************************************************************************/
-/********************************************************************************************/
+//End of the bloody new_layer function!
