@@ -187,7 +187,7 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
 void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, \
                float P_fine_stop,float frain, float select_ackerman)
 {
-      int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0,kludge=0;
+      int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0;
       float LX[6]={0.0,0.0,0.0,0.0,0.0,0.0}, L2X[6]={0.0,0.0,0.0,0.0,0.0,0.0};
       float P, T, dT, dP, PNH3p, PH2Sp, freeze;
       float PH2, PHe, PH2S, PNH3, PH2O, PCH4, PPH3;
@@ -306,7 +306,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   strcpy(phase_NH3,"NH3_over_liquid_NH3");
             SPNH3 = sat_pressure(phase_NH3,T);
 
-            if(PH2O - P*SuperSatSelf[3] > SPH2O)
+            if(PH2O - PH2O*SuperSatSelf[3] > SPH2O)
             {
                   CH2O = 1;
                   LH2O = latent_heat(phase_H2O,T);
@@ -314,7 +314,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   L2X[3]= LX[3]*LH2O/(R*T*T);
             }
 
-            if(PH2S - P*SuperSatSelf[0] > SPH2S)
+            if(PH2S - PH2S*SuperSatSelf[0] > SPH2S)
             {
                   CH2S = 1;
                   LH2S = latent_heat(phase_H2S,T);
@@ -322,7 +322,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   L2X[1]= LX[1]*LH2S/(R*T*T);
             }
 
-            if(PNH3 - P*SuperSatSelf[1] > SPNH3)
+            if(PNH3 - PNH3*SuperSatSelf[1] > SPNH3)
             {
                   CNH3 = 1;
                   LNH3 = latent_heat(phase_NH3,T);
@@ -344,7 +344,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 
       KNH4SH = sat_pressure("NH4SH",T);
 
-      if(PH2Sp*PNH3p > KNH4SH)
+      if(PH2Sp*PNH3p > KNH4SH) //Does NH4SH cloud form? If so, calculate latent heat.
       {
             if ( !NH4SH_cloud_base )
             {
@@ -357,7 +357,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             L2X[0]= LX[0]*5417.0/(T*T);
       }
 
-      if(PCH4 > SPCH4)
+      if(PCH4 > SPCH4) //Does a CH4 cloud form?
       {
             CCH4 = 1;
             LCH4 = latent_heat(phase_CH4,T);
@@ -365,7 +365,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             L2X[4]= LX[4]*LCH4/(R*T*T);
       }
 
-      if(PPH3 - P*SuperSatSelf[2] > SPPH3)
+      if(PPH3 - PPH3*SuperSatSelf[2] > SPPH3) //Does a Phosphine cloud form? If so calculate latent heat.
       {
             CPH3 = 1;
             LPH3 = latent_heat(phase_PH3,T);
@@ -477,28 +477,46 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             layer[j].XH2O = (double) SPH2O/(double) P + SuperSatSelf[3];
             if (sol_cloud)
             {
-                  dXH2O = layer[j].XH2O - layer[j-1].XH2O;
+                  dXH2O = layer[j].XH2O - layer[j-1].XH2O-(SuperSatSelf[3]*SPH2O)/P;
                   //Insert Ackerman & Marley Procedure Here
                   
-                  if(select_ackerman==1 || select_ackerman==3)
+                  if(select_ackerman==1 || select_ackerman==3) //If frain is applied to solution cloud, or both solution cloud and ammonia ice
                   {
-                  Teff=124; //Kelvin                  
-                  q_c=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
+                      Teff=124; //Kelvin
+                                        
+                      q_c=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
                                                 layer[j-1].z, layer[j-1].q_c,layer[j].XH2O,layer[j-1].XH2O, XH2, XHe, XH2S, XNH3, XH2O,\
                                                 XCH4, XPH3, (-1)*dXH2O*(1-C_sol_NH3), frain);
-                  q_c_nh3=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
+                      
+                      q_c_nh3=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
                                                 layer[j-1].z, layer[j-1].q_c_nh3,layer[j].XNH3,layer[j-1].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
                                                 XCH4, XPH3,(-1)*dXNH3*C_sol_NH3, frain);
-                  layer[j].DSOL =1e6*((q_c*AMU_H2O+q_c_nh3)*P*P)/(R*T*-dP);
-                  layer[j].DSOL_NH3=1e6*(q_c_nh3*AMU_NH3*P*P)/(R*T*-dP);
-                  layer[j].q_c_nh3=q_c_nh3;
-                  layer[j].q_c=q_c;
-                  layer[j].first=1;
+                      
+                      layer[j].DSOL =1e6*((q_c*AMU_H2O+q_c_nh3)*P*P)/(R*T*-dP); //Calulate cloud density g/cm^3 of solution cloud
+                      layer[j].DSOL_NH3=1e6*(q_c_nh3*AMU_NH3*P*P)/(R*T*-dP);  // Calculate cloud density g/cm^3 of solution cloud that is actually NH3
+                      
+                      layer[j].q_c_nh3=q_c_nh3;
+                      layer[j].q_c=q_c;
+
+                  if(layer[j].first!=1) wet_adiabatic_lapse_rate=alr;
+                  else
+                    {
+                      LX[3]  = LH2O*layer[j-1].q_c;
+                      L2X[3] = LX[3]*LH2O/(R*T*T);
+                      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout);
+                      T = layer[j].T;
+                      H = R*T/(layer[j-1].mu*layer[j-1].g);
+                      alr = 1e5*dT/(dP*H/P);
+                      wet_adiabatic_lapse_rate=alr;
+                    }
+
+                   layer[j].first=1;
+                  
                   }
                   else
-                  {
-                  layer[j].DSOL = 1e6*( (1.0-C_sol_NH3)*AMU_H2O*dXH2O + C_sol_NH3*AMU_NH3*dXNH3)*P*P/(R*T*dP);
-                  layer[j].DSOL_NH3=1e6*(C_sol_NH3*AMU_NH3*dXNH3*P*P)/(R*T*dP);
+                   {
+                    layer[j].DSOL = 1e6*( (1.0-C_sol_NH3)*AMU_H2O*dXH2O + C_sol_NH3*AMU_NH3*dXNH3)*P*P/(R*T*dP);
+                    layer[j].DSOL_NH3=1e6*(C_sol_NH3*AMU_NH3*dXNH3*P*P)/(R*T*dP);
                   }
                   layer[j].DH2O = ZERO;
                   if (layer[j].DSOL > COUNT_CLOUD)
@@ -576,5 +594,3 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 /********************************************************************************************/
 /********************************************************************************************/
 /********************************************************************************************/
-
-
