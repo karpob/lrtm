@@ -120,10 +120,10 @@ P_targ_i=1;
 P_term_i=0.141;
 use_lindal='Y';
 SuperSatSelf_H2S=0;
-SuperSatSelf_NH3=0;
+SuperSatSelf_NH3=1;
 SuperSatSelf_PH3=0;
 SuperSatSelf_H2O=0;
-supersatNH3=0;
+supersatNH3=1;
 supersatH2S=0;
 AutoStep_constant=8;
 fp=-1;
@@ -134,7 +134,7 @@ dP_init=1;
 dP_fine=0.1;
 P_fine_start=10;
 P_fine_stop=1;
-frain=1;
+frain=3;
 select_ackerman=2;
 
  table_output=[XH2;XHe;(1e6)*XH2S;(1e6)*XNH3;(1e6)*XH2O;(1e6)*XCH4;(1e6)*XPH3];
@@ -161,7 +161,7 @@ end
 theta=0
 Raydirection(1)=-cos(theta*(pi/180));
 Raydirection(2)=sin(theta*(pi/180));
-
+save('fun.mat')
 %Run Radiative Transfer model for all frequencies
 for j=1:length(f)
     no_ph3=0; 

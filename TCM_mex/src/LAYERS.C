@@ -317,7 +317,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   strcpy(phase_NH3,"NH3_over_liquid_NH3");
             SPNH3 = sat_pressure(phase_NH3,T);
 
-            if(PH2O - PH2O*SuperSatSelf[3] > SPH2O)
+            if(PH2O - SPH2O*SuperSatSelf[3] > SPH2O)
             {
                   CH2O = 1;
                   LH2O = latent_heat(phase_H2O,T);
@@ -325,7 +325,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   L2X[3]= LX[3]*LH2O/(R*T*T);
             }
 
-            if(PH2S - PH2S*SuperSatSelf[0] > SPH2S)
+            if(PH2S - SPH2S*SuperSatSelf[0] > SPH2S)
             {
                   CH2S = 1;
                   LH2S = latent_heat(phase_H2S,T);
@@ -333,7 +333,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   L2X[1]= LX[1]*LH2S/(R*T*T);
             }
 
-            if(PNH3 - PNH3*SuperSatSelf[1] > SPNH3)
+            if(PNH3 - SPNH3*SuperSatSelf[1] > SPNH3)
             {
                   CNH3 = 1;
                   LNH3 = latent_heat(phase_NH3,T);
@@ -376,7 +376,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             L2X[4]= LX[4]*LCH4/(R*T*T);
       }
 
-      if(PPH3 - PPH3*SuperSatSelf[2] > SPPH3) //Does a Phosphine cloud form? If so calculate latent heat.
+      if(PPH3 - SPPH3*SuperSatSelf[2] > SPPH3) //Does a Phosphine cloud form? If so calculate latent heat.
       {
             CPH3 = 1;
             LPH3 = latent_heat(phase_PH3,T);
@@ -432,16 +432,18 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 *************************************************************************************************************************************/
       if(CH2S)
       {
-            layer[j].XH2S = (double) SPH2S/(double) P + SuperSatSelf[0];
+            //layer[j].XH2S=(double)SPH2S/(double)P;
             if (sol_cloud)
             {
                   dXH2S = layer[j].XH2S - layer[j-1].XH2S;
                   layer[j].DH2S = ZERO;
+                  layer[j].XH2S = (double) SPH2S/(double) P;
             }
             else
             {
                   dXH2S = (LH2S*layer[j-1].XH2S)*dT/(R*T*T) - layer[j-1].XH2S*dP/P;
                   layer[j].DH2S = 1e6*AMU_H2S*P*P*dXH2S/(R*T*dP);
+                  layer[j].XH2S = (double) SPH2S/(double) P + ((double)SuperSatSelf[0]*(double)SPH2S)/(double)P;
                   if (layer[j].DH2S > COUNT_CLOUD)
                   {
                         if (T > TRIPLEPT_H2S) layer[j].clouds+=1000L;
@@ -464,11 +466,12 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 
       if(CNH3)
       {
-            layer[j].XNH3 = (double) SPNH3/(double) P + SuperSatSelf[1];
+            //layer[j].XNH3=(double)SPNH3/(double)P;
             if (sol_cloud)
             {
                   dXNH3 = layer[j].XNH3 - layer[j-1].XNH3;
                   layer[j].DNH3 = ZERO;
+                  layer[j].XNH3=(double)SPNH3/(double)P;
             }
             else
             {
@@ -482,11 +485,13 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                                                 XCH4, XPH3, dXNH3, frain);
                   layer[j].DNH3 = 1e6*AMU_NH3*P*P*q_c_nh3_ice/(R*T*-dP);
                   layer[j].q_c_nh3_ice=q_c_nh3_ice;
+                  layer[j].XNH3 = (double) SPNH3/(double) P + ((double)SPNH3*(double)SuperSatSelf[1])/(double)P;
                   layer[j].first_nh3=1;
                   }
                   else
                   {
                   layer[j].DNH3=1e6*AMU_NH3*P*P*dXNH3/(R*T*dP);
+                  layer[j].XNH3 = (double) SPNH3/(double) P + ((double)SPNH3*(double)SuperSatSelf[1])/(double)P;
                   }
                   
                   if (layer[j].DNH3 > COUNT_CLOUD)
@@ -511,7 +516,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 
       if(CH2O)
       {
-            layer[j].XH2O = (double) SPH2O/(double) P + SuperSatSelf[3];
+            //layer[j].XH2O=(double)SPH2O/(double)P;
             if (sol_cloud)
             {
                   dXH2O = layer[j].XH2O - layer[j-1].XH2O;
@@ -546,7 +551,8 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                       alr = 1e5*dT/(dP*H/P);
                       wet_adiabatic_lapse_rate=alr;
                     }
-
+                    layer[j].XH2O = (double) SPH2O/(double) P + ((double)SuperSatSelf[3]*(double)SPH2O)/(double)P; //adding supersaturation of water as a fraction of saturation
+                   
                    layer[j].first=1;//Set the first flag to indicate that this is NOT the first level we've seen a solution cloud.
                   
                   }
@@ -554,6 +560,8 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                    {
                     layer[j].DSOL = 1e6*( (1.0-C_sol_NH3)*AMU_H2O*dXH2O + C_sol_NH3*AMU_NH3*dXNH3)*P*P/(R*T*dP);
                     layer[j].DSOL_NH3=1e6*(C_sol_NH3*AMU_NH3*dXNH3*P*P)/(R*T*dP);
+                    layer[j].XH2O = (double) SPH2O/(double) P + ((double)SuperSatSelf[3]*(double)SPH2O)/(double)P; //adding supersaturation of water as a fraction of saturation
+               
                   }
                   layer[j].DH2O = ZERO;
                   //if we're above the cloud threshould put this "cloud mask address" in layer[j].clouds
@@ -563,9 +571,10 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
             else
             {
                   dXH2O = (LH2O*layer[j-1].XH2O)*dT/(R*T*T) - layer[j-1].XH2O*dP/P;
-                  layer[j].DH2O = 1e6*AMU_H2O*P*P*dXH2O/(R*T*dP);
-                  if (layer[j].DH2O > COUNT_CLOUD)
-                        layer[j].clouds+=2L;
+                  layer[j].DH2O = 1e6*AMU_H2O*P*P*dXH2O/(R*T*dP);   //NOTE!!!! no supersaturation included for ice cloud, if you want it, add it with caution
+                  layer[j].XH2O= (double) SPH2O/(double) P;         //     (ie. I wouldn't recommend sticking the same value for solution cloud here
+                  if (layer[j].DH2O > COUNT_CLOUD)                  //      as it wouldn't be physically represenative. Different phases will have different
+                        layer[j].clouds+=2L;                        //      CCN (Cloud Condensation Nuclei))!!!!!
             }
       }
       else    //If there isn't a water condensate...Don't Make one via numerical error! Keep mole fraction for next level.
@@ -607,7 +616,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       if(CPH3)
       {
             dXPH3 = (LPH3*layer[j-1].XPH3)*dT/(R*T*T) - layer[j-1].XPH3*dP/P;
-            layer[j].XPH3 = (double) SPPH3/(double) P + SuperSatSelf[2];
+            layer[j].XPH3 = (double) SPPH3/(double) P + ((double)SuperSatSelf[2]*(double)SPPH3)/(double)P; //adding supersaturation of phosphine as a fraction of saturation
             layer[j].DPH3 = 1e6*AMU_PH3*P*P*dXPH3/(R*T*dP);
             if(layer[j].DPH3 > COUNT_CLOUD)
                   layer[j].clouds+=100000L;
