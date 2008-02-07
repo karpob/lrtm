@@ -1,5 +1,7 @@
-/****************************sat_lat.c************************************/
+/* Initialize solution cloud (read in Romani's data file), and calculate concentration of NH3 that condenses in solution cloud*/
 #include "model.h"
+
+
 /*  These declarations are for computing the H2O-NH3 solution cloud  */
 #define ROMANI        1           /* 1=use Romani, 0=use Briggs/Sackett */
 static int KA=0, KLT=0, KHT=0;
@@ -17,6 +19,22 @@ void PPRES(float C1, float T1, float *VPH, float *VPN);
 #define  NA     20
 #define  NWLT   18
 #define  NWHT   20
+
+/****************************************************************************************************
+      init_soln_cloud()
+                       This reads in coefficients for some spline fits
+                       given by Paul Romani.  This is DeBoer's adaptation in C
+                       from the original FORTRAN code. Uses the coefficients
+                       in spline fits for calculation of parameters in solution_cloud().
+            input: 
+                   --> int mode: If 1 is selected, this will read in and plug in to 
+                                 spline fits.
+                                 If anything else, it will remove the coefficients from memory.
+            output:
+                      None, really. However, several cryptic global variables are calculated which
+                       go into solution_cloud()
+
+****************************************************************************************************/
 
 void init_soln_cloud(int mode)
 {
@@ -139,6 +157,20 @@ void init_soln_cloud(int mode)
 #define LOWER_CONC    0.0
 #define UPPER_CONC    0.5
 #define CONC_STEP     0.0001
+/***************************************************************************************************************
+   solution_cloud(): This routine calculates the mole fraction of ammonia that goes into solution for the water-solution cloud.
+
+         Input: 
+              -->TC: Temperature
+              -->PNH3: Partial Pressure of NH3 in bars.
+              -->PH2O: Partial Pressure of H2O in bars.
+              -->SPNH3: Saturation Pressure of Ammonia
+              -->SPH2O: Saturation Pressure of Water
+
+         Output:
+              <--C_sol: mole fraction of ammonia that dissolves in the solution.
+**************************************************************************************************************/
+
 
 float solution_cloud(float TC, float PNH3, float PH2O, float *SPNH3, float *SPH2O)
 {

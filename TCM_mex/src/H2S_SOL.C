@@ -26,6 +26,18 @@ C
 /*extern struct ATM_LAYER layer[MAXLAYERS];*/
 extern struct ATM_LAYER *layer;
 
+/***********************************************************************
+   h2s_dissolve(): Calculate the mole fraction of H2S that dissolves into
+                   the solution cloud
+                
+         Input:
+             -->int j: layer index
+             -->SPH2S: Saturation vapor pressure of H2S
+
+         Output:
+             <--CH2S: the mole fraction of H2S that dissolves in the cloud.
+***********************************************************************/
+
 float h2s_dissolve(int j, float *SPH2S)
 {
       int i, scloud=0;

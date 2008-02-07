@@ -9,6 +9,22 @@
 //extern struct ATM_LAYER *layer;
 //extern float Hydrogen_Curve_Fit_Select;
 
+
+/*******************************************************************************
+ specifice_heat() this function calculates the specific heat for a 
+                  given temperature and pressure.
+
+      Input: 
+          -->int j : layer index.
+          -->float T: Temperature
+          -->float P: Pressure in bars
+      Output:
+          <--Cp: specific heat in erg/K/mol 
+             To select equilibrium normal or intermediate this is switched through
+             the global variable Hydrogen_Curve_Fit_select 
+                                       0=equilibrium, -1=intermediate,0.25=normal
+
+*****************************************************************************/
 float specific_heat(int j, float T, float P)
 {
       int i;

@@ -226,9 +226,11 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       PPH3 = layer[j-1].XPH3*P;
       PH2O = layer[j-1].XH2O*P;
       PCH4 = layer[j-1].XCH4*P;
-      PNH3p= PNH3 - supersatNH3*P;
-      PH2Sp= PH2S - supersatH2S*P;
-      H = R*T/(layer[j-1].mu*layer[j-1].g);
+      PNH3p= PNH3 - supersatNH3*P;  //Partial Pressure of H2S subtracting supersaturation for NH4SH cloud
+      PH2Sp= PH2S - supersatH2S*P; //Partial Pressure of H2S subtracting supersaturation for NH4SH cloud
+                                   // **Note! supersaturation is defined as an additional mole fraction
+                                   //   whereas SuperSatSelf is defined as fraction of supersaturation (ie. 1=100%)
+      H = R*T/(layer[j-1].mu*layer[j-1].g); //Scale Height
       alr = 1e5*dT/(dP*H/P);
       dry_adiabatic_lapse_rate=alr;
 

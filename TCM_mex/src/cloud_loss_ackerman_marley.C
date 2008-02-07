@@ -40,31 +40,32 @@ float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, floa
        float q_c_old=0,q_v_old=0,Qv=0,q_v=0,q_c=0,gamma=0,F=0,Htemp=0;
                                     
                   
-       boltz_sigma=5.6704e-8; // W/m^2/K^4
-       Flux=boltz_sigma*(pow(Teff,4));// W/m^2
-       cp_temp=specific_heat(j,T,P);
+       boltz_sigma=5.6704e-8; // W/m^2/K^4 (stefan boltzmann constant)
+       Flux=boltz_sigma*(pow(Teff,4));// W/m^2  (Jupiter's thermal emission)
+       cp_temp=specific_heat(j,T,P);  
        mu_temp=AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3; //  g/mol
                   
                   
        if((wet_adiabatic_lapse_rate/dry_adiabatic_lapse_rate)>0.1) GAMMA_TEMP=(wet_adiabatic_lapse_rate/dry_adiabatic_lapse_rate);
-       else GAMMA_TEMP=0.1;
+       else GAMMA_TEMP=0.1; //Eqn 6 of Ackerman and Marley.
 
        mixing_L=H*GAMMA_TEMP;
        rho_temp=(mu_temp*P)/(R*T);
        F=(gamma-1.0)/gamma;
        
        Eddy_Diffusion_Coef=H*F*pow(mixing_L/H,(4.0/3.0))*pow((1e-3)*(R*Flux)\
-                                                          /(mu_temp*rho_temp*cp_temp),1.0/3.0);
-                  
-       if(Eddy_Diffusion_Coef<1e5) Eddy_Diffusion_Coef=1e5;
+                                                          /(mu_temp*rho_temp*cp_temp),1.0/3.0); //eqn. 5 in Ackerman and Marley, 2001
+                                                                                                //1e-3 is there to get consistent units.  
+                                                                                                //Should be in cm^2/sec
+       if(Eddy_Diffusion_Coef<1e5) Eddy_Diffusion_Coef=1e5; //Lower limit on Diffusion as suggested by Ackerman and Marley, 2001                                     
                         
-       my_dz=1e5*(layer[j].z-layer[j-1].z);
-       wstar=Eddy_Diffusion_Coef/mixing_L;
+       my_dz=1e5*(layer[j].z-layer[j-1].z); // my_dz in cm
+       wstar=Eddy_Diffusion_Coef/mixing_L;  // cm/sec
 
 
        if(layer[j-1].first!=1)
         {
-           q_c_old=delta_q_c;//(-1)*dXH2O*(1-C_sol_NH3);
+           q_c_old=delta_q_c;
            q_v_old=previous_q_v;
          }
        else
@@ -74,9 +75,7 @@ float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, floa
          }
          
          q_v=current_q_v;
-         q_c=-(Eddy_Diffusion_Coef*(q_v-q_v_old-q_c_old))/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
-         //Qv=(-Eddy_Diffusion_Coef*(q_v-q_v_old))/my_dz;
-         //q_c=(Eddy_Diffusion_Coef*q_c_old-Qv*my_dz)/(Eddy_Diffusion_Coef+frain*wstar*my_dz);
+         q_c=-(Eddy_Diffusion_Coef*(q_v-q_v_old-q_c_old))/(Eddy_Diffusion_Coef+frain*wstar*my_dz); //solution in discrete form of eqn. 4 in Ackerman and Marley
                   
          return q_c;
 }

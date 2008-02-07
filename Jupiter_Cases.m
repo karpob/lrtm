@@ -161,7 +161,7 @@ end
 theta=0
 Raydirection(1)=-cos(theta*(pi/180));
 Raydirection(2)=sin(theta*(pi/180));
-save('fun.mat')
+
 %Run Radiative Transfer model for all frequencies
 for j=1:length(f)
     no_ph3=0; 

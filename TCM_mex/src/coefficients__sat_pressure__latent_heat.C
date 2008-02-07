@@ -1,6 +1,15 @@
-/****************************sat_lat.c************************************/
 #include "model.h"
 
+/************************************************************************
+   void coefficients(): This function returns the coefficients for 
+                        saturation pressure and latent heat.
+                        See DeBoer's thesis Table 3.1.
+          Input:
+             -->char s[]: String with desired components NH3_over_NH3_ice etc.
+             -->float T: Temperature (not really used, there for fun?)
+          Output:   
+             <--float a[]: Array of coefficients returned 
+**********************************************************************/
 void coefficients(char s[], float a[], float T)
 {
       if( !strcmp(s,"NH3_over_NH3_ice") )  /*Briggs and Sackett*/
@@ -95,6 +104,17 @@ void coefficients(char s[], float a[], float T)
       return;
 }
 
+/*************************************************************************
+ float sat_pressure(): calculates the saturation pressure of a given
+                       condensible species.
+
+         Input:
+           -->char s[]: String of the desired condensation mechanism 
+                        H2S_over_H2S_ice, etc.
+           -->float T: Temperature (K)
+         Output:
+           <--SP or exp(SP): Saturation vapor pressure.
+*************************************************************************/
 #define SUPERSAT 1.00
 float sat_pressure(char s[], float T)
 {
@@ -106,6 +126,18 @@ float sat_pressure(char s[], float T)
 	else return ( exp(SP) );
 }
 #undef SUPERSAT
+/*************************************************************************
+ float latent_heat(): calculates the Latent Heat of a given
+                       condensible species.
+
+         Input:
+                -->char s[]: String of the desired condensation mechanism 
+                        H2S_over_H2S_ice, etc.
+                -->float T: Temperature (K)
+         Output:
+               <--L: Latent Heat.
+*************************************************************************/
+
 
 float latent_heat(char s[], float T)
 {
