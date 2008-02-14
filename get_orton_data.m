@@ -5,14 +5,14 @@ function [tcme,tcmp,Re,gravity]= get_orton_data(oblateness_factor,Planet)
 %Planet=String with name of the desired planet.
 
 if(strcmp(Planet,'Jupiter'))
-	name='Orton_compare/Jupiter_actual.txt'
+	name='Orton_comparison_model/Jupiter_actual.txt'
         Xh2=0.864;
         Xhe=0.134;
         gravity=2400.0; %(cm/sec^2)
         Re=70000.0;  %km
         Re=Re*1e5; %convert to cm        
 elseif(strcmp(Planet,'Saturn'))
-        name='Orton_compare/Saturn_actual.txt'
+        name='Orton_comparison_model/Saturn_actual.txt'
         Xh2=0.881;
         Xhe=0.119;
         gravity=990.0; % cm/sec**2
@@ -20,7 +20,7 @@ elseif(strcmp(Planet,'Saturn'))
         Re=Re*1e5; % convert to cm
 
 elseif(strcmp(Planet,'Uranus'))
-	name='Orton_compare/Uranus_actual.txt'
+	name='Orton_comparison_model/Uranus_actual.txt'
         Xh2=0.827;
         Xhe=0.15;
         gravity=913.0;% cm/sec**2

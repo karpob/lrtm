@@ -15,8 +15,9 @@ co=ao*oblateness_factor; % along z
 %2=goodman
 %3=goodman by joiner
 %4=borysow
-%5=borysow with orton modification
-select_h2h2_model=1;
+%5=borysow with orton et al, 2007 modification
+%6=borysow with orton et al modification with a second modification below 3 GHz
+select_h2h2_model=5;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -39,7 +40,7 @@ select_water_model=2;
 %include cloud absorption?
 %1=yes
 %0=no
-include_clouds=1;
+include_clouds=0;
 
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
@@ -63,7 +64,8 @@ BWHM=10; % Beamwidth Half-maximum
 
 % Juno bands
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
-f=[0.4:0.1:10,10:1:25];
+f=[0.5:0.1:10,10:1:25];
+%f=[0.5,0.6,1,25];
 nfreq=length(f)
 Selected_Model='Mean_Lindal'
 
@@ -110,8 +112,11 @@ for i=1:length(XNH3_rel_H2)
 end
 
 %Misc DeBoer TCM inputs
-P_temp=1000;
-T_temp=1303.349;
+%P_temp=1000;
+%T_temp=1303.349;
+P_temp=6000;
+T_temp=2200;
+
 g0_i=2330; %2417;
 R0e_i=ao;
 P0_i=1;
@@ -135,7 +140,7 @@ dP_fine=0.1;
 P_fine_start=10;
 P_fine_stop=1;
 frain=3;
-select_ackerman=2;
+select_ackerman=0;
 
  table_output=[XH2;XHe;(1e6)*XH2S;(1e6)*XNH3;(1e6)*XH2O;(1e6)*XCH4;(1e6)*XPH3];
     to_dlm=transpose(table_output);

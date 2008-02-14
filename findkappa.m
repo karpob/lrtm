@@ -93,6 +93,9 @@ for k=1:stopindex
    if(select_h2h2_model==5)
        alphah2(k)=falpha_orton(f,T(k),P(k));
    end
+   if(select_h2h2_model==6)
+       alphah2(k)=falpha_orton_mod(f,T(k),P(k));
+   end
 end   
 cd ..
 % Call Water Vapor
