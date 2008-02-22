@@ -2,11 +2,11 @@
 %
 clear all;
 %oblateness_factor=0.935; % Jupiter
-oblateness_factor=0.902; % Saturn
+%oblateness_factor=0.902; % Saturn
 %oblateness_factor=1;
-%oblateness_factor=0.977; %Uranus
-output_filename='orton_test_Saturn_ortonh2h2).mat'
-[tcme,tcmp,Re,gravity]= get_orton_data(oblateness_factor,'Saturn');
+oblateness_factor=0.977; %Uranus
+output_filename='orton_test_Uranus_borysowh2h2).mat'
+[tcme,tcmp,Re,gravity]= get_orton_data(oblateness_factor,'Uranus');
 %oblateness_factor=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Planet verticies                                   %
@@ -15,7 +15,7 @@ ao_jupiter=71492*100000; % along x (in centimeters)
 ao_saturn=60268*100000;
 ao_uranus=25559*100000;
 
-ao=ao_saturn;
+ao=ao_uranus;
 bo=ao;       % along y
 co=ao*oblateness_factor; % along z
 
@@ -26,7 +26,7 @@ co=ao*oblateness_factor; % along z
 %4=borysow
 %5=borysow with orton et al, 2007 modification
 %6=borysow with orton et al modification with a second modification below 3 GHz
-select_h2h2_model=6;
+select_h2h2_model=4;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -94,7 +94,7 @@ end
 
 % Set Spacecraft Orientation
 
-theta=30.123;%30;%54.5910 %along z
+theta=19.625;%30;%54.5910 %along z
 %theta=54.5912 %along y
 %theta=60;
 %Set Viewing Geometry

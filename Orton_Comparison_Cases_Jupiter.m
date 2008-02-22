@@ -4,7 +4,7 @@ clear all;
 oblateness_factor=0.935; % Jupiter
 %oblateness_factor=0.902; % Saturn
 %oblateness_factor=0.977; %Uranus
-output_filename='orton_test_Jupiter.mat'
+output_filename='orton_test_Jupiter_ortonh2h2.mat'
 [tcme,tcmp,Re,gravity]= get_orton_data(oblateness_factor,'Jupiter');
 %oblateness_factor=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -94,7 +94,7 @@ end
 
 % Set Spacecraft Orientation
 
-theta=61.74;%30;%54.5910 %along z
+theta=61.872;%30;%54.5910 %along z
 %theta=54.5912 %along y
 %theta=60;
 %Set Viewing Geometry

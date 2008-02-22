@@ -54,8 +54,8 @@ k=(0:recordlength-1);
 P=[0;(tcme(recordlength-k,1))];
 T=[2.7;(tcme(recordlength-k,2))];
 % third is the dR vector -handled elsewhere since need two
-major=1e5.*[(tcme(recordlength-k,3))];
-minor=1e5.*[(tcmp(recordlength-k,3))];
+major=1e5.*[(tcme(recordlength-k,3))]; % convert from km to cm
+minor=1e5.*[(tcmp(recordlength-k,3))]; % convert from km to cm
 xH2=[0;(tcme(recordlength-k,4))];
 xHe=[0;(tcme(recordlength-k,5))];
 xH2S=[0;(tcme(recordlength-k,6))];
