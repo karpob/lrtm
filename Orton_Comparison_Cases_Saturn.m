@@ -26,7 +26,7 @@ co=ao*oblateness_factor; % along z
 %4=borysow
 %5=borysow with orton et al, 2007 modification
 %6=borysow with orton et al modification with a second modification below 3 GHz
-select_h2h2_model=6;
+select_h2h2_model=5;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -118,5 +118,9 @@ for j=1:length(f)
 end
 
 R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
-
+orton=load('orton_saturn_Tb.dat');
+delta_nadir=100*(Tatma-transpose(orton(:,1)))./transpose(orton(:,1));
+delta_mu=100*(Tatm_a_limb-transpose(orton(:,2)))./transpose(orton(:,2));
+M=[Tatma;Tatm_a_limb;delta_nadir;delta_mu];
+dlmwrite('Saturn.dat',transpose(M),'delimiter','\t','precision',6)
 save(output_filename);

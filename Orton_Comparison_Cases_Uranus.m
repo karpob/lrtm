@@ -119,4 +119,10 @@ end
 
 R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
 
+orton=load('orton_uranus_Tb.dat');
+delta_nadir=100*(Tatma-transpose(orton(:,1)))./transpose(orton(:,1));
+delta_mu=100*(Tatm_a_limb-transpose(orton(:,2)))./transpose(orton(:,2));
+M=[Tatma;Tatm_a_limb;delta_nadir;delta_mu];
+dlmwrite('Uranus.dat',transpose(M),'delimiter','\t','precision',6)
+
 save(output_filename);

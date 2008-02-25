@@ -4,7 +4,7 @@ clear all;
 oblateness_factor=0.935; % Jupiter
 %oblateness_factor=0.902; % Saturn
 %oblateness_factor=0.977; %Uranus
-output_filename='orton_test_Jupiter_ortonh2h2.mat'
+output_filename='orton_test_Jupiter_borysowh2h2.mat'
 [tcme,tcmp,Re,gravity]= get_orton_data(oblateness_factor,'Jupiter');
 %oblateness_factor=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -25,7 +25,7 @@ co=ao*oblateness_factor; % along z
 %4=borysow
 %5=borysow with orton et al, 2007 modification
 %6=borysow with orton et al modification with a second modification below 3 GHz
-select_h2h2_model=6;
+select_h2h2_model=5;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -54,7 +54,7 @@ include_clouds=0;
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
 %
 %refractivity_source=0; % No bending due to refraction n=1.0D0
- refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
+refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
 %refractivity_source=4; % Karpowicz w/Clouds H2, He, CH4 etc.. using Essen, and other sources
@@ -76,7 +76,7 @@ BWHM=10; % Beamwidth Half-maximum
 %f=[0.5:0.1:10,10:1:25];
 
 f=[0.999308193333;1.498962290;4.99654096667;14.98962290;29.979245800;42.827494000;99.930819333;299.792459;999.308193333;2997.92458];
-disp('poop2')
+
 theta=0
 Raydirection(1)=-cos(theta*(pi/180));
 Raydirection(2)=sin(theta*(pi/180));
@@ -112,11 +112,15 @@ for j=1:length(f)
                                                                                 tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
                                                                        select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
     clear maintamone;
-    disp('poop3') 
+    
     Tatm_a_limb
     cos((pi/180)*zenith_limb(j))
 end
 
 R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
-
+orton=load('orton_jupiter_Tb.dat');
+delta_nadir=100*(Tatma-transpose(orton(:,1)))./transpose(orton(:,1));
+delta_mu=100*(Tatm_a_limb-transpose(orton(:,2)))./transpose(orton(:,2));
+M=[Tatma;Tatm_a_limb;delta_nadir;delta_mu];
+dlmwrite('Jupiter.dat',transpose(M),'delimiter','\t','precision',6)
 save(output_filename);

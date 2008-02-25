@@ -27,7 +27,7 @@ rho=rho*molecules_per_mole;
 amagat=rho/Lo;
 
 if(nu<0.1)
-    alphah2=100*nu*nu*spec(1)*amagat*amagat;
+    alphah2=100*(nu^2)*spec(1)*amagat*amagat;
 else
     alphah2=spec(1)*amagat*amagat;
 end
