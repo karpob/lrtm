@@ -16,7 +16,7 @@ co=ao*oblateness_factor; % along z
 %3=goodman by joiner
 %4=borysow
 %5=borysow with orton et al, 2007 modification
-%6=borysow with orton et al modification with a second modification below 3 GHz
+%6=orton et al based upon interpolation
 select_h2h2_model=5;
 
 %select_ammonia_model

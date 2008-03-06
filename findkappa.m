@@ -88,13 +88,14 @@ for k=1:stopindex
        alphah2(k)=falphah2_goodman_by_joiner(f,T(k),P_H2(k),P_He(k));
    end
    if(select_h2h2_model==4)
-       alphah2(k)=falpha_borysow(f,T(k),P(k));
+       alphah2(k)=falpha_borysow(f,T(k),P_H2(k));
    end
    if(select_h2h2_model==5)
-       alphah2(k)=falpha_orton(f,T(k),P(k));
+       alphah2(k)=falpha_orton(f,T(k),P_H2(k));
    end
    if(select_h2h2_model==6)
-       alphah2(k)=falpha_orton_mod(f,T(k),P(k));
+       alphah2(k)=falpha_orton_quantum_h2h2(f,T(k),P_H2(k),P_H2(k),P_CH4(k),0);
+       % by default we use equilibruim H2, last arg set to zero you want something different...(ie. normal, intermediate, etc change this)
    end
 end   
 cd ..
