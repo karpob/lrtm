@@ -40,16 +40,16 @@ select_water_model=2;
 %include cloud absorption?
 %1=yes
 %0=no
-include_clouds=0;
+include_clouds=0
 
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
 %
-% refractivity_source=0; % No bending due to refraction n=1.0D0
+ refractivity_source=0; % No bending due to refraction n=1.0D0
 % refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
- refractivity_source=4; % Karpowicz w/Clouds H2, He, CH4 etc.. using Essen, and other sources
+% refractivity_source=4; % Karpowicz w/Clouds H2, He, CH4 etc.. using Essen, and other sources
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %load craft;
 
@@ -125,10 +125,10 @@ P_targ_i=1;
 P_term_i=0.141;
 use_lindal='Y';
 SuperSatSelf_H2S=0;
-SuperSatSelf_NH3=1;
+SuperSatSelf_NH3=0;
 SuperSatSelf_PH3=0;
 SuperSatSelf_H2O=0;
-supersatNH3=1;
+supersatNH3=0;
 supersatH2S=0;
 AutoStep_constant=8;
 fp=-1;
