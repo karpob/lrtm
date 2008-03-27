@@ -1,7 +1,7 @@
 function [Tbeam,zenith,wfwa,refindex,Tatma,...
           intercepts_boresight,intercepts_b]= maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,...
                                           select_h2h2_model,select_ammonia_model,select_water_model,...
-                                          include_clouds,N_ring_one,Nphi,BWHM,refractivity_source)
+                                          include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,cassini_pattern,cassini_data_path)
 %  maintamone.m -> main routine for LRTM function calculates Tb, and
 %                  weighting functions
 %
@@ -159,8 +159,11 @@ end
 % tau_a is the tau of that layer, tau is the cumulative summations of those layers
 % Now do the beamspread and rotate beampattern towards planet along look
 % vector
-
-[beamz,beam_weightz,beam_weighted_ave]=beamsample(Nphi,N_ring_one,BWHM);
+if(cassini_pattern==1)
+    [beamz,beam_weightz,beam_sum]=load_cassini_beampattern(cassini_data_path);
+else
+    [beamz,beam_weightz,beam_sum]=beamsample(Nphi,N_ring_one,BWHM);
+end
 
 [Vr1,Zr]=rotbeam(Raydirection,beamz);
 
@@ -208,10 +211,10 @@ end
 disp('Applying beamweights.')
 Na=length(Tatma);
 Nb=length(Tatmb);
-size(beam_weightz);
+
 Twa=sum(Tatma)*1./Na;
 Twb=sum(Tatmb*beam_weightz');
-Tbeam=(Twa+Twb)/(1+beam_weighted_ave);
+Tbeam=(Twa+Twb)/(1+beam_sum);
 
 % Find weighting function
 wfa=1.*fwght(wlayersa,masterindexa);

@@ -22,6 +22,10 @@ for cases=1:4
     if(cases<=4)
         theta=17.15;
         BWHM=0.37;
+        cassini_pattern=1;
+        cassini_data_path='Cassini_beampattern/BEAM3_V01.PAT';
+        
+        
     %elseif(cases<=8)
     %    theta=16.52;
     %    BWHM=1.0;
@@ -218,7 +222,7 @@ select_h2h2_model=1;
         [Tbeam_nadir(j,cases),zenith_nadir(j,cases),weighting_function_a_nadir(1:me(j)+1,j,cases)]= maintamone(Raydirection,Rayorigin,...
                                tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
-                               include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
+                               include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,cassini_pattern,cassini_data_path);
     end
 
     X_direction=-cos(theta*(pi/180));
@@ -230,7 +234,7 @@ select_h2h2_model=1;
         [Tbeam_limb(j,cases),zenith_limb(j,cases),weighting_function_a_limb(1:me(j)+1,j,cases)]= maintamone(Raydirection,Rayorigin,...
                                     tcme(1:me(j),1:22,j),tcmp(1:me(j),1:22,j),ao,bo,co,...
                                     f,no_ph3,select_h2h2_model,select_ammonia_model,select_water_model,...
-                                    include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
+                                    include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,cassini_pattern,cassini_data_path);
                                clear ph3decay;
                                
                              % Sorry! ugly piece to flip around PH3 so you

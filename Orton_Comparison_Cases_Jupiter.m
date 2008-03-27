@@ -70,6 +70,8 @@ Raydirection=[-1 0 0];
 N_ring_one=4; %Number of beams in first phi ring
 Nphi=3; %Number of rings in phi
 BWHM=10; % Beamwidth Half-maximum
+cassini_pattern=0;
+cassini_data_path='none';
 
 % Juno bands
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
@@ -86,7 +88,8 @@ for j=1:length(f)
     no_ph3=0; 
     [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j),refractive_index(:,j),Tatma(j)]= maintamone(Raydirection,Rayorigin,...
                                                                                    tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
-                                                                                   select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
+                                                                                   select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
+                                                                                   cassini_pattern,cassini_data_path);
     clear maintamone;
     Tatma
 end

@@ -1,4 +1,4 @@
-function [Beamz,Beam_weightz,beam_weighted_ave]=load_cassini_beampattern(path)
+function [Beamz,Beam_weightz,beam_sum]=load_cassini_beampattern(path)
 
 % function load_cassini_beampattern
 % 
@@ -27,23 +27,44 @@ Beam_weight=data;
 theta_degree=[-2:0.01:1.99];
 phi_degree=[-6:0.01:5.99];
 
+
 theta=theta_degree*(pi/180);
 phi=phi_degree*(pi/180);
-r=1;
+
 
 Beam_X=[];
 Beam_Y=[];
 Beam_Z=[];
 beam_weighted_ave=0;
-[Beam_X,Beam_Y,Beam_Z]=meshgrid(r,phi,theta)
-[R,TH,PHI]=meshgrid(r,theta,phi);
+
+[TH,PHI]=meshgrid(theta,phi);
+[mm,nn]=size(TH);
+R=ones(mm,nn);
 [Beam_X,Beam_Y,Beam_Z]=sph2cart(TH,PHI,R);
-kk=1;
-for i_phi=1:length(phi_degree)
-    for j_theta=1:lenth(theta)
-        Beamz(:,kk)=[Beam_X(i_phi,j_theta);Beam_Y(i_phi,j_theta);Beam_Z(i_phi,j_theta)];
-        Beam_weightz(kk)=Beam_weight(i_phi,j_theta);
-        kk=kk+1;
-    end    
+
+% reshape is used to redimension arrays and to replace the following:
+%
+%kk=1;
+%for i_phi=1:length(phi_degree)
+%    for j_theta=1:length(theta)
+%        Beamz(:,kk)=[Beam_X(j_theta,i_phi);Beam_Y(j_theta,i_phi);Beam_Z(j_theta,i_phi)];
+%        Beam_weightz(kk)=Beam_weight(i_phi,j_theta);
+%        kk=kk+1;
+%    end    
+%end
+
+
+
+[m,n]=size(Beam_X);
+Beamz_X=reshape(Beam_X,1,m*n);
+Beamz_Y=reshape(Beam_Y,1,m*n);
+Beamz_Z=reshape(Beam_Z,1,m*n);
+
+Beamz=[Beamz_X;Beamz_Y;Beamz_Z];
+
+Beam_weightz=reshape(Beam_weight,1,m*n);
+if(Beam_weightz(:)<0)
+    Beam_weightz(:)=0;
 end
-beam_weighted_ave=1;
+
+beam_sum=sum(Beam_weightz);
