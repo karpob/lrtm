@@ -25,11 +25,12 @@ select_h2h2_model=5;
 %3 " berge-gulkis
 %4 " mohammed-steffes
 %5 " spilker
+%6 Hanley Steffes Model
 % Note, 1 and 5 won't work for current Jupiter/adams data set
 % spilker correction factor C goes negative, giving negative absorption
 % coefficient
 
-select_ammonia_model=2;
+select_ammonia_model=6;
 
 %select_water_model
 %1 original deboer water vapor model
@@ -45,11 +46,11 @@ include_clouds=0
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
 %
- refractivity_source=0; % No bending due to refraction n=1.0D0
+% refractivity_source=0; % No bending due to refraction n=1.0D0
 % refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
-% refractivity_source=4; % Karpowicz w/Clouds H2, He, CH4 etc.. using Essen, and other sources
+ refractivity_source=4; % Karpowicz w/Clouds H2, He, CH4 etc.. using Essen, and other sources
 % %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %load craft;
 
@@ -71,7 +72,7 @@ cassini_data_path='none';
 f=[0.5:0.1:10,10:1:25];
 %f=[0.5,0.6,1,25];
 nfreq=length(f)
-Selected_Model='Mean_Lindal'
+Selected_Model='Enhanced_Water'
 
 Model_Names={'Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',...
              'Depleted_Water','Enhanced_Water','Hot_Spot'}
