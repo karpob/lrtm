@@ -30,7 +30,7 @@ select_h2h2_model=5;
 % spilker correction factor C goes negative, giving negative absorption
 % coefficient
 
-select_ammonia_model=6;
+select_ammonia_model=5;
 
 %select_water_model
 %1 original deboer water vapor model
@@ -41,7 +41,7 @@ select_water_model=2;
 %include cloud absorption?
 %1=yes
 %0=no
-include_clouds=0
+include_clouds=1
 
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
@@ -181,6 +181,7 @@ for j=1:length(f)
                                                                                    cassini_pattern,cassini_data_path);
     clear maintamone;
     Tbeam_nadir
+    save(output_filename);
 end
 
 
@@ -206,6 +207,7 @@ for j=1:length(f)
                                                                                 cassini_pattern,cassini_data_path);
     clear maintamone;
     Tbeam_limb
+    save(output_filename);
 end
 
 R=100*(Tbeam_nadir-Tbeam_limb)./Tbeam_nadir;
