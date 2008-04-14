@@ -26,11 +26,12 @@ select_h2h2_model=5;
 %4 " mohammed-steffes
 %5 " spilker
 %6 Hanley Steffes Model
+%7 Hanley Steffes Model v 2.0
 % Note, 1 and 5 won't work for current Jupiter/adams data set
 % spilker correction factor C goes negative, giving negative absorption
 % coefficient
 
-select_ammonia_model=5;
+select_ammonia_model=7;
 
 %select_water_model
 %1 original deboer water vapor model

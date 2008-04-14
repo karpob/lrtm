@@ -63,6 +63,10 @@ for k=1:stopindex
     if(select_ammonia_model==6)
        alphanh3(k)=nh3hsmodel(f,T(k),P(k),XH2(k),XHe(k),XNH3(k))/OpticaldepthstodB;
     end
+    if(select_ammonia_model==7)
+       alphanh3(k)=nh3hsmodel2(f,T(k),P(k),XH2(k),XHe(k),XNH3(k))/OpticaldepthstodB;
+    end
+    
 end
 cd ..
 
