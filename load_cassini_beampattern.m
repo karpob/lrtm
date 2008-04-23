@@ -36,10 +36,11 @@ Beam_X=[];
 Beam_Y=[];
 Beam_Z=[];
 beam_weighted_ave=0;
+r=1
 
-[TH,PHI]=meshgrid(theta,phi);
+[R,TH,PHI]=meshgrid(r,theta,phi);
 [mm,nn]=size(TH);
-R=ones(mm,nn);
+%R=ones(mm,nn);
 [Beam_X,Beam_Y,Beam_Z]=sph2cart(TH,PHI,R);
 
 % reshape is used to redimension arrays and to replace the following:
@@ -60,7 +61,7 @@ Beamz_X=reshape(Beam_X,1,m*n);
 Beamz_Y=reshape(Beam_Y,1,m*n);
 Beamz_Z=reshape(Beam_Z,1,m*n);
 
-Beamz=[Beamz_X;Beamz_Y;Beamz_Z];
+Beamz=[Beamz_Z;Beamz_Y;Beamz_X];
 
 Beam_weightz=reshape(Beam_weight,1,m*n);
 if(Beam_weightz(:)<0)

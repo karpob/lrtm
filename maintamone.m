@@ -213,7 +213,7 @@ Na=length(Tatma);
 Nb=length(Tatmb);
 
 Twa=sum(Tatma)*1./Na;
-Twb=sum(Tatmb*beam_weightz');
+Twb=sum(Tatmb.*beam_weightz);
 Tbeam=(Twa+Twb)/(1+beam_sum);
 
 % Find weighting function
