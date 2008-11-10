@@ -26,7 +26,7 @@ co=ao*oblateness_factor; % along z
 %4=borysow
 %5=borysow with orton et al, 2007 modification
 %6=orton et al based upon interpolation
-select_h2h2_model=4;
+select_h2h2_model=6;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -78,7 +78,7 @@ cassini_data_path='none';
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
 %f=[0.5:0.1:10,10:1:25];
 
-f=[0.999308193333;1.498962290;4.99654096667;14.98962290;29.979245800;42.827494000;99.930819333;299.792459;999.308193333;2997.92458]
+f=[0.999308193333;]%1.498962290;4.99654096667;14.98962290;29.979245800;42.827494000;99.930819333;299.792459;999.308193333;2997.92458]
 theta=0
 Raydirection(1)=-cos(theta*(pi/180));
 Raydirection(2)=sin(theta*(pi/180));
@@ -88,7 +88,7 @@ for j=1:length(f)
     no_ph3=0; 
     [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j),refractive_index(:,j),Tatma(j)]= maintamone(Raydirection,Rayorigin,...
                                                                                    tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
-                                                                                   select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
+                                                                                   select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,...
                                                                                    cassini_pattern,cassini_data_path);
     clear maintamone;
     Tatma
@@ -113,10 +113,10 @@ for j=1:length(f)
     no_ph3=0;
     [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j),refractive_index(:,j),Tatm_a_limb(j)]= maintamone(Raydirection,Rayorigin,...
                                                                                 tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
-                                                                       select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
+                                                                       select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,...
                                                                         cassini_pattern,cassini_data_path);
     clear maintamone;
-    disp('poop3') 
+    
     Tatm_a_limb
     cos((pi/180)*zenith_limb(j))
 end

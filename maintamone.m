@@ -168,10 +168,10 @@ end
 [Vr1,Zr]=rotbeam(Raydirection,beamz);
 
 % initialize wlayers
-wlayersb=zeros(length(P),length(Vr1));
+wlayersb=zeros(length(P)-1,length(Vr1));
 
 % masterindex for wght fnctns
-windexb=zeros(length(P),length(Vr1));
+windexb=zeros(length(P)-1,length(Vr1));
 missb=0;
 
 % Calculate Optical Depth values, brightness temperature and weighting
@@ -183,6 +183,7 @@ for p=1:length(Vr1);
    Rd=[Vr1(:,p)]';
    [intercept,internormal,d,t,masterindexb,missflag]=findraypath(recordlength,refindex,P,ellipses,Rayorigin,Rd);
    windexb(1:size(masterindexb,1),p)=masterindexb;
+   max(masterindexb);
    disb=d;
    if missflag==1
       disp('This beam-sample  (b)Misses Planet')

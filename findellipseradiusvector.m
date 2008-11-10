@@ -26,6 +26,6 @@ a=ao+major;				% semi-minor axis is x
 b=bo+major;				% semi-minor axis is also y
 c=co+minor;				% semi-major axis is z
 
-ellipses.a=[a;min(a)];
-ellipses.b=[b;min(b)];
-ellipses.c=[c;min(c)];
+ellipses.a=[a];
+ellipses.b=[b];
+ellipses.c=[c];

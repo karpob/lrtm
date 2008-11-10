@@ -73,7 +73,7 @@ end
 % HEY-NOW NEED TO PRECALC RADIUS OF PLANET SHELLS
 
 masterindex=[];
-for k=1:length(P)
+for k=1:length(P)-1
    P_ray=P(k);
    ellipse.a=ellipses.a(k);
    ellipse.b=ellipses.b(k);
@@ -151,6 +151,6 @@ for k=1:length(P)
    Psave(k)=P_ray;				% Debug-saves pressure profile
    masterindex=[masterindex;k];
 end
-
 d=d';
+
 % comes out with shallowest first (top->bottom)

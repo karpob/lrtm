@@ -41,7 +41,8 @@ function kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,X
 
 OpticaldepthstodB=434294.5;
 stopindex=size(T,1);
-
+stopindex=stopindex-1;
+ % can't include bottom P pressure..no appropriate depth associated with it.
 % Call ammonia
 cd NH3
 for k=1:stopindex
