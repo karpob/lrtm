@@ -4,7 +4,7 @@ clear all;
 oblateness_factor=0.935; % Jupiter
 %oblateness_factor=0.902; % Saturn
 %oblateness_factor=0.977; %Uranus
-output_filename='orton_test_Jupiter_borysowh2h2.mat'
+output_filename='orton_test_Jupiter_h2h2.mat'
 [tcme,tcmp,Re,gravity]= get_orton_data(oblateness_factor,'Jupiter');
 %oblateness_factor=1;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -25,7 +25,7 @@ co=ao*oblateness_factor; % along z
 %4=borysow
 %5=borysow with orton et al, 2007 modification
 %6=orton et al based upon interpolation
-select_h2h2_model=5;
+select_h2h2_model=6;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -54,7 +54,7 @@ include_clouds=0;
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
 %
 %refractivity_source=0; % No bending due to refraction n=1.0D0
-refractivity_source=1; % Original DeBoer/Hoffman H2/He refractivity 
+refractivity_source=0; % Original DeBoer/Hoffman H2/He refractivity 
 % refractivity_source=2; % Karpowicz H2/He refractivity using original Essen data
 % refractivity_source=3; % Karpowicz H2, He, CH4 etc.. using Essen, and other sources
 %refractivity_source=4; % Karpowicz w/Clouds H2, He, CH4 etc.. using Essen, and other sources
@@ -69,15 +69,17 @@ Raydirection=[-1 0 0];
 %Get Beam parameters
 N_ring_one=4; %Number of beams in first phi ring
 Nphi=3; %Number of rings in phi
-BWHM=10; % Beamwidth Half-maximum
+BWHM=3; % Beamwidth Half-maximum
 cassini_pattern=0;
 cassini_data_path='none';
-
+c=2.99792458e10;
 % Juno bands
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
 %f=[0.5:0.1:10,10:1:25];
+nu=[0.0330; 0.0500; 0.1670; 0.5000;  1.0000;  1.4300;  3.3300;  10.0000;  33.3000; 100.0000];
 
-f=[0.999308193333;1.498962290;4.99654096667;14.98962290;29.979245800;42.827494000;99.930819333;299.792459;999.308193333;2997.92458];
+f=(nu*c)./(1e9);
+%f=[0.999308193333;1.498962290;4.99654096667;14.98962290;29.979245800;42.827494000;99.930819333;299.792459;999.308193333;2997.92458];
 
 theta=0
 Raydirection(1)=-cos(theta*(pi/180));
@@ -88,7 +90,7 @@ for j=1:length(f)
     no_ph3=0; 
     [Tbeam_nadir(j),zenith_nadir(j),weighting_function_a_nadir(:,:,j),refractive_index(:,j),Tatma(j)]= maintamone(Raydirection,Rayorigin,...
                                                                                    tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
-                                                                                   select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
+                                                                                   select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,...
                                                                                    cassini_pattern,cassini_data_path);
     clear maintamone;
     Tatma
@@ -113,7 +115,8 @@ for j=1:length(f)
     no_ph3=0;
     [Tbeam_limb(j),zenith_limb(j),weighting_function_a_limb(:,:,j),refractive_index(:,j),Tatm_a_limb(j)]= maintamone(Raydirection,Rayorigin,...
                                                                                 tcme,tcmp,ao,bo,co,f(j),no_ph3,select_h2h2_model,select_ammonia_model,...
-                                                                       select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source);
+                                                                       select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,...
+                                                                       cassini_pattern,cassini_data_path);
     clear maintamone;
     
     Tatm_a_limb

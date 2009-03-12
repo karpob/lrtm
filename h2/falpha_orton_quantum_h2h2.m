@@ -75,7 +75,7 @@ amagat_sq_ch4=amagat_ch4^2;
 % Enough having fun with amagats, time to read in the data             %
 % Read in data supplied by Glenn Orton from His quantum scattering code%    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-name='orton_h2h2_grid.txt';
+name='cia.longrev08.data';%'orton_h2h2_grid.txt';
 file_handle=fopen(name,'r');
 line1=fscanf(file_handle,'%f %f %f',[3,1]);
 line2=fscanf(file_handle,'%f',[1,1]);
@@ -89,6 +89,16 @@ alpha_nH2_He=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_eH2_CH4=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_nH2_CH4=fscanf(file_handle,line_format,[line1(1),line2]);
 fclose(file_handle);
+
+normal_or_equilibrium==1;
+for i=1:length(wave_numbers)
+   if(wave_numbers<0.1)
+       scale_factor=100*(wave_numnbers(i)*wave_numbers(i));
+   else
+       scale_factor=1;
+   end
+end
+
 % Close the file
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
@@ -98,16 +108,17 @@ fclose(file_handle);
 % Absorption coefficient of things with normal hydrogen=1, 
 % equilibrium hydrogen=0
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if(normal_or_equilibrium==0)
-    alpha_H2=alpha_eH2;
-    alpha_He=alpha_eH2_He;
-    alpha_CH4=alpha_eH2_CH4;
-end
-if(normal_or_equilibrium==1)
-    alpha_H2=alpha_nH2;
-    alpha_He=alpha_nH2_He;
-    alpha_CH4=alpha_nH2_CH4;
-end
+%if(normal_or_equilibrium==0)
+%    alpha_H2=alpha_eH2;
+%    alpha_He=alpha_eH2_He;
+%    alpha_CH4=alpha_eH2_CH4;
+%end
+%if(normal_or_equilibrium==1)
+%    alpha_H2=alpha_nH2;
+%    alpha_He=alpha_nH2_He;
+%    alpha_CH4=alpha_nH2_CH4;
+%end
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -116,19 +127,49 @@ end
 % "evenly spaced T in log space used for calculation 
 %   (ie. 10 temperatures in Orton's file)
 
-Ti=[40,51.667,66.724,86.177,111.302,143.753,185.664,239.794,309.705,400];
-
+%Ti=[40,51.667,66.724,86.177,111.302,143.753,185.664,239.794,309.705,400];
+logTi=linspace(log(40),log(400),10);
 % interpolate values for given wavenumber (nu), and while we're at it multiply
 % by amagat^2 of each constituent
+no_div_by_three=0;
+np=0;
+theta_x=-85.4;
+k=0;
+fp=0;
+no_actual=0;
 
-alpha_H2_prime=amagat_sq_h2*exp(interp2(wave_numbers,Ti,alpha_H2,nu,T,'spline'));
-alpha_He_prime=amagat_sq_he*exp(interp2(wave_numbers,Ti,alpha_He,nu,T,'spline'));
-alpha_CH4_prime=amagat_sq_ch4*exp(interp2(wave_numbers,Ti,alpha_CH4,nu,T,'spline'));
+for i=1:201
+    k=i-1;
+    no_div_by_three=(2*(2*k+1)+1)*exp(theta_x*(2*k+1)*((2*k+2)/T))+no_div_by_three;
+    np=(2*2*k+1)*exp(theta_x*(2*k+1)*((2*k)/T))+np;
+end
+
+no_actual=no_div_by_three*3;
+np_actual=np;
+
+    alpha_H2_prime_1=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_eH2,nu,log(T),'spline'));
+    alpha_He_prime_1=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_eH2_He,nu,log(T),'spline'));
+    alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_eH2_CH4,nu,log(T),'spline'));
+   alpha_H2_prime_2=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_nH2,nu,log(T),'spline'));
+    alpha_He_prime_2=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_nH2_He,nu,log(T),'spline'));
+    alpha_CH4_prime_2=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_nH2_CH4,nu,log(T),'spline'));
+
+%
+%    alpha_H2_prime_2=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_nH2,nu,log(T),'spline'));
+%    alpha_He_prime_2=amagat_sq_he*exp(interp2(wave_numbers,logTi,alpha_nH2_He,nu,log(T),'spline'));
+%    alpha_CH4_prime_2=amagat_sq_ch4*exp(interp2(wave_numbers,logTi,alpha_nH2_CH4,nu,log(T),'spline'));
 
 % Add up alpha's of H2-H2, H2-He, H2-CH4
-alpha=alpha_H2_prime+alpha_He_prime+alpha_CH4_prime;
-
+alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1;
+alpha_2=alpha_H2_prime_2+alpha_He_prime_2+alpha_CH4_prime_2;
+fp=(np_actual)/(np_actual+no_actual);
+%fo=(no_actual)/(np_actual+no_actual);
+if(abs(fp-0.25)<1e-8)
+    alpha=alpha_2;%+fo*alpha_2;%*(np_actual)/(np_actual+no_actual); % ((np_actual)/(np_actual+no_actual))*alpha_1+((no_actual)/(np_actual+no_actual))*alpha_2;
+else
+    alpha=alpha_1;
+end
 % If nu<0.1 apply correction factor.
 if(nu<0.1)
-     alpha=100*(nu^2)*alpha;
+  alpha=100*(nu^2)*alpha;
 end
