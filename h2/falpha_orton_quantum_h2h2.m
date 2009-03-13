@@ -150,9 +150,9 @@ np_actual=np;
     alpha_H2_prime_1=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_eH2,nu,log(T),'spline'));
     alpha_He_prime_1=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_eH2_He,nu,log(T),'spline'));
     alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_eH2_CH4,nu,log(T),'spline'));
-   alpha_H2_prime_2=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_nH2,nu,log(T),'spline'));
-    alpha_He_prime_2=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_nH2_He,nu,log(T),'spline'));
-    alpha_CH4_prime_2=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_nH2_CH4,nu,log(T),'spline'));
+%   alpha_H2_prime_2=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_nH2,nu,log(T),'spline'));
+%    alpha_He_prime_2=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_nH2_He,nu,log(T),'spline'));
+%    alpha_CH4_prime_2=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_nH2_CH4,nu,log(T),'spline'));
 
 %
 %    alpha_H2_prime_2=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_nH2,nu,log(T),'spline'));
@@ -161,15 +161,15 @@ np_actual=np;
 
 % Add up alpha's of H2-H2, H2-He, H2-CH4
 alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1;
-alpha_2=alpha_H2_prime_2+alpha_He_prime_2+alpha_CH4_prime_2;
+%alpha_2=alpha_H2_prime_2+alpha_He_prime_2+alpha_CH4_prime_2;
 fp=(np_actual)/(np_actual+no_actual);
 %fo=(no_actual)/(np_actual+no_actual);
-if(abs(fp-0.25)<1e-8)
-    alpha=alpha_2;%+fo*alpha_2;%*(np_actual)/(np_actual+no_actual); % ((np_actual)/(np_actual+no_actual))*alpha_1+((no_actual)/(np_actual+no_actual))*alpha_2;
-else
+%if(T>400)
+%    alpha=alpha_2;%+fo*alpha_2;%*(np_actual)/(np_actual+no_actual); % ((np_actual)/(np_actual+no_actual))*alpha_1+((no_actual)/(np_actual+no_actual))*alpha_2;
+%else
     alpha=alpha_1;
-end
+%end
 % If nu<0.1 apply correction factor.
-if(nu<0.1)
-  alpha=100*(nu^2)*alpha;
-end
+%if(nu<0.1)
+%  alpha=100*(nu^2)*alpha;
+%end

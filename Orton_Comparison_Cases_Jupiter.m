@@ -69,7 +69,7 @@ Raydirection=[-1 0 0];
 %Get Beam parameters
 N_ring_one=4; %Number of beams in first phi ring
 Nphi=3; %Number of rings in phi
-BWHM=3; % Beamwidth Half-maximum
+BWHM=1; % Beamwidth Half-maximum
 cassini_pattern=0;
 cassini_data_path='none';
 c=2.99792458e10;
