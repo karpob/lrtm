@@ -30,7 +30,7 @@ float specific_heat(int j, float T, float P)
       int i;
       float XH2, XHe, XH2S, XNH3, XH2O, XCH4, XPH3;
       float Cp_H2, Cp_He, Cp_H2S, Cp_NH3, Cp_H2O, Cp_CH4, Cp_PH3, Cp;
-
+      FILE *output_T_P;
 /**************versions of CpH2*******************************************/
 /*      fit for equilibrium   ***/
       	if (T<120.0 && Hydrogen_Curve_Fit_Select==0.0)
@@ -60,13 +60,29 @@ float specific_heat(int j, float T, float P)
                    	6.239e-10*pow(T,4.0) + 1.696e-12*pow(T,5.0);
         else if (Hydrogen_Curve_Fit_Select==0.25)
             	Cp_H2 = 3.5;
+	
+	if(Hydrogen_Curve_Fit_Select==666.0)
+        {
+		output_T_P=fopen("output_T_P.txt","w");
+		fprintf(output_T_P,"%f\t%f",T,P);
+		fclose(output_T_P);
+                
+		system("python cp_h2.py");
+		
+		output_T_P=fopen("input_Cp.txt","r");
+		fscanf(output_T_P,"%f",Cp_H2);
+		fclose(output_T_P);
+         }
 /*************************************************************************/
-      Cp_He = 2.503;   /*                  */
-      Cp_H2S = 4.013;
-      Cp_NH3 = 4.459;  /*Briggs and Sackett*/
-      Cp_H2O = 4.0; 
-      Cp_CH4 = 4.5;    /*                  */
-	Cp_PH3 = 0.0;
+	if(Hydrogen_Curve_Fit_Select!=666.0)
+	{
+        	Cp_He = 2.503;   /*                  */
+        	Cp_H2S = 4.013;
+        	Cp_NH3 = 4.459;  /*Briggs and Sackett*/
+        	Cp_H2O = 4.0; 
+        	Cp_CH4 = 4.5;    /*                  */
+		Cp_PH3 = 0.0;
+	}
 
       XH2  = layer[j-1].XH2;
       XHe  = layer[j-1].XHe;
@@ -74,7 +90,7 @@ float specific_heat(int j, float T, float P)
       XNH3 = layer[j-1].XNH3;
       XH2O = layer[j-1].XH2O;
       XCH4 = layer[j-1].XCH4;
-	XPH3 = layer[j-1].XPH3;
+      XPH3 = layer[j-1].XPH3;
       Cp = (XH2*Cp_H2 + XHe*Cp_He + XH2S*Cp_H2S + XNH3*Cp_NH3 + XPH3*Cp_PH3)*R;
 
       return ( Cp );
