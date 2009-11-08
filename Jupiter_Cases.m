@@ -17,7 +17,7 @@ co=ao*oblateness_factor; % along z
 %4=borysow
 %5=borysow with orton et al, 2007 modification
 %6=orton et al based upon interpolation
-select_h2h2_model=5;
+select_h2h2_model=6;
 
 %select_ammonia_model
 %1 original hoffman coding of spilker
@@ -37,12 +37,12 @@ select_ammonia_model=7;
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
-select_water_model=2;
+select_water_model=3;
 
 %include cloud absorption?
 %1=yes
 %0=no
-include_clouds=1
+include_clouds=0
 
 % refractivity_source
 % Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
@@ -70,10 +70,11 @@ cassini_data_path='none';
 
 % Juno bands
 %f=[0.6,1.2];%,2.4,4.8,9.6,23]; %operating frequency in GHz
-f=[0.5:0.1:10,10:1:25];
+%f=[0.5:0.1:10,10:1:25]; %too fine try something else..
+f=[0.6:0.1:1,1.5:0.5:9.5,10:2:22,23];
 %f=[0.5,0.6,1,25];
 nfreq=length(f)
-Selected_Model='Enhanced_Water'
+Selected_Model='Depleted_Water'
 
 Model_Names={'Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',...
              'Depleted_Water','Enhanced_Water','Hot_Spot'}
@@ -118,10 +119,10 @@ for i=1:length(XNH3_rel_H2)
 end
 
 %Misc DeBoer TCM inputs
-%P_temp=1000;
-%T_temp=1303.349;
-P_temp=6000;
-T_temp=2200;
+P_temp=1000;
+T_temp=1678;
+%P_temp=6000;
+%T_temp=2200;
 
 g0_i=2330; %2417;
 R0e_i=ao;
@@ -137,13 +138,13 @@ SuperSatSelf_H2O=0;
 supersatNH3=0;
 supersatH2S=0;
 AutoStep_constant=8;
-fp=-1;
+fp=666;
 dz=1;
 XCO=0;
 use_dz=0;
-dP_init=1;
-dP_fine=0.1;
-P_fine_start=10;
+dP_init=10;
+dP_fine=0.25;
+P_fine_start=13;
 P_fine_stop=1;
 frain=3;
 select_ackerman=0;
