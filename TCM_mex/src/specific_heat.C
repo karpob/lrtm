@@ -63,15 +63,26 @@ float specific_heat(int j, float T, float P)
 	
 	if(Hydrogen_Curve_Fit_Select==666.0)
         {
-		output_T_P=fopen("output_T_P.txt","w");
-		fprintf(output_T_P,"%f\t%f",T,P);
+		XH2  = layer[j-1].XH2;
+                XHe  = layer[j-1].XHe;
+                XH2S = layer[j-1].XH2S;
+                XNH3 = layer[j-1].XNH3;
+                XH2O = layer[j-1].XH2O;
+                XCH4 = layer[j-1].XCH4;
+                XPH3 = layer[j-1].XPH3;
+		output_T_P=fopen("python_compressibility/calc_Cp/output_T_P.txt","w");
+		fprintf(output_T_P,"%f\t%f\t%f\t%f\t%f",T,P*XH2,P*XHe,P*XCH4,P*XH2O);
 		fclose(output_T_P);
                 
-		system("python cp_h2.py");
+		system("python python_compressibility/calc_Cp/cp_h2_new.py");
 		
-		output_T_P=fopen("input_Cp.txt","r");
-		fscanf(output_T_P,"%f",Cp_H2);
+		output_T_P=fopen("python_compressibility/calc_Cp/input_Cp.txt","r");
+		
+		fscanf(output_T_P,"%f %f\n",&Cp,&P);
 		fclose(output_T_P);
+		Cp_H2S = 4.013;
+        	Cp_NH3 = 4.459;  /*Briggs and Sackett*/
+		Cp=Cp+XH2S*Cp_H2S*R+XNH3*Cp_NH3*R;
          }
 /*************************************************************************/
 	if(Hydrogen_Curve_Fit_Select!=666.0)
@@ -82,16 +93,17 @@ float specific_heat(int j, float T, float P)
         	Cp_H2O = 4.0; 
         	Cp_CH4 = 4.5;    /*                  */
 		Cp_PH3 = 0.0;
+	        XH2  = layer[j-1].XH2;
+                XHe  = layer[j-1].XHe;
+                XH2S = layer[j-1].XH2S;
+                XNH3 = layer[j-1].XNH3;
+                XH2O = layer[j-1].XH2O;
+                XCH4 = layer[j-1].XCH4;
+                XPH3 = layer[j-1].XPH3;
+                Cp = (XH2*Cp_H2 + XHe*Cp_He + XH2S*Cp_H2S + XNH3*Cp_NH3 + XPH3*Cp_PH3)*R;
 	}
 
-      XH2  = layer[j-1].XH2;
-      XHe  = layer[j-1].XHe;
-      XH2S = layer[j-1].XH2S;
-      XNH3 = layer[j-1].XNH3;
-      XH2O = layer[j-1].XH2O;
-      XCH4 = layer[j-1].XCH4;
-      XPH3 = layer[j-1].XPH3;
-      Cp = (XH2*Cp_H2 + XHe*Cp_He + XH2S*Cp_H2S + XNH3*Cp_NH3 + XPH3*Cp_PH3)*R;
+      
 
       return ( Cp );
 }

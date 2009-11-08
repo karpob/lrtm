@@ -9,12 +9,12 @@
 #define MAXLAYERS       100000
 #define R               8.3143E7    /* Universal gas constant [erg/K/mol] */
 #define AMU             1.66056E-24 /* Atomic Mass Unit in grams */
-#define AMU_H2          2.016
-#define AMU_He          4.003        /* constituent masses [amu] */
+#define AMU_H2          2.01594     /*updated karpowicz*/
+#define AMU_He          4.0026      /*updated bk*/  /* constituent masses [amu] */
 #define AMU_H2S         34.076
 #define AMU_NH3         17.030
-#define AMU_H2O         18.015
-#define AMU_CH4         16.04
+#define AMU_H2O         18.015486068204702 /*bk*/ 
+#define AMU_CH4         16.0428  /*bk*/
 #define AMU_PH3         33.997
 #define AMU_NH4SH       51.110
 #define H2S_SOLAR       3.18E-5
@@ -49,7 +49,8 @@ struct ATM_LAYER {
       float tau;              /* layer optical depth */
       float DW;               /* disk averaged weighting function */
       float T;                /* layer temperature   */
-      float P;                /* layer pressure      */
+      float P;                /* layer pressure  (ideal pressure)    */
+      float P_real;           /* Real pressure */
       float z;                /* altitude */
       double XH2;
       double XHe;

@@ -189,7 +189,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 {
       int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0;
       float LX[6]={0.0,0.0,0.0,0.0,0.0,0.0}, L2X[6]={0.0,0.0,0.0,0.0,0.0,0.0};
-      float P, T, dT, dP, PNH3p, PH2Sp, freeze;
+      float P, T, dT, dP, PNH3p, PH2Sp, freeze, P_real;
       float PH2, PHe, PH2S, PNH3, PH2O, PCH4, PPH3;
       double XH2, XHe, XH2S, XNH3, XH2O, XCH4, XPH3;
       float SPH2O=1E6, SPCH4=1E6, SPH2S=1E6, SPNH3=1E6, SPPH3=1E6, KNH4SH;
@@ -202,7 +202,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       char phase_H2S[21], phase_NH3[21], phase_PH3[21];
       char phase_H2O[21], phase_CH4[21];
       FILE *alrfp;
-
+      FILE *output_T_P;
       layer[j].clouds=0L;
 
       if (j==1) hereonout=0;
@@ -217,6 +217,14 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       
     /* Calculated Partial pressures of previous step*/
       dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout); /*dry adiabat*/
+      P_real=layer[j].P;
+      if(Hydrogen_Curve_Fit_Select==666.0)
+      {
+      		output_T_P=fopen("python_compressibility/calc_Cp/input_Cp.txt","r");
+		fscanf(output_T_P,"%f %f\n",&P,&P_real);
+		fclose(output_T_P);
+      }
+      layer[j].P_real=P_real;
       P  = layer[j].P;
       T  = layer[j].T;
       PH2  = layer[j-1].XH2*P;
@@ -231,7 +239,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                                    // **Note! supersaturation is defined as an additional mole fraction
                                    //   whereas SuperSatSelf is defined as fraction of supersaturation (ie. 1=100%)
       H = R*T/(layer[j-1].mu*layer[j-1].g); //Scale Height
-      alr = 1e5*dT/(dP*H/P);
+      alr = 1e5*dT/(dP*H/P_real);
       dry_adiabatic_lapse_rate=alr;
 
       /* For the solution clouds see:  Weidenschilling and Lewis 1973, Icarus 20:465.
