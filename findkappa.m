@@ -121,6 +121,12 @@ for k=1:stopindex
    if(select_water_model==3)
        alphah2o(k)=fwatervaporalpha_goodman(f,P(k),T(k),XH2O(k),XH2(k),XHe(k));
    end
+   if(select_water_model==4)
+      density_h2_g_m3=(P_H2(k)*2.01594)/((8.314472e-5)*T(k))
+      density_he_g_m3=(P_He(k)*4.0026)/((8.314310e-5)*T(k))
+      density_h2o_g_m3=(P_H2O(k)*(8.314472/0.46141805))/((8.314472e-5)*T(k))
+      alphah2o(k)=karpowicz_h2o_model(f,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T(k))
+   end
 end
 cd ..
 if(include_clouds==1)
