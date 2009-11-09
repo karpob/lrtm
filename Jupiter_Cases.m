@@ -37,6 +37,7 @@ select_ammonia_model=7;
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
+%4 Karpowicz absorption model.
 select_water_model=4;
 
 %include cloud absorption?
@@ -121,7 +122,8 @@ end
 %Misc DeBoer TCM inputs
 %Guess for deep P,T to match 1 bar level.
 P_temp=1000;
-T_temp=1.555678710937500e+03;
+%T_temp=1.555678710937500e+03;
+T_temp=1.583782470703125e+03;
 %P_temp=6000;
 %T_temp=2200;
 
