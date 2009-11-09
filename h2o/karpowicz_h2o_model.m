@@ -80,3 +80,5 @@ Foreign_Continuum=Foreign_Continuum_He+Foreign_Continuum_H2;
 Self_Continuum=Cs1*((P_h2o*(1.0/mbars_to_bars))^2)*power(f,2.0)+Cs2*power(f,2.0);%*power(Theta,3) #self continuum term from Eqn 6, Rosenkranz
 
 alpha_h2o=line_contribution+inv_km_to_dB*Foreign_Continuum+inv_km_to_dB*Self_Continuum;
+alpha_h2o=alpha_h2o/434294.5;
+
