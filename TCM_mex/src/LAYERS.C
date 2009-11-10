@@ -223,7 +223,9 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       		output_T_P=fopen("python_compressibility/calc_Cp/input_Cp.txt","r");
 		fscanf(output_T_P,"%f %f\n",&P,&P_real);
 		fclose(output_T_P);
+                P_real=P_real+layer[j-1].XNH3*P+layer[j-1].XH2S*P;
       }
+      
       layer[j].P_real=P_real;
       P  = layer[j].P;
       T  = layer[j].T;
