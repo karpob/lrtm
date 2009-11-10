@@ -189,7 +189,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
 {
       int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0;
       float LX[6]={0.0,0.0,0.0,0.0,0.0,0.0}, L2X[6]={0.0,0.0,0.0,0.0,0.0,0.0};
-      float P, T, dT, dP, PNH3p, PH2Sp, freeze, P_real;
+      float P, T, dT, dP, PNH3p, PH2Sp, freeze, P_real,Junk;
       float PH2, PHe, PH2S, PNH3, PH2O, PCH4, PPH3;
       double XH2, XHe, XH2S, XNH3, XH2O, XCH4, XPH3;
       float SPH2O=1E6, SPCH4=1E6, SPH2S=1E6, SPNH3=1E6, SPPH3=1E6, KNH4SH;
@@ -221,7 +221,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       if(Hydrogen_Curve_Fit_Select==666.0)
       {
       		output_T_P=fopen("python_compressibility/calc_Cp/input_Cp.txt","r");
-		fscanf(output_T_P,"%f %f\n",&P,&P_real);
+		fscanf(output_T_P,"%f %f\n",&Junk,&P_real);
 		fclose(output_T_P);
                 P_real=P_real+layer[j-1].XNH3*P+layer[j-1].XH2S*P;
       }
