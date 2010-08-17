@@ -123,7 +123,7 @@ end
 %Guess for deep P,T to match 1 bar level.
 P_temp=1000;
 %T_temp=1.555678710937500e+03;
-T_temp=1.583782470703125e+03;
+T_temp=1583.782470703125;
 %P_temp=6000;
 %T_temp=2200;
 
@@ -141,7 +141,7 @@ SuperSatSelf_H2O=0;
 supersatNH3=0;
 supersatH2S=0;
 AutoStep_constant=8;
-fp=666;
+fp=-1;
 dz=1;
 XCO=0;
 use_dz=0;

@@ -39,14 +39,14 @@ float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, \
           dP= -1.0*dP_fine;
           P= layer[j-1].P + dP;
       }
-      else if (P<= P_targ && *eflag != 97)
+      else if (new_P_fine<= P_targ && *eflag != 97)
       {
            *eflag = 98;
            P = P_targ;
            dP = PfL[1]-P_targ;
            jj=j;
       }
-      else if (P <=P_targ)
+      else if (new_P_fine <=P_targ)
       {
            dP=PfL[j-jj+1]-layer[j-1].P;
            P=layer[j-1].P+dP;

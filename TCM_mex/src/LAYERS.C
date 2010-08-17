@@ -3,6 +3,7 @@
 
 /****************************layers.c**************************************/
 #include "layers.h"
+extern float *TfL, *PfL, lawf[],P_term;
 float gravity(int j);
 //float specific_heat(int j, float T, float P);
 float sat_pressure(char component[], float T);
@@ -14,7 +15,7 @@ float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_f
 float get_dT(int j, float T, float P, float dP, float *LX, float *L2X,int hereonout);
 float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain);
 float SuperSatSelf[5];
-extern float *TfL, *PfL, lawf[];
+
 
 /****************************************************************************************************/
 /***************************************************************************************************/
