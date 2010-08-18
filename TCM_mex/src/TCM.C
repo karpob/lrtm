@@ -142,14 +142,14 @@ void mexFunction(int nlhs, mxArray *plhs[],
               
               new_layer(j,dz,&eflag, dP_init, dP_fine, P_fine_start, P_fine_stop, frain,select_ackerman);
               P = layer[j].P;
-              printf("error flag Pressure, level,T_targ %d %f %d %f\n",eflag,P,j,T_targ);
+              //printf("error flag Pressure, level,T_targ %d %f %d %f\n",eflag,P,j,T_targ);
                   
                   if (eflag == 98)  /* check target temperature */
                   {                                         /* eflag       P      */
                         eflag = 97;                         /*  97      < P_targ  */
                         T = layer[j].T;                     /*  99      <=P_term  */
                         T_err = 100.0*(T - T_targ)/T_targ;  /*  98      <=P_targ  */
-                        printf("Terr %f %f \n",T_err,TLIMIT);
+                        //printf("Terr %f %f \n",T_err,TLIMIT);
                       if (fabs(T_err)>TLIMIT)
                         {
                               layer[0].T = layer[0].T - (T - T_targ)*2.0;
