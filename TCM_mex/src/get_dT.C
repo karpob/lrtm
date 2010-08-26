@@ -1,5 +1,5 @@
 #include "layers.h"
-float specific_heat(int j, float T, float P);
+float specific_heat(int j, float T, float P,float Cp_in,float P_real);
 /********************************************************************************************/
 /********************************************************************************************/
 // float get_dT()  This function uses Pressure temperature and the latent heats associated with
@@ -15,7 +15,7 @@ float specific_heat(int j, float T, float P);
 //            --> *L2X: Array of latent heats squared times mole fraction (see DeBoer eqn 3.19)
 /********************************************************************************************/
 
-float get_dT(int j, float T, float P, float dP, float *LX, float *L2X, int hereonout)
+float get_dT(int j, float T, float P, float dP, float *LX, float *L2X, int hereonout,float Cp_in,float P_real)
 {
       int i;
       float m, b, Cp, dT_num, dT_den, dT; 
@@ -32,7 +32,7 @@ float get_dT(int j, float T, float P, float dP, float *LX, float *L2X, int hereo
       else
       {
             
-            Cp = specific_heat(j, T, P);
+            Cp = specific_heat(j, T, P,Cp_in,P_real);
             dT_num = (R*T + LX[0]+LX[1]+LX[2]+LX[3]+LX[4]+LX[5])*dP;
             dT_den = P*(Cp + L2X[0]+L2X[1]+L2X[2]+L2X[3]+L2X[4]+L2X[5]);
             dT = dT_num/dT_den; // eqn 3.19 in DeBoer's thesis

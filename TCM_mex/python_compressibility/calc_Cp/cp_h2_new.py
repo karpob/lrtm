@@ -74,6 +74,13 @@ Pcalc=pressure_vector4(density,T,tau,delta,parameters_H2,parameters_ch4,paramete
 
 CP_mix=C_p_vector_mix4(density,T,delta,tau,parameters_H2,parameters_ch4,parameters_he,parameters_h2o,h2_ch4_mix_params,h2_h2o_mix_params,x_h2,x_ch4,x_he,x_h2o)
 Pcalc=Pcalc/Bars_to_kPa
-f=open('python_compressibility/calc_Cp/input_Cp.txt','w')
-f.write(str(CP_mix[0])+' '+str(Pcalc[0]))
-f.close()
+try:
+   f=open('python_compressibility/calc_Cp/input_Cp.txt','w')
+   f.write(str(CP_mix[0])+' '+str(Pcalc[0]))
+   f.close()
+   print 'success',str(Pcalc[0])
+except:
+   f=open('python_compressibility/calc_Cp/fail.txt','w')
+   f.write('failed to write input_Cp.txt');
+   f.close()
+   print 'fail'

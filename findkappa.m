@@ -125,14 +125,14 @@ for k=1:stopindex
       density_h2_g_m3=(P_H2(k)*2.01594)/((8.314472e-5)*T(k));
       density_he_g_m3=(P_He(k)*4.0026)/((8.314310e-5)*T(k));
       density_h2o_g_m3=(P_H2O(k)*(8.314472/0.46141805))/((8.314472e-5)*T(k));
-      alphah2o(k)=karpowicz_h2o_model(f,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T(k))
+      alphah2o(k)=karpowicz_h2o_model(f,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T(k));
    end
 end
 cd ..
 if(include_clouds==1)
     cd clouds
     for k=1:stopindex
-        complex_dielectric_SOL(k)=get_complex_dielectric_constant_water(f,T(k)); %Use equations in Ulabny, Fung, Moore for water
+        complex_dielectric_SOL(k)=get_complex_dielectric_constant_water(f,T(k)); %Use equations in Ulaby, Fung, Moore for water
         complex_dielectric_H2S(k)=1+sqrt(-1)*1; %Don't care no H2S clouds here.
         complex_dielectric_NH3(k)=(((1.48)^2)-((8.73e-4)^2)) + sqrt(-1)*(2*1.48*8.73e-4); %Use Howett, Carlson, Irwin,Calcutt ref index nu=1300 cm^-1
         complex_dielectric_H2O(k)=3.15 + sqrt(-1)*1e-3;                                   %Wost Case at 33 GHz Matsuoka,Fujita,Mae 1996
