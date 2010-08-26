@@ -6,99 +6,17 @@
 #include <Python.h>
 extern float *TfL, *PfL, lawf[],P_term;
 float gravity(int j);
-//float specific_heat(int j, float T, float P);
+float specific_heat(int j, float T, float P,float Cp_in);
 float sat_pressure(char component[], float T);
 float solution_cloud(float T, float PNH3, float PH2O, float *SPNH3, float *SPH2O);
 float h2s_dissolve(int j, float *SPH2S);
 float latent_heat(char component[], float T);
 float get_dP_using_dz(int j, int *eflag, float dz);
 float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
-float get_dT(int j, float T, float P, float dP, float *LX, float *L2X,int hereonout,float Cp_in,float P_real);
+float get_dT(int j, float T, float P, float dP, float *LX, float *L2X,int hereonout,float Cp_in);
 float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain,float Cp_in);
 float SuperSatSelf[5];
 double *get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O);
-//float get_Cp_from_python(float T,float PH2,float PHe,float PCH4,float PH2O);
-
-
-double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
-{   
-    char *current_path;
-    PyObject *strret,*mymod, *strfunc;
-    PyObject *py_args,*py_out;
-    double P;
-    double Cp;
-    double static vals[2];
-    char *path,*newpath,*to_gaslib,*to_site_packages;
-    to_gaslib="/python_compressibility/calc_Cp";
-    to_site_packages="/opt/local/lib/python2.5/site-packages";
-    //equivalent to pwd
-    current_path=getcwd(NULL,0);
-    
-    //get paths that python interpreter sees 
-    path=Py_GetPath();
-    
-    //make a blank character array the size of paths + ":"
-    newpath= new char[strlen(path)+strlen(current_path)+4+strlen(to_gaslib)+4+strlen(to_site_packages)];
-    
-    //copy python path to newpath
-    strcpy(newpath,path);
-    
-    //add a : separator
-    strcat(newpath,":");
-    
-    //add current path
-    strcat(newpath,current_path);
-    strcat(newpath,to_gaslib);
-
-    //add site packages
-    strcat(newpath,":");
-    strcat(newpath,to_site_packages);
-    //printf("my path is:%s\n",newpath);
-    //initialize python interpreter
-    Py_Initialize();
-    
-    //tell python where your modules are     
-    PySys_SetPath(newpath);
-    
-    //load your module (filename)
-    //mymod = PyImport_ImportModule("reverse");
-    //mymod=PyImport_ImportModule("Specific_Heat_CAPI");
-      mymod=PyImport_ImportModule("Pressure_CAPI");
-    //load your function def
-    Py_INCREF(strfunc);
-    //strfunc=PyObject_GetAttrString(mymod,"SpecificHeatCAPI");
-    strfunc=PyObject_GetAttrString(mymod,"PressureCAPI");
-    //T,P*XH2,P*XHe,P*XCH4,P*XH2O
-    //make a python value
-    //strargs = Py_BuildValue("(s)", "Fun");
-    
-    //py_args=Py_BuildValue("fffff",T,PH2,PHe,PCH4,PH2O);
-    
-    //printf("%f %f %f %f %f",T,PH2,PHe,PCH4,PH2O);
-   //call your function with built python arg
-    py_out=PyEval_CallFunction(strfunc,"fffff",T,PH2,PHe,PCH4,PH2O);
-    PyArg_Parse(py_out,"(dd)",&P,&Cp);
-   //pull out the answer from the python function
-   
-    //Cp=PyFloat_AsDouble(py_out);
-    //P=PyFloat_AsDouble(py_out);
-    //printf("Reversed string: %f\n", Cp);
-    
-    //unload/free python stuff?
-    Py_DECREF(py_out);
-    Py_DECREF(py_args);
-    Py_DECREF(strfunc);
-    Py_DECREF(mymod);
-    
-    //clear out of python interp
-  //  PyErr_Clear();
- //   Py_Finalize();
-    //Py_Finalize still crashes things, probably should figure out why.
-    vals[0]=P;
-    vals[1]=Cp;
-//    printf("vals %f %f \n",vals[0],vals[1]);
-    return vals;    
-}
 
 
 /****************************************************************************************************/
@@ -304,20 +222,10 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       
     /* Calculated Partial pressures of previous step*/
       
-
-//      if(Hydrogen_Curve_Fit_Select==666.0)
-//       {
-//         	output_T_P=fopen("python_compressibility/calc_Cp/input_Cp.txt","r");
-//		fscanf(output_T_P,"%f %f\n",&Junk,&P_real);
-//		fclose(output_T_P);
- //               P_real=get_P_from_python(T,PH2,PHe,PCH4,PH2O)
-//                P_real=P_real+layer[j-1].XNH3*P+layer[j-1].XH2S*P;
-//      }
       
       if(Hydrogen_Curve_Fit_Select==666.0)
        {
          
-        //Cp_in=get_Cp_from_python(T,PH2,PHe,PCH4,PH2O);
       	vals=get_P_from_python(layer[j-1].T,layer[j-1].XH2*layer[j].P,layer[j-1].XHe*layer[j].P,layer[j-1].XCH4*layer[j].P,layer[j-1].XH2O*layer[j].P);
         P_real=vals[0]+layer[j-1].XNH3*P+layer[j-1].XH2S*P;
         Cp_in=vals[1];
@@ -325,8 +233,8 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       	layer[j].P_real=P_real;
        }
       
-      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in,P_real); /*dry adiabat*/
-      //printf("%d %f %f %f %f %f \n",j,layer[j-1].T,layer[j].P,dP,hereonout,Cp_in);
+      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in); /*dry adiabat*/
+      
       P  = layer[j].P;
       T  = layer[j].T;
       PH2  = layer[j-1].XH2*P;
@@ -343,13 +251,13 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       H = R*T/(layer[j-1].mu*layer[j-1].g); //Scale Height
       
       
-      //if(Hydrogen_Curve_Fit_Select!=666.0)Cp_in=0;
-      
+      if(Hydrogen_Curve_Fit_Select!=666.0)Cp_in=0;
+      //I think this means I use Ideal gas law for lapse rate...which I think is correct...looking for density      
       P_real=layer[j].P;
       alr = 1e5*dT/(dP*H/P_real);
       dry_adiabatic_lapse_rate=alr;
 
-//      printf("Cp %f\n",Cp);
+
       /* For the solution clouds see:  Weidenschilling and Lewis 1973, Icarus 20:465.
             Lewis 1969, Icarus 10:365. Briggs and Sackett 1989, Icarus 80:77.
             Atreya and Romani 1985, Recent Advances in Planetary Meteorology.
@@ -506,7 +414,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       /*  New temperature:  wet adiabat if any of the above clouds condense */
       if (C)
       {
-            dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in,P_real);
+            dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in);
             T = layer[j].T;
             H = R*T/(layer[j-1].mu*layer[j-1].g);
             alr = 1e5*dT/(dP*H/P);
@@ -663,7 +571,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                     {
                       LX[3]  = LH2O*layer[j-1].q_c;
                       L2X[3] = LX[3]*LH2O/(R*T*T);
-                      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in,P_real);
+                      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in);
                       T = layer[j].T;
                       H = R*T/(layer[j-1].mu*layer[j-1].g);
                       alr = 1e5*dT/(dP*H/P);
@@ -762,12 +670,93 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       XH2O = layer[j].XH2O;
       XCH4 = layer[j].XCH4;
       XPH3 = layer[j].XPH3;
-   //calculated the abundance of H2 as the remainder of the other constituents.
+      //calculated the abundance of H2 as the remainder of the other constituents.
       layer[j].XH2  = (1.0-XH2S-XNH3-XH2O-XCH4-XPH3-XHe-XCO);
       XH2  = layer[j].XH2;
-     //Calculate the molecular weight (mu in Deboer's thesis chapter 3, not to be confused with cos(theta)) of the "Air"
+      //Calculate the molecular weight (mu in Deboer's thesis chapter 3, not to be confused with cos(theta)) of the "Air"
       layer[j].mu = AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3;
       layer[j].g = gravity(j);//calculated the acceleration due to gravity cm/sec^2
       return; //Go back to main function in TCM.C returning nothing, but having updated values in layers data structure (see model.h)
 }
-//End of the bloody new_layer function!
+
+/* get_P_from_python->is used to interface between python_compressibility/calc_Cp/Specific_Heat_CAPI.py and the TCM.
+              Inputs:
+                     -->T    :temperature in deg K.
+                     -->PH2  : Ideal pressure of Hydrogen in bars (density proxy)
+                     -->PHe  : Ideal pressure of Helium in bars (density proxy)
+                     -->PCH4 : Ideal pressure of Methane in bars (density proxy)
+                     -->PH2O : Ideal pressure of Water in bars (density proxy)
+              Outputs:
+                     <--vals[0]: Real Pressure in bars.
+                     <--vals[1]: Specific heat in erg/K/mol
+*/
+             
+double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
+{   
+    char *current_path;
+    PyObject *strret,*mymod, *strfunc;
+    PyObject *py_args,*py_out;
+    double P;
+    double Cp;
+    double static vals[2];
+    char *path,*newpath,*to_gaslib,*to_site_packages;
+    to_gaslib="/python_compressibility/calc_Cp";
+    to_site_packages="/opt/local/lib/python2.5/site-packages";
+    /****************Begin Path Stuff************************/
+    //equivalent to pwd
+    current_path=getcwd(NULL,0);
+    
+    //get paths that python interpreter sees 
+    path=Py_GetPath();
+    
+    //make a blank character array the size of paths + ":"
+    newpath= new char[strlen(path)+strlen(current_path)+4+strlen(to_gaslib)+4+strlen(to_site_packages)];
+    
+    //copy python path to newpath
+    strcpy(newpath,path);
+    
+    //add a : separator
+    strcat(newpath,":");
+    
+    //add current path
+    strcat(newpath,current_path);
+    strcat(newpath,to_gaslib);
+
+    //add site packages
+    strcat(newpath,":");
+    strcat(newpath,to_site_packages);
+    /*****************End Path stuff**************************/
+
+    /*****************Start Talking to Python ****************/
+    Py_Initialize();
+    
+    //tell python where your modules are     
+    PySys_SetPath(newpath);
+    
+    //load your module (filename)
+    mymod=PyImport_ImportModule("Pressure_CAPI");
+    //load your function def
+    Py_INCREF(strfunc);//do we need this?
+    strfunc=PyObject_GetAttrString(mymod,"PressureCAPI");
+
+   //call your function with built python arg
+    py_out=PyEval_CallFunction(strfunc,"fffff",T,PH2,PHe,PCH4,PH2O);
+    
+   //pull out the answer from the python function
+    PyArg_Parse(py_out,"(dd)",&P,&Cp);
+    
+    //unload/free python stuff?
+    Py_DECREF(py_out);
+    Py_DECREF(py_args);
+    Py_DECREF(strfunc);
+    Py_DECREF(mymod);
+    
+    //clear out of python interp
+    //PyErr_Clear();
+    //Py_Finalize();
+    //Py_Finalize still crashes things, probably should figure out why.
+    /**************************Done Talking to Python*******************/
+    vals[0]=P;
+    vals[1]=Cp;
+    return vals;    
+}

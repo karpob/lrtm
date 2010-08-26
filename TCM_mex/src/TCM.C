@@ -22,7 +22,7 @@ int use_dz,jj;
 double P_temp,T_temp;
 void new_layer(int j, float dz, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop, float frain,float select_ackerman);
 void new_layer_original(int j, float dz, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
-float specific_heat(int j, float T, float P);
+float specific_heat(int j, float T, float P,float Cp_in);
 int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3,double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i,float supersatNH3_i,float supersatH2S_i);
 void init_soln_cloud(int mode);
 void dt_tag(FILE *fp);

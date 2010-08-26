@@ -30,7 +30,7 @@
 
 
 
-float specific_heat(int j, float T, float P, float Cp_in,float P_real)
+float specific_heat(int j, float T, float P, float Cp_in)
 {
       int i;
       float XH2, XHe, XH2S, XNH3, XH2O, XCH4, XPH3;
@@ -76,20 +76,9 @@ float specific_heat(int j, float T, float P, float Cp_in,float P_real)
                 XH2O = layer[j-1].XH2O;
                 XCH4 = layer[j-1].XCH4;
                 XPH3 = layer[j-1].XPH3;
-		//output_T_P=fopen("python_compressibility/calc_Cp/output_T_P.txt","w");
-                
-		//T,P*XH2,P*XHe,P*XCH4,P*XH2O
-               
-		//fclose(output_T_P);
-                
-		//system("python python_compressibility/calc_Cp/cp_h2_new.py");
-		//Cp=go(T,P*XH2,P*XHe,P*XCH4,P*XH2O);
-		//output_T_P=fopen("python_compressibility/calc_Cp/input_Cp.txt","r");
-		//printf("py string%s\n",to_python_string);
-		//fscanf(output_T_P,"%f %f\n",&Cp,&P);
-		//fclose(output_T_P);
+
                 Cp=Cp_in;
-                P=P_real;
+
 		Cp_H2S = 4.013;
         	Cp_NH3 = 4.459;  /*Briggs and Sackett*/
 		Cp=Cp+XH2S*Cp_H2S*R+XNH3*Cp_NH3*R;
