@@ -37,7 +37,7 @@ select_ammonia_model=7;
 %1 original deboer water vapor model
 %2 corrected deboer water vapor model
 %3 (to be implemented goodman 1969 water vapor model
-%4 Karpowicz absorption model.
+%4 Karpowicz and Steffes 2011, Icarus absorption model.
 select_water_model=4;
 
 %include cloud absorption?
