@@ -1,9 +1,0 @@
-h2=0.81;
-he=0.19;
-nh3=2.8e-7;
-T=123;
-f=[8:0.1:9]';
-P=4.53;
-quickbg
-quickspil
-[alphanh3,alphaspilker]
