@@ -1,0 +1,89 @@
+PATH=
+                            ===NEPTUNE===
+XH2S     XNH3     XH2O     XCH4    XPH3     XCO    XHe    g[cm/s^2]   R0[cm]   P0[bar]
+1.20e-3  3.0e-5   1.213e-3 3.0e-2  4.297E-7 0.0    0.19   1130.0      2.45e9      1
+T(deep;K)  P(deep;bar)    NH3-supersat-H2S   look angle weighting function coeff's
+560.0      500.0          4.0e-7          0.0   2.001  0.145  -0.191
+use Lindal?    T(target)   P(target)  P(terminate)
+Y              135.0       6.268       0.1
+TP.NEP 39
+Self-cloud supersaturations H2S   NH3    PH3    H2O (mixing ratio)
+                            0.0   0.0    0.0    0.0
+Use the "Windex" cloud
+1
+
+
+target CH4 condense:370.0        200.0      83.55       1.9        0.1           0.0
+target .178:404.85       200.0        52.1        0.178    0.1           0.0
+337.0        100.0        52.1        0.178
+391.0        175.0       135.0        6.268
+
+$run #4:   6X (1 NH3-5e-7) H2S, 1X NH3, 30X H2O,  2% CH4 (A/G)
+XH2S     XNH3     XH2O     XCH4     XHe    g[cm/s^2]   R0[cm]   P0[bar]
+9.95e-5  1.00e-4  2.32e-2  2.0e-2   0.19   1130.0      2.45e9      1
+$run #2:   15X (0.5 NH3+1.7e-4) H2S, 0.5X NH3, 30X H2O,  2% CH4 (A/G)
+XH2S     XNH3     XH2O     XCH4     XHe    g[cm/s^2]   R0[cm]   P0[bar]
+2.2e-4   5.00e-5  2.32e-2  2.0e-2   0.19   1130.0      2.45e9      1
+$run #3:   25X (2 NH3+1.7e-4) H2S, 2X NH3, 30X H2O,  2% CH4 (A/G)
+XH2S     XNH3     XH2O     XCH4     XHe    g[cm/s^2]   R0[cm]   P0[bar]
+3.7e-4   2.00e-4  2.32e-2  2.0e-2   0.19   1130.0      2.45e9      1
+$-run #1:   18X (1 NH3+1.7e-4) H2S, 1X NH3, 30X H2O,  2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     XHe    g[cm/s^2]   R0[cm]   P0[bar]
+2.7e-4   1.00e-4  2.32e-2  2.0e-2   0.19   1130.0      2.45e9      1
+
+new solar
+XH2S     XNH3     XH2O     XCH4     XHe    g[cm/s^2]   R0[cm]   P0[bar]
+3.08e-5  1.87e-4  1.43e-3  6.05e-4  0.16   1130.0      2.45e9      1
+
+
+
+$-run #1s1:   18X (1 NH3+1.7e-4) H2S, 1X NH3, 30X H2O,  2% CH4 (A/G) 2e-7 super
+$-run #2:   30X H2S, 2.8X NH3, 30X H2O,  2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     XHe    g[cm/s^2]   R0[cm]   P0[bar]
+4.5e-4   2.8e-4   2.32e-2  2.0e-2   0.19   1130.0      2.45e9      1
+
+
+$-run # :   17X (1 NH3+1.45e-4) H2S, 1X NH3, 10X H2O,  2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+2.45e-4  1.00e-4  7.72e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+-run # :  22X H2S, 1.5X NH3, 2X H2O, 2% CH4
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+3.18e-4  1.5e-4   1.5e-3   2.1e-2   0.2346   1130.0       2.45e9      1
+-run # :  Weidenschilling and Lewis solar (w/ 2% CH4)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+2.9e-5   1.52e-4  1.05e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+-run # :  dePater  30X H2S, 1X NH3, 30X H2O, 2% CH4
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+9.54e-4  1.47e-4  3.5e-2   2.0e-2   0.2346   1130.0       2.45e9      1
+-run # :  20X H2S, 1X NH3, 10X H2O, 2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+2.92e-4  1.00e-4  7.73e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+-run # :  25X H2S, 1X NH3, 5X H2O,  2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+3.65e-4  1.00e-4  3.86e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+-run # :  25X H2S, 1X NH3, 5X H2O,  2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+3.65e-4  1.00e-4  3.86e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+-run # :   17X (1 NH3+1.5e-4) H2S, 1X NH3, 5X H2O,  2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+2.5e-4   1.00e-4  3.86e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+-run # :   24X (2 NH3+1.45e-4) H2S, 2X NH3, 5X H2O,  2% CH4 (Anders/Grevasse)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+3.45e-4  2.00e-4  3.86e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+
+
+Anders and Grevasse solar (w/ 2% CH4)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+1.46e-5  1.00e-4  7.73e-4  2.0e-2   0.2346   1130.0       2.45e9      1
+
+dePater solar (w/ 2% CH4)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+3.18e-5  1.47e-4  1.17e-3  2.0e-2   0.2346   1130.0       2.45e9      1
+
+Joanna thesis p. 90 (#1 for H2S and NH3)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+3.3e-4   1.5e-4  1.5e-3    2.0e-2   0.2346   1130.0       2.45e9      1
+
+Joanna thesis p. 90 (#2 for H2S and NH3)
+XH2S     XNH3     XH2O     XCH4     He/H2  g[cm/s^2]      R0[cm]   P0[bar]
+3.3e-5   4.0e-5  1.5e-3    2.0e-2   0.2346   1130.0       2.45e9      1

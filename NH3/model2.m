@@ -1,0 +1,9 @@
+h2=0.86;
+he=0.14;
+nh3=2.3e-4;
+T=161;
+f=[2.3,8.4,32]';
+P=1.8;
+quickbg
+quickspil
+[alphaspilker]*434294.5
