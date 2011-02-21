@@ -91,13 +91,21 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	print wave_numbers
 	# interpolate values for given wavenumber (nu), and while we're at it multiply
 	# by amagat^2 of each constituent
-	print numpy.max(numpy.max(alpha_eH2))
-	print numpy.min(numpy.min(alpha_eH2))
+	x=[]
+	y=[]
+	z=[]
 	
-	x,y=numpy.meshgrid(logTi,wave_numbers)
-	f=scipy.interpolate.interp2d(x,y,alpha_eH2,kind='linear')
-	print 'done'
-    	alpha_H2_prime_1=amagat_sq_h2*exp(f(math.log(T),nu))
+	for i in range(0,len(logTi)):
+		for j in range(0,len(wave_numbers)):
+			x.append(logTi[i])
+			y.append(wave_numbers[i])
+			z.append(alpha_eH2[i,j])	
+	x=numpy.asarray(x)
+	y=numpy.asarray(y)
+	z=numpy.asarray(z)
+	f=scipy.interpolate.bisplrep(x,y,z,s=0)
+	tau=interpolate.bisplev(log(T),nu)
+    	alpha_H2_prime_1=amagat_sq_h2*exp(tau)
 	"""
 	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_He)
     	alpha_He_prime_1=amagat_he*amagat_h2*exp(f(log(T),nu))
