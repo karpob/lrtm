@@ -25,44 +25,45 @@ def ReadasciiCIA(name):
 
 	#equilibrium H2-H2 collisions
 	alpha_eH2=[]	
-	for i in range(0,nTemps):
-		alpha_eH2.append(vals[0:nFreq])
-		vals[0:nFreq]=''
+	alpha_eH2=vals[0:nFreq*nTemps]
+	vals[0:nFreq*nTemps]=''
 	alpha_eH2=numpy.asarray(alpha_eH2,dtype=float)
-	alpha_eH2=alpha_eH2.reshape(nTemps,nFreq)
-
+	alpha_eH2=alpha_eH2.reshape(nFreq,nTemps)
+	alpha_eH2=numpy.transpose(alpha_eH2)
 	#normal H2-H2 collisions
 
-	alpha_nH2=[]
-        for i in range(0,nTemps):
-                alpha_nH2.append(vals[0:nFreq])
-		vals[0:nFreq]=''
-        alpha_nH2=numpy.asarray(alpha_nH2,dtype=float)
-        alpha_nH2=alpha_nH2.reshape(nTemps,nFreq)	
+	alpha_nH2=vals[0:nFreq*nTemps]
+	vals[0:nFreq*nTemps]=''
+       	alpha_nH2=numpy.asarray(alpha_nH2,dtype=float)
+        alpha_nH2=alpha_nH2.reshape(nFreq,nTemps)
+	alpha_nH2=numpy.transpose(alpha_nH2)	
 	
 	#equilibrium H2-He collisions
-	alpha_eH2_He=[]
-        for i in range(0,nTemps):
-                alpha_eH2_He.append(vals[0:nFreq])
-		vals[0:nFreq]=''
+        alpha_eH2_He=vals[0:nFreq*nTemps]
+	vals[0:nFreq*nTemps]=''
         alpha_eH2_He=numpy.asarray(alpha_eH2_He,dtype=float)
-        alpha_eH2_He=alpha_eH2_He.reshape(nTemps,nFreq)
+	alpha_eH2_He=alpha_eH2_He.reshape(nFreq,nTemps)
+	alpha_eH2_He=numpy.transpose(alpha_eH2_He)
+        
 	
 	#equilibrium nH2-He collisions
-	alpha_nH2_He=[]
-        for i in range(0,nTemps):
-                alpha_nH2_He.append(vals[0:nFreq])
-		vals[0:nFreq]=''
-        alpha_nH2_He=numpy.asarray(alpha_nH2_He,dtype=float)
-        alpha_nH2_He=alpha_nH2_He.reshape(nTemps,nFreq)
+	alpha_nH2_He=vals[0:nFreq*nTemps]
+        vals[0:nFreq*nTemps]=''
+	alpha_nH2_He=numpy.asarray(alpha_nH2_He,dtype=float)
+	alpha_nH2_He=alpha_nH2_He.reshape(nFreq,nTemps)
+	alpha_nH2_He=numpy.transpose(alpha_nH2_He)
+        #alpha_nH2_He=alpha_nH2_He.reshape(nTemps,nFreq)
 
 	#equilibrium H2-CH4 collisions
-        alpha_eH2_CH4=[]
-        for i in range(0,nTemps):
-                alpha_eH2_CH4.append(vals[0:nFreq])
-		vals[0:nFreq]=''
-        alpha_eH2_CH4=numpy.asarray(alpha_eH2_CH4,dtype=float)
-        alpha_eH2_CH4=alpha_eH2_CH4.reshape(nTemps,nFreq)
+        alpha_eH2_CH4=vals[0:nFreq*nTemps]
+        vals[0:nFreq*nTemps]=''
+	alpha_eH2_CH4=numpy.asarray(alpha_eH2_CH4,dtype=float)
+	alpha_eH2_CH4=alpha_eH2_CH4.reshape(nFreq,nTemps)
+	alpha_eH2_CH4=numpy.transpose(alpha_eH2_CH4)
+
+        
+
+        #alpha_eH2_CH4=alpha_eH2_CH4.reshape(nTemps,nFreq)
 	
 	#save time...don't use, dont parse.
 	#normal H2-CH4 collisions
