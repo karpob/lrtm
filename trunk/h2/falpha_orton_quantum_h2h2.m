@@ -76,11 +76,12 @@ amagat_sq_ch4=amagat_ch4^2;
 % Read in data supplied by Glenn Orton from His quantum scattering code%    
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 name='cia.longrev08.data';%'orton_h2h2_grid.txt';
-file_handle=fopen(name,'r');
-line1=fscanf(file_handle,'%f %f %f',[3,1]);
-line2=fscanf(file_handle,'%f',[1,1]);
-line_length=line2;
-line_format=strcat('%',sprintf('%d', line_length),'f');
+
+file_handle=fopen(name,'r')
+line1=fscanf(file_handle,'%f %f %f',[3,1])
+line2=fscanf(file_handle,'%f',[1,1])
+line_length=line2
+line_format=strcat('%',sprintf('%d', line_length),'f')
 wave_numbers=fscanf(file_handle,line_format,[line2,1]);
 alpha_eH2=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_nH2=fscanf(file_handle,line_format,[line1(1),line2]);
@@ -89,7 +90,7 @@ alpha_nH2_He=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_eH2_CH4=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_nH2_CH4=fscanf(file_handle,line_format,[line1(1),line2]);
 fclose(file_handle);
-
+size(alpha_eH2)
 normal_or_equilibrium==1;
 for i=1:length(wave_numbers)
    if(wave_numbers<0.1)
