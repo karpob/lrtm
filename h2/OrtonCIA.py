@@ -20,7 +20,7 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	from numpy import exp,linspace,log
 	import scipy.interpolate 
 	from ReadasciiCIA import ReadasciiCIA
-	import scipy,numpy,pylab
+	import scipy,numpy,pylab,math
 	################################################################
 	# Convert stuff to wavenumbers and amagats...let the fun begin.#
 	################################################################
@@ -93,13 +93,12 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	# by amagat^2 of each constituent
 	print numpy.max(numpy.max(alpha_eH2))
 	print numpy.min(numpy.min(alpha_eH2))
-	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2,kx=2,ky=3)
-	print f(nu,log(T))
-    	alpha_H2_prime_1=amagat_sq_h2*exp(f(nu,log(T)))
-	print amagat_sq_h2
-	print wave_numbers
-	print type(wave_numbers)
-	print numpy.shape(wave_numbers)
+	
+	x,y=numpy.meshgrid(logTi,wave_numbers)
+	f=scipy.interpolate.interp2d(x,y,alpha_eH2,kind='linear')
+	print 'done'
+    	alpha_H2_prime_1=amagat_sq_h2*exp(f(math.log(T),nu))
+	"""
 	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_He)
     	alpha_He_prime_1=amagat_he*amagat_h2*exp(f(log(T),nu))
 
@@ -110,6 +109,6 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1
 	
     	alpha=alpha_1
-	
-
-	return alpha,alpha_H2_prime_1,alpha_He_prime_1,alpha_CH4_prime_1
+	"""
+	alpha=alpha_H2_prime_1
+	return alpha#,alpha_H2_prime_1,alpha_He_prime_1,alpha_CH4_prime_1
