@@ -18,9 +18,9 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	     alpha_CH4_prime <-- CIA absorption from H2-CH4
 	"""
 	from numpy import exp,linspace,log
-	from scipy.interpolate import interp2d
+	import scipy.interpolate 
 	from ReadasciiCIA import ReadasciiCIA
-	
+	import scipy,numpy,pylab
 	################################################################
 	# Convert stuff to wavenumbers and amagats...let the fun begin.#
 	################################################################
@@ -87,17 +87,24 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 
 	#Ti=[40,51.667,66.724,86.177,111.302,143.753,185.664,239.794,309.705,400]
 	logTi=linspace(log(minTemp),log(maxTemp),num=nTemps)
+	print logTi
+	print wave_numbers
 	# interpolate values for given wavenumber (nu), and while we're at it multiply
 	# by amagat^2 of each constituent
-
-	f=interp2d(wave_numbers,logTi,alpha_eH2,kind='cubic')
+	print numpy.max(numpy.max(alpha_eH2))
+	print numpy.min(numpy.min(alpha_eH2))
+	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2,kx=2,ky=3)
+	print f(nu,log(T))
     	alpha_H2_prime_1=amagat_sq_h2*exp(f(nu,log(T)))
+	print amagat_sq_h2
+	print wave_numbers
+	print type(wave_numbers)
+	print numpy.shape(wave_numbers)
+	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_He)
+    	alpha_He_prime_1=amagat_he*amagat_h2*exp(f(log(T),nu))
 
-	f=interp2d(wave_numbers,logTi,alpha_eH2_He,kind='cubic')
-    	alpha_He_prime_1=amagat_he*amagat_h2*exp(f(nu,log(T)))
-
-	f=interp2d(wave_numbers,logTi,alpha_eH2_CH4,kind='cubic')
-	alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(f(nu,log(T)))
+	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_CH4)
+	alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(f(log(T),nu))
 
 	# Add up alpha's of H2-H2, H2-He, H2-CH4
 	alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1
