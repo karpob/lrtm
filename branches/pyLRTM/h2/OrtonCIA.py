@@ -1,4 +1,4 @@
-def falpha_orton_quantum_h2h2(f,T,P_H2,P_He,P_CH4):
+def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	"""
 	This function uses data supplied by Glenn Orton from his quantum scattering
 	code for H2-H2, H2-He, and H2-CH4. The data is interpolated using interp2
@@ -19,6 +19,7 @@ def falpha_orton_quantum_h2h2(f,T,P_H2,P_He,P_CH4):
 	"""
 	from numpy import exp,linspace,log
 	from scipy.interpolate import interp2d
+	from ReadasciiCIA import ReadasciiCIA
 	
 	################################################################
 	# Convert stuff to wavenumbers and amagats...let the fun begin.#
@@ -76,7 +77,7 @@ def falpha_orton_quantum_h2h2(f,T,P_H2,P_He,P_CH4):
 	# Read in data supplied by Glenn Orton from His quantum scattering code#    
 	########################################################################
 	
-	nTemps,minTemp,maxTemp,nu,alpha_eH2,alpha_eH2_He,alpha_eH2_CH4=ReadasciiCIA('h2Parameters/cia.longrev08.data')
+	nTemps,minTemp,maxTemp,wave_numbers,alpha_eH2,alpha_eH2_He,alpha_eH2_CH4=ReadasciiCIA('h2Parameters/cia.longrev08.data')
 
 	#####################################################################
 	#  Start interpolation scheme                                       #
@@ -89,10 +90,14 @@ def falpha_orton_quantum_h2h2(f,T,P_H2,P_He,P_CH4):
 	# interpolate values for given wavenumber (nu), and while we're at it multiply
 	# by amagat^2 of each constituent
 
+	f=interp2d(wave_numbers,logTi,alpha_eH2,kind='cubic')
+    	alpha_H2_prime_1=amagat_sq_h2*exp(f(nu,log(T)))
 
-    	alpha_H2_prime_1=amagat_sq_h2*exp(interp2d(wave_numbers,logTi,alpha_eH2,nu,log(T),kind='cubic'))
-    	alpha_He_prime_1=amagat_he*amagat_h2*exp(interp2d(wave_numbers,logTi,alpha_eH2_He,nu,log(T),kind='cubic'))
-    	alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(interp2d(wave_numbers,logTi,alpha_eH2_CH4,nu,log(T),kind='cubic'))
+	f=interp2d(wave_numbers,logTi,alpha_eH2_He,kind='cubic')
+    	alpha_He_prime_1=amagat_he*amagat_h2*exp(f(nu,log(T)))
+
+	f=interp2d(wave_numbers,logTi,alpha_eH2_CH4,kind='cubic')
+	alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(f(nu,log(T)))
 
 	# Add up alpha's of H2-H2, H2-He, H2-CH4
 	alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1
@@ -100,4 +105,4 @@ def falpha_orton_quantum_h2h2(f,T,P_H2,P_He,P_CH4):
     	alpha=alpha_1
 	
 
-	return alpha,alpha_H2_prime,alpha_He_prime,alpha_CH4_primet
+	return alpha,alpha_H2_prime_1,alpha_He_prime_1,alpha_CH4_prime_1
