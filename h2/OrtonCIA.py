@@ -106,4 +106,5 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	
     	#alpha=alpha_1
 	
-	return alpha_H2_prime_1#alpha,alpha_H2_prime_1,alpha_He_prime_1,alpha_CH4_prime_1
+	return alpha,alpha_H2_prime_1,alpha_He_prime_1,alpha_CH4_prime_1
+	#please use this one.
