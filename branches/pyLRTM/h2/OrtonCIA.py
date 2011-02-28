@@ -90,18 +90,20 @@ def OrtonCIA(f,T,P_H2,P_He,P_CH4):
 	
 	# interpolate values for given wavenumber (nu), and while we're at it multiply
 	# by amagat^2 of each constituent
-	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2)
+	f=scipy.interpolate.interp2d(logTi,wave_numbers,alpha_eH2,kind='cubic')
+	
+	#f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2)
     	alpha_H2_prime_1=amagat_sq_h2*exp(f(log(T),nu))
 	
-	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_He)
-    	alpha_He_prime_1=amagat_he*amagat_h2*exp(f(log(T),nu))
+	#f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_He)
+    	#alpha_He_prime_1=amagat_he*amagat_h2*exp(f(log(T),nu))
 
-	f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_CH4)
-	alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(f(log(T),nu))
+	#f=scipy.interpolate.RectBivariateSpline(logTi,wave_numbers,alpha_eH2_CH4)
+	#alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(f(log(T),nu))
 
 	# Add up alpha's of H2-H2, H2-He, H2-CH4
-	alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1
+	#alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1
 	
-    	alpha=alpha_1
+    	#alpha=alpha_1
 	
-	return alpha,alpha_H2_prime_1,alpha_He_prime_1,alpha_CH4_prime_1
+	return alpha_H2_prime_1#alpha,alpha_H2_prime_1,alpha_He_prime_1,alpha_CH4_prime_1
