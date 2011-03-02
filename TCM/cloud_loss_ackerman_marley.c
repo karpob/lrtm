@@ -37,7 +37,7 @@ float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, floa
                                  float delta_q_c,float frain,float Cp_in)
 {
        float boltz_sigma=0,Flux=0,cp_temp=0,mu_temp=0,GAMMA_TEMP=0,mixing_L=0,rho_temp=0,Eddy_Diffusion_Coef=0,my_dz=0,wstar=0;
-       float q_c_old=0,q_v_old=0,Qv=0,q_v=0,q_c=0,gamma=0,F=0,Htemp=0;
+       float q_c_old=0,q_v_old=0,q_v=0,q_c=0,gamma=0,F=0;
                                     
                   
        boltz_sigma=5.6704e-8; // W/m^2/K^4 (stefan boltzmann constant)

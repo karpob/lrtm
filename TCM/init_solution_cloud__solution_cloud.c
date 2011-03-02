@@ -175,7 +175,7 @@ void init_soln_cloud(int mode)
 float solution_cloud(float TC, float PNH3, float PH2O, float *SPNH3, float *SPH2O)
 {
       int have_cloud=0;
-      float C_sol, PNH3C,PH2S;
+      float C_sol, PNH3C,PH2S; //note PH2S is not used unless line near the end of function is  uncommented.
 
       if (ROMANI)  /* Is there a prayer of a solution cloud? */
       {

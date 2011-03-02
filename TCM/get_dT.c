@@ -20,7 +20,7 @@ float get_dT(int j, float T, float P, float dP, float *LX, float *L2X, int hereo
       int i;
       float m, b, Cp, dT_num, dT_den, dT; 
       
-      extern float *TfL, *PfL, lawf[];
+      extern float *TfL, *PfL;
       if (hereonout)   /*linear interpolation from Lindal's points*/
       {
             for (i=0; P <= PfL[i]; ++i)  ;

@@ -23,7 +23,7 @@ extern float *TfL, *PfL, lawf[];
 float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, \
                       float P_fine_start, float P_fine_stop)
 {
-      float dz, P, T, H, dP, new_P_fine, new_P_coarse;
+      float dz, P, H, dP, new_P_fine, new_P_coarse;
       H = R*layer[j-1].T/(layer[j-1].mu*layer[j-1].g);
       new_P_fine=layer[j-1].P - dP_fine;
       new_P_coarse=layer[j-1].P - dP_init;
