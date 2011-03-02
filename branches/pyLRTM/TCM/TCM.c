@@ -70,10 +70,9 @@ int intoTheVoid( float dz,
                   float frain,
                   float select_ackerman)
 {
-      int bottom, top, j, eflag=0, jcntr=0, found,cross_my_P0=0;
-      float P, T, T_err=100.0, f=1.0, T_bright, T_ob, W,Pr;
-      float refr, refr2, dawf;
-      char outfile[15],use_lindal_i='Y';
+      int  top, j, eflag=0, jcntr=0, found,cross_my_P0=0;
+      float P, T, T_err=100.0;
+      char use_lindal_i='Y';
 
 	  
 
@@ -204,6 +203,8 @@ double getFloatValues(int i,int j)
 		if(i==19)return layer[j].z-z_offset;
 		if(i==20)return layer[j].DSOL_NH3;
 		if(i==21)return layer[j].P_real;
+		printf("exceed i dimension");
+		return 0;
 }
 
 /**************That's All Folks!********************************/

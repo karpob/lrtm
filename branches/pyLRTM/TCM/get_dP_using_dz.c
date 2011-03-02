@@ -15,7 +15,7 @@ extern float *TfL, *PfL, lawf[];
 
 float get_dP_using_dz(int j, int *eflag, float dz)
 {
-      float P, T, H, dP;
+      float P, H, dP;
 
       if (AutoStep)
       { 

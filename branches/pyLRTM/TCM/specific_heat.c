@@ -32,11 +32,11 @@
 
 float specific_heat(int j, float T, float P, float Cp_in)
 {
-      int i;
+     
       float XH2, XHe, XH2S, XNH3, XH2O, XCH4, XPH3;
       float Cp_H2, Cp_He, Cp_H2S, Cp_NH3, Cp_H2O, Cp_CH4, Cp_PH3, Cp;
-      FILE *output_T_P;
-      //go(1);
+      
+      
 /**************versions of CpH2*******************************************/
 /*      fit for equilibrium   ***/
       	if (T<120.0 && Hydrogen_Curve_Fit_Select==0.0)
