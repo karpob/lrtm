@@ -1,19 +1,19 @@
 import TCM
-dz =1
+dz =1.
 XHe_i =0.1351
 XH2S_i =6.6254e-05
 XNH3_i =3.9150e-04
 XH2O_i =0.0022
 XCH4_i =0.0018
 XPH3_i =5.1627e-07
-XCO =0
-P_temp =1000
+XCO =0.
+P_temp =1000.
 T_temp =1.5838e+03
-g0_i =2330
+g0_i =2330.
 R0_i =7.1492e+09
-P0_i =1
-T_targ_i =166
-P_targ_i =1
+P0_i =1.
+T_targ_i =166.
+P_targ_i =1.
 P_term_i =0.141
 use_lindal_in=1
 n_lindal_pts_i =61
@@ -24,11 +24,11 @@ SuperSatSelf4_i=0.
 supersatNH3_i=0.
 supersatH2S_i=0.
 AutoStep_constant=8
-fp =666
-dP_init =10
+fp =666.
+dP_init =1
 dP_fine =0.2500
 P_fine_start=13
-P_fine_stop=1
+P_fine_stop=1.
 use_dz =0
 frain =3
 select_ackerman=0
@@ -79,13 +79,14 @@ c=[]
 #	b.append(TCM.getCldVal(i))
 for i in range(0, a):
 	cc=[]
-	for j in range(0,20):
+	for j in range(0,22):
 		print TCM.getFloatValues(j,i)
 		cc.append(TCM.getFloatValues(j,i))
 	c.append(cc)
 import numpy
 print c[0][0]
 a=numpy.asarray(c)
-print a[:,0],a[0:,2]
+print numpy.max(a[:,21]),numpy.min(a[:,21])
+print numpy.max(a[:,20]),numpy.min(a[:,20])
 
 

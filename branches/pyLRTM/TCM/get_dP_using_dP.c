@@ -20,7 +20,7 @@ extern float *TfL, *PfL, lawf[];
 //                    <-- layer data structure (see model.h)
 /********************************************************************************************/
 
-float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, \
+float get_dP_using_dP(int j, float dP_init, float dP_fine, \
                       float P_fine_start, float P_fine_stop)
 {
       float dz, P, H, dP, new_P_fine, new_P_coarse;
@@ -39,9 +39,9 @@ float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, \
           dP= -1.0*dP_fine;
           P= layer[j-1].P + dP;
       }
-      else if (new_P_fine<= P_targ && *eflag != 97)
+      else if (new_P_fine<= P_targ && layer[j-1].eflag != 97 )
       {
-           *eflag = 98;
+           layer[j].eflag = 98;
            P = P_targ;
            dP = PfL[1]-P_targ;
            jj=j;
@@ -50,11 +50,11 @@ float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, \
       {
            dP=PfL[j-jj+1]-layer[j-1].P;
            P=layer[j-1].P+dP;
-          
+	   layer[j].eflag=97;          
       }
       if(P <= P_term)
       {
-           *eflag = 99;
+           layer[j].eflag = 99;
            P= P_term;
            dP=P - layer[j-1].P;
       }

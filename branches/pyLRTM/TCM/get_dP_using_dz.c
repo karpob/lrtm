@@ -6,14 +6,14 @@ extern float *TfL, *PfL, lawf[];
 //                         This function calculates the pressure step for a given value of dz
 //             Input:
 //                 --> int j: value of the layer index of layer data structure (see model.h)
-//                 --> int *eflag: error flag which is returned to main 
+//                 --> int eflag: error flag which is returned to main 
 //                 --> dz : altitude step in km
 //             Output:
 //                 <-- dP: the pressure step in bars
 //                 <-- layer data structure see model.h
 /********************************************************************************************/
 
-float get_dP_using_dz(int j, int *eflag, float dz)
+float get_dP_using_dz(int j, float dz)
 {
       float P, H, dP;
 
@@ -32,13 +32,13 @@ float get_dP_using_dz(int j, int *eflag, float dz)
 
       if (P <= P_term)
       {
-            *eflag = 99;
+            layer[j].eflag = 99;
             P = P_term;
             dP = P - layer[j-1].P;
       }
-      else if ( P <= P_targ && *eflag != 97 )
+      else if ( P <= P_targ && layer[j-1].eflag != 97 )
       {
-            *eflag = 98;
+            layer[j].eflag= 98;
             P = P_targ;
             dP = P - layer[j-1].P;
       }

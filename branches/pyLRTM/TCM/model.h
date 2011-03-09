@@ -6,7 +6,7 @@
 
 #define nbgetc()        bioskey(0) & 0xFF
 
-#define MAXLAYERS       500
+#define MAXLAYERS       5000
 #define R               8.3143E7    /* Universal gas constant [erg/K/mol] */
 #define AMU             1.66056E-24 /* Atomic Mass Unit in grams */
 #define AMU_H2          2.01594     /*updated karpowicz*/
@@ -75,4 +75,5 @@ struct ATM_LAYER {
       float q_c_nh3;
       float q_c_nh3_ice;
       int first_nh3;
+      int eflag;
                   };

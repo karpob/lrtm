@@ -6,6 +6,7 @@
 
 /*Globals*/
 struct ATM_LAYER *layer;
+int hereonout;
 char use_lindal;
 int NH4SH_cloud_base=0;
 float P_targ, T_targ, P_term, g0, R0, P0, supersatNH3, supersatH2S,use_lindal_in;
@@ -22,8 +23,8 @@ float Hydrogen_Curve_Fit_Select;
 int sol_cloud=USE_SOL_CLOUD;
 
 /*       Prototypes      */
-void new_layer(int j, float dz, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop, float frain,float select_ackerman);
-void new_layer_original(int j, float dz, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
+int new_layer(int j, float dz, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop, float frain,float select_ackerman,float Hydrogen_Curve_Fit_Select);
+int new_layer_original(int j, float dz, int eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
 float specific_heat(int j, float T, float P,float Cp_in);
 int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3,double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i,float supersatNH3_i,float supersatH2S_i);
 int intoTheVoid( float dz, double XHe_i,double XH2S_i,double XNH3_i,double XH2O_i,double XCH4_i,double XPH3_i,double XCO, float P_temp,float T_temp,float g0_i,float R0_i,float P0_i,float T_targ_i,float P_targ_i,float P_term_i,float use_lindal_in,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i,float SuperSatSelf3_i,float SuperSatSelf4_i,float supersatNH3_i,float supersatH2S_i,int AutoStep_constant,float Hydrogen_Curve_Fit_Select,float dP_init,float dP_fine,float P_fine_start,float P_fine_stop,int use_dz,float frain,float select_ackerman);
@@ -70,11 +71,12 @@ int intoTheVoid( float dz,
                   float frain,
                   float select_ackerman)
 {
-      int  top, j, eflag=0, jcntr=0, found,cross_my_P0=0;
+      int  top, j, jcntr=0, found,cross_my_P0=0;
       float P, T, T_err=100.0;
       char use_lindal_i='Y';
-
-	  
+      
+      int ef=0;
+      int tmp;	  
 
       printf("Starting DeBoer/Steffes/Karpowicz Thermo-chemical Model\n");		
       
@@ -101,35 +103,38 @@ int intoTheVoid( float dz,
       
       while (fabs(T_err) > TLIMIT && jcntr < MAXTRIES)
       {
-            eflag = 0; //reset flag
+            ef = 0; //reset flag
             jj=0;     //reset jj
             ++jcntr;  //increment jcntr
            		
             printf("iteration: %d      \n",jcntr);
             		
-            for(j=1;eflag!=99 && j<MAXLAYERS;++j) //go through the layers          
+            for(j=1;ef!=99 && j<MAXLAYERS;++j) //go through the layers          
             {                                               
               
-              new_layer(j,dz,&eflag, dP_init, dP_fine, P_fine_start, P_fine_stop, frain,select_ackerman);
+              tmp=new_layer(j,dz, dP_init, dP_fine, P_fine_start, P_fine_stop, frain,select_ackerman,Hydrogen_Curve_Fit_Select);
+	      if(layer[j].eflag==99)ef=99;
               P = layer[j].P;
-              //printf("error flag Pressure, level,T_targ %d %f %d %f\n",eflag,P,j,T_targ);
+              //printf("error flag Pressure, level,T_targ %d %f %d %f\n",layer[j].eflag,P,j,T_targ,layer[j].T);
                   
-                  if (eflag == 98)  /* check target temperature */
+                  if (layer[j].eflag == 98 )  /* check target temperature */
                   {                                         /* eflag       P      */
-                        eflag = 97;                         /*  97      < P_targ  */
+                        layer[j].eflag = 97;                         /*  97      < P_targ  */
                         T = layer[j].T;                     /*  99      <=P_term  */
                         T_err = 100.0*(T - T_targ)/T_targ;  /*  98      <=P_targ  */
-                        //printf("Terr %f %f \n",T_err,TLIMIT);
+                        printf("Terr %f %f \n",T_err,TLIMIT);
                       if (fabs(T_err)>TLIMIT)
                         {
                               layer[0].T = layer[0].T - (T - T_targ)*2.0;
                               P = layer[0].P;
-                              eflag = 99;
+                              layer[j].eflag = 99;
+			      ef=99;
                               sol_cloud = USE_SOL_CLOUD;
                               NH4SH_cloud_base = 0;
                         }
                      
                   }
+		
             }
 			
       }
