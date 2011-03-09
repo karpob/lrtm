@@ -5,15 +5,15 @@
 #include "layers.h"
 #include <Python.h>
 extern float *TfL, *PfL, lawf[],P_term;
-
+extern int hereonout;
 float gravity(int j);
 float specific_heat(int j, float T, float P,float Cp_in);
 float sat_pressure(char component[], float T);
 float solution_cloud(float T, float PNH3, float PH2O, float *SPNH3, float *SPH2O);
 float h2s_dissolve(int j, float *SPH2S);
 float latent_heat(char component[], float T);
-float get_dP_using_dz(int j, int *eflag, float dz);
-float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
+float get_dP_using_dz(int j, float dz);
+float get_dP_using_dP(int j, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
 float get_dT(int j, float T, float P, float dP, float *LX, float *L2X,int hereonout,float Cp_in);
 float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain,float Cp_in);
 float SuperSatSelf[5];
@@ -85,6 +85,7 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
       layer[n].DPH3 = ZERO;
       layer[n].DNH4SH = ZERO;
       layer[n].DSOL = ZERO;
+      layer[n].eflag=0;
       XH2 = layer[n].XH2;
       layer[n].z = 0.0;
 //*****************************************************//
@@ -108,10 +109,11 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
        n_lindal_pts=n_lindal_pts_i;
 //********************************************************************************//
 	  
-	  
+      	  
       if (use_lindal == 'Y')
       {
             pfp=fopen("TP.TCM","r");
+	    printf("%d",n_lindal_pts);
             TfL = (float *) malloc(n_lindal_pts*sizeof(float));
             PfL = (float *) malloc(n_lindal_pts*sizeof(float));
 			
@@ -169,14 +171,14 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
 
 /********************************************************************************/
 /********************************************************************************/
-// void new_layer() 
+// int new_layer() 
 //                 This function each calculates how much of a constituent
 //                 is, or isn't condensed for a given atmospheric layer j 
 //                 values are stored in the layer data structure (in model.h)
 //         Inputs:
 //              -->int j : layer index assiociated with layer data structure (see model.h)
 //              -->float dz : altitude step, if one chooses stepping in altitude
-//              -->int *eflag: flag which will cause function to return to main
+//              -->int eflag: flag which will cause function to return to main
 //              -->float dP_init: initial pressure step (if one chooses to step in pressure)
 //              -->float dP_fine: pressure step after P_start (if one chooses to step in pressure)
 //              -->float P_fine_start: pressure level to begin stepping with dP_fine
@@ -188,8 +190,8 @@ int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,do
 //              <-- values in layer data structure (see model.h)
 /*******************************************************************************/
 /*******************************************************************************/
-void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, \
-               float P_fine_stop,float frain, float select_ackerman)
+int new_layer(int j, float dz,float dP_init, float dP_fine, float P_fine_start, \
+               float P_fine_stop,float frain, float select_ackerman,float Hydrogen_Curve_Fit_Select)
 {
       int CNH4SH=0, CH2S=0, CNH3=0, CH2O=0, CCH4=0, CPH3=0, C=0, C_sol_zero=0;
       float LX[6]={0.0,0.0,0.0,0.0,0.0,0.0}, L2X[6]={0.0,0.0,0.0,0.0,0.0,0.0};
@@ -209,16 +211,17 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       layer[j].clouds=0L;
       float Cp_in;
       double *vals;
+      
       if (j==1) hereonout=0;
       /*  Get new P,dP and T,dT values  */
 
       if (use_dz)
       {
-      	dP = get_dP_using_dz(j,eflag,dz);
+      	dP = get_dP_using_dz(j,dz);
       }
 
-      else dP=get_dP_using_dP(j, eflag, dP_init, dP_fine, P_fine_start, P_fine_stop);
-      
+      else dP=get_dP_using_dP(j, dP_init, dP_fine, P_fine_start, P_fine_stop);
+            
     /* Calculated Partial pressures of previous step*/
       
       
@@ -228,7 +231,6 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       	vals=get_P_from_python(layer[j-1].T,layer[j-1].XH2*layer[j].P,layer[j-1].XHe*layer[j].P,layer[j-1].XCH4*layer[j].P,layer[j-1].XH2O*layer[j].P);
         P_real=vals[0]+layer[j-1].XNH3*P+layer[j-1].XH2S*P;
         Cp_in=vals[1];
-        
       	layer[j].P_real=P_real;
        }
       
@@ -675,7 +677,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       //Calculate the molecular weight (mu in Deboer's thesis chapter 3, not to be confused with cos(theta)) of the "Air"
       layer[j].mu = AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3;
       layer[j].g = gravity(j);//calculated the acceleration due to gravity cm/sec^2
-      return; //Go back to main function in TCM.C returning nothing, but having updated values in layers data structure (see model.h)
+      return(0); //Go back to main function in TCM.C returning nothing, but having updated values in layers data structure (see model.h)
 }
 
 /* get_P_from_python->is used to interface between python_compressibility/calc_Cp/Specific_Heat_CAPI.py and the TCM.
@@ -700,7 +702,7 @@ double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
     double static vals[2];
     char *path,*newpath,*to_gaslib,*to_site_packages;
     to_gaslib="/python_compressibility/calc_Cp";
-    to_site_packages="/opt/local/lib/python2.5/site-packages";
+    to_site_packages="/tgrs05/scratch/local/lib/python2.6/site-packages";
     /****************Begin Path Stuff************************/
     //equivalent to pwd
     current_path=getcwd(NULL,0);
@@ -735,7 +737,7 @@ double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
     //load your module (filename)
     mymod=PyImport_ImportModule("Pressure_CAPI");
     //load your function def
-    Py_INCREF(strfunc);//do we need this?
+    //Py_INCREF(strfunc);//do we need this?
     strfunc=PyObject_GetAttrString(mymod,"PressureCAPI");
 
    //call your function with built python arg
@@ -745,13 +747,13 @@ double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
     PyArg_Parse(py_out,"(dd)",&P,&Cp);
     
     //unload/free python stuff?
-    Py_DECREF(py_out);
-    Py_DECREF(py_args);
-    Py_DECREF(strfunc);
-    Py_DECREF(mymod);
+    //Py_DECREF(py_out);
+    //Py_DECREF(py_args);
+    //Py_DECREF(strfunc);
+    //Py_DECREF(mymod);
     
     //clear out of python interp
-    //PyErr_Clear();
+    PyErr_Clear();
     //Py_Finalize();
     //Py_Finalize still crashes things, probably should figure out why.
     /**************************Done Talking to Python*******************/
