@@ -126,6 +126,40 @@ end
 %  >>mex *.C -o TCM
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 
+dz
+XHe_i
+XH2S_i
+XNH3_i
+XH2O_i
+XCH4_i
+XPH3_i
+XCO
+P_temp
+T_temp
+g0_i
+R0e_i
+P0_i
+T_targ_i
+P_targ_i
+P_term_i
+1
+n_lindal
+SuperSatSelf_H2S
+SuperSatSelf_NH3
+SuperSatSelf_PH3
+SuperSatSelf_H2O
+supersatNH3
+supersatH2S
+AutoStep_constant
+fp
+dP_init
+dP_fine
+P_fine_start
+P_fine_stop
+use_dz
+frain
+select_ackerman
+
 cd TCM_mex
 [P,T,XH2,XHe,XH2S,XNH3,XH20,XCH4,XPH3,...
     clouds,DNH4SH_i,DH2S_i,DNH3_i,DH2O_i,DCH4_i,DPH3_i,DSOL_i,...

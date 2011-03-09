@@ -77,11 +77,11 @@ amagat_sq_ch4=amagat_ch4^2;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 name='cia.longrev08.data';%'orton_h2h2_grid.txt';
 
-file_handle=fopen(name,'r')
-line1=fscanf(file_handle,'%f %f %f',[3,1])
-line2=fscanf(file_handle,'%f',[1,1])
-line_length=line2
-line_format=strcat('%',sprintf('%d', line_length),'f')
+file_handle=fopen(name,'r');
+line1=fscanf(file_handle,'%f %f %f',[3,1]);
+line2=fscanf(file_handle,'%f',[1,1]);
+line_length=line2;
+line_format=strcat('%',sprintf('%d', line_length),'f');
 wave_numbers=fscanf(file_handle,line_format,[line2,1]);
 alpha_eH2=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_nH2=fscanf(file_handle,line_format,[line1(1),line2]);
@@ -90,7 +90,7 @@ alpha_nH2_He=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_eH2_CH4=fscanf(file_handle,line_format,[line1(1),line2]);
 alpha_nH2_CH4=fscanf(file_handle,line_format,[line1(1),line2]);
 fclose(file_handle);
-size(alpha_eH2)
+
 normal_or_equilibrium==1;
 for i=1:length(wave_numbers)
    if(wave_numbers<0.1)
@@ -131,7 +131,7 @@ end
 %Ti=[40,51.667,66.724,86.177,111.302,143.753,185.664,239.794,309.705,400];
 logTi=linspace(log(40),log(400),10);
 % interpolate values for given wavenumber (nu), and while we're at it multiply
-% by amagat^2 of each constituent
+% by amagat^2 of each constituentl
 no_div_by_three=0;
 np=0;
 theta_x=-85.4;
@@ -147,10 +147,14 @@ end
 
 no_actual=no_div_by_three*3;
 np_actual=np;
-
-    alpha_H2_prime_1=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_eH2,nu,log(T),'spline'));
-    alpha_He_prime_1=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_eH2_He,nu,log(T),'spline'));
-    alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_eH2_CH4,nu,log(T),'spline'));
+max(max(alpha_eH2))
+min(min(alpha_eH2))
+amagat_sq_h2
+alpha_eH2(1,:)
+interp2(wave_numbers,logTi,alpha_eH2,nu,log(T),'spline')
+    alpha_H2_prime_1=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_eH2,nu,log(T),'spline'))
+    alpha_He_prime_1=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_eH2_He,nu,log(T),'spline'))
+    alpha_CH4_prime_1=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_eH2_CH4,nu,log(T),'spline'))
 %   alpha_H2_prime_2=amagat_sq_h2*exp(interp2(wave_numbers,logTi,alpha_nH2,nu,log(T),'spline'));
 %    alpha_He_prime_2=amagat_he*amagat_h2*exp(interp2(wave_numbers,logTi,alpha_nH2_He,nu,log(T),'spline'));
 %    alpha_CH4_prime_2=amagat_h2*amagat_ch4*exp(interp2(wave_numbers,logTi,alpha_nH2_CH4,nu,log(T),'spline'));
@@ -161,6 +165,7 @@ np_actual=np;
 %    alpha_CH4_prime_2=amagat_sq_ch4*exp(interp2(wave_numbers,logTi,alpha_nH2_CH4,nu,log(T),'spline'));
 
 % Add up alpha's of H2-H2, H2-He, H2-CH4
+
 alpha_1=alpha_H2_prime_1+alpha_He_prime_1+alpha_CH4_prime_1;
 %alpha_2=alpha_H2_prime_2+alpha_He_prime_2+alpha_CH4_prime_2;
 fp=(np_actual)/(np_actual+no_actual);
@@ -169,6 +174,7 @@ fp=(np_actual)/(np_actual+no_actual);
 %    alpha=alpha_2;%+fo*alpha_2;%*(np_actual)/(np_actual+no_actual); % ((np_actual)/(np_actual+no_actual))*alpha_1+((no_actual)/(np_actual+no_actual))*alpha_2;
 %else
     alpha=alpha_1;
+    min(wave_numbers)
 %end
 % If nu<0.1 apply correction factor.
 %if(nu<0.1)
