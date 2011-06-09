@@ -1,5 +1,5 @@
 #include "layers.h"
-float specific_heat(int j, float T, float P,float Cp_in);
+float specific_heat(int j, float T, float P,float Hydrogen_Curve_Fit_Select);
 /******************************************************************************************/
 // float cloud_loss_ackerman_marley()
 //                                   This function computes the mole fraction of condensate
@@ -34,7 +34,7 @@ float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, floa
                                  float dry_adiabatic_lapse_rate,float current_z, float previous_z, \
                                  float previous_q_c, float current_q_v, float previous_q_v,float XH2, \
                                  float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, \
-                                 float delta_q_c,float frain,float Cp_in)
+                                 float delta_q_c,float frain,float Hydrogen_Curve_Fit_Select)
 {
        float boltz_sigma=0,Flux=0,cp_temp=0,mu_temp=0,GAMMA_TEMP=0,mixing_L=0,rho_temp=0,Eddy_Diffusion_Coef=0,my_dz=0,wstar=0;
        float q_c_old=0,q_v_old=0,q_v=0,q_c=0,gamma=0,F=0;
@@ -42,7 +42,7 @@ float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, floa
                   
        boltz_sigma=5.6704e-8; // W/m^2/K^4 (stefan boltzmann constant)
        Flux=boltz_sigma*(pow(Teff,4));// W/m^2  (Jupiter's thermal emission)
-       cp_temp=specific_heat(j,T,P,Cp_in);  
+       cp_temp=specific_heat(j,T,P,Hydrogen_Curve_Fit_Select);  
        mu_temp=AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3; //  g/mol
                   
                   

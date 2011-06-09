@@ -36,7 +36,7 @@
 #define ZERO            1e-30       /* zero cloud density (for plotting) */
 #define COUNT_CLOUD     1e-3       /* count cloud opacity if greater than this number */
 #define MAXTRIES        100          /* Maximum number of iterations to fit deep temperature */
-//#define TLIMIT          1e-8         /* allowed % error in T */
+#define TLIMIT          0.05         /* allowed % error in T */
 #define TAULIMIT        20          /* max tau used for T */
 #define SQ(x)           ( (x)*(x) )
 #define CU(x)           ( (x)*(x)*(x) )

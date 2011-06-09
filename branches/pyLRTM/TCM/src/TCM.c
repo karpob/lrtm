@@ -20,7 +20,7 @@ int use_dz,jj;
 #define USE_SOL_CLOUD  1      /*consider its formation?*/
 double P_temp,T_temp;
 float z_offset;
-float Hydrogen_Curve_Fit_Select;
+//float Hydrogen_Curve_Fit_Select;
 int sol_cloud=USE_SOL_CLOUD;
 
 /*       Prototypes      */
@@ -29,7 +29,7 @@ float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_f
 void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P_fine_start, \
                float P_fine_stop,float frain, float select_ackerman,float Hydrogen_Curve_Fit_Select);
 int new_layer_original(int j, float dz, int eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
-float specific_heat(int j, float T, float P,float Cp_in);
+float specific_heat(int j, float T, float P);
 int init_atm(int n,double XHe,double XH2S,double XNH3,double XH2O,double XCH4,double XPH3,double P_temp,double T_temp,float g0_i,float R0_i, float P0_i,char use_lindal_i, float T_targ_i, float P_targ_i, float P_term_i,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i, float SuperSatSelf3_i, float SuperSatSelf4_i,float supersatNH3_i,float supersatH2S_i);
 int intoTheVoid( float dz, double XHe_i,double XH2S_i,double XNH3_i,double XH2O_i,double XCH4_i,double XPH3_i,double XCO, float P_temp,float T_temp,float g0_i,float R0_i,float P0_i,float T_targ_i,float P_targ_i,float P_term_i,float use_lindal_in,int n_lindal_pts_i,float SuperSatSelf1_i,float SuperSatSelf2_i,float SuperSatSelf3_i,float SuperSatSelf4_i,float supersatNH3_i,float supersatH2S_i,int AutoStep_constant,float Hydrogen_Curve_Fit_Select,float dP_init,float dP_fine,float P_fine_start,float P_fine_stop,int use_dz,float frain,float select_ackerman);
 double getFloatValues(int i,int j);
@@ -158,10 +158,12 @@ int intoTheVoid( float dz,
       int  top, j, jcntr=0, found,cross_my_P0=0;
       double P, T, T_err=100.0;
       char use_lindal_i='Y';
-      double Tlim=0.0001;
+      
       int eflag=0;
       int tmp;	  
-
+      
+      
+      
       printf("Starting DeBoer/Steffes/Karpowicz Thermo-chemical Model\n");		
       
        //Allocate memory for layer data structure.
@@ -185,7 +187,7 @@ int intoTheVoid( float dz,
       //while error in temperature is greater than Tlimit, or if you've gone on long enough
       //  without converging on a solution ...  
       
-      while (fabs(T_err) > Tlim && jcntr < MAXTRIES)
+      while (fabs(T_err) > TLIMIT && jcntr < MAXTRIES)
       {
             eflag = 0; //reset flag
             jj=0;     //reset jj
@@ -209,11 +211,11 @@ int intoTheVoid( float dz,
                   if (eflag == 98 )  /* check target temperature */
                   {                                         /* eflag       P      */
                         eflag = 97;                         /*  97      < P_targ  */
-                        T = layer[j-1].T;                     /*  99      <=P_term  */
-                        T_err = 100.*fabs(T - T_targ)/T_targ;  /*  98      <=P_targ  */
-                        //printf("Terr %f %f %d \n",T_err,Tlim,j);
+                        T = layer[j].T;                     /*  99      <=P_term  */
+                        T_err = 100.*(T - T_targ)/T_targ;  /*  98      <=P_targ  */
+                        printf("Terr %f %f %d \n",T_err,TLIMIT,j);
 			//printf("eflag %d",eflag);
-                      if (T_err>Tlim)
+                      if (fabs(T_err)>TLIMIT)
                         {
                               layer[0].T = layer[0].T - (T - T_targ)*2.0;
                               P = layer[0].P;
@@ -228,7 +230,7 @@ int intoTheVoid( float dz,
             }
 			
       }
-  
+      
       /*if (P > P_term)
       {
              printf("Abnormal termination. P= %f bigger than Pterm=%f                       \n",P,P_term);
@@ -237,15 +239,15 @@ int intoTheVoid( float dz,
       } */
 
       top = j-1;
-
+      
       if (USE_SOL_CLOUD)
             init_soln_cloud(0); //free solution cloud memory allocation
   
-      if (use_lindal == 'Y' || use_lindal == 'y')
-      {
-            free(PfL); //free lindal profile memory allocation
-            free(TfL);
-      }
+      //if (use_lindal == 'Y' || use_lindal == 'y')
+     // {
+     //       free(PfL); //free lindal profile memory allocation
+     //       free(TfL);
+     // }
       
      for (j =0 ;j<=top;++j)
       {     
@@ -256,7 +258,7 @@ int intoTheVoid( float dz,
             }
       }
       
-     
+
       return (top);		  
 }
 
@@ -299,6 +301,7 @@ double getFloatValues(int i,int j)
 		if(i==18)return layer[j].mu;
 		if(i==19)return layer[j].DSOL_NH3;
 		if(i==20)return layer[j].P_real;
+                
 		printf("exceed i dimension");
 		return 0;
 }

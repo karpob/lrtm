@@ -3,18 +3,18 @@
 
 /****************************layers.c**************************************/
 #include "layers.h"
-#include <Python.h>
+
 extern float *TfL, *PfL, lawf[],P_term;
 float gravity(int j);
-float specific_heat(int j, float T, float P,float Cp_in);
+float specific_heat(int j, float T, float P,float Hydrogen_Curve_Fit_Select);
 float sat_pressure(char component[], float T);
 float solution_cloud(float T, float PNH3, float PH2O, float *SPNH3, float *SPH2O);
 float h2s_dissolve(int j, float *SPH2S);
 float latent_heat(char component[], float T);
 float get_dP_using_dz(int j, int *eflag, float dz);
 float get_dP_using_dP(int j, int *eflag, float dP_init, float dP_fine, float P_fine_start, float P_fine_stop);
-float get_dT(int j, float T, float P, float dP, float *LX, float *L2X,int hereonout,float Cp_in);
-float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain,float Cp_in);
+float get_dT(int j, float T, float P, float dP, float *LX, float *L2X,int hereonout,float Hydrogen_Curve_Fit_Select);
+float cloud_loss_ackerman_marley(int j,float Teff,float T, float P,float H, float wet_adiabatic_lapse_rate, float dry_adiabatic_lapse_rate,float current_z, float previous_z, float previous_q_c, float current_q_v, float previous_q_v,float XH2, float XHe,float XH2S,float XNH3, float XH2O,float XCH4, float XPH3, float delta_q_c,float frain,float Hydrogen_Curve_Fit_Select);
 float SuperSatSelf[5];
 double *get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O);
 
@@ -208,7 +208,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       FILE *alrfp;
       FILE *output_T_P;
       layer[j].clouds=0L;
-      float Cp_in,Told;
+      float Cp_in=0.0,Told;
       double *vals;
       int hereonout;
       if (j==1) hereonout=0;
@@ -223,18 +223,19 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       
     /* Calculated Partial pressures of previous step*/
       
-      
+      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Hydrogen_Curve_Fit_Select);
+      P_real=layer[j].P;
       if(Hydrogen_Curve_Fit_Select==666.0)
        {
          
-      	vals=get_P_from_python(layer[j-1].T,layer[j-1].XH2*layer[j].P,layer[j-1].XHe*layer[j].P,layer[j-1].XCH4*layer[j].P,layer[j-1].XH2O*layer[j].P);
-        P_real=vals[0]+layer[j-1].XNH3*P+layer[j-1].XH2S*P;
-        Cp_in=vals[1];
+      	vals=get_P_from_python(layer[j].T,layer[j].XH2*layer[j].P,layer[j].XHe*layer[j].P,layer[j].XCH4*layer[j].P,layer[j].XH2O*layer[j].P);
+        P_real=float(vals[0])+layer[j].XNH3*P+layer[j].XH2S*P;
+        Cp_in=float(vals[1]);
         
       	layer[j].P_real=P_real;
        }
       
-      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in); /*dry adiabat*/
+      /*dry adiabat*/
       
       P  = layer[j].P;
       T  = layer[j].T;
@@ -415,7 +416,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       /*  New temperature:  wet adiabat if any of the above clouds condense */
       if (C)
       {
-            dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in);
+            dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Hydrogen_Curve_Fit_Select);
             T = layer[j].T;
             H = R*T/(layer[j-1].mu*layer[j-1].g);
             alr = 1e5*dT/(dP*H/P);
@@ -509,7 +510,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                   Teff=124; //in Kelvin
                   q_c_nh3_ice=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
                                                 layer[j-1].z, layer[j-1].q_c_nh3_ice,layer[j].XNH3,layer[j-1].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
-                                                XCH4, XPH3, dXNH3, frain,Cp_in);
+                                                XCH4, XPH3, dXNH3, frain,Hydrogen_Curve_Fit_Select);
                   layer[j].DNH3 = 1e6*AMU_NH3*P*P*q_c_nh3_ice/(R*T*-dP);
                   layer[j].q_c_nh3_ice=q_c_nh3_ice;
                   layer[j].XNH3 = (double) SPNH3/(double) P + ((double)SPNH3*(double)SuperSatSelf[1])/(double)P;
@@ -555,11 +556,11 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                                         
                       q_c=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
                                                 layer[j-1].z, layer[j-1].q_c,layer[j].XH2O,layer[j-1].XH2O, XH2, XHe, XH2S, XNH3, XH2O,\
-                                                XCH4, XPH3, (-1)*dXH2O*(1-C_sol_NH3), frain,Cp_in);
+                                                XCH4, XPH3, (-1)*dXH2O*(1-C_sol_NH3), frain,Hydrogen_Curve_Fit_Select);
                       
                       q_c_nh3=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
                                                 layer[j-1].z, layer[j-1].q_c_nh3,layer[j].XNH3,layer[j-1].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
-                                                XCH4, XPH3,(-1)*dXNH3*C_sol_NH3, frain,Cp_in);
+                                                XCH4, XPH3,(-1)*dXNH3*C_sol_NH3, frain,Hydrogen_Curve_Fit_Select);
                       
                       layer[j].DSOL =1e6*((q_c*AMU_H2O+q_c_nh3)*P*P)/(R*T*-dP); //Calulate cloud density g/cm^3 of solution cloud
                       layer[j].DSOL_NH3=1e6*(q_c_nh3*AMU_NH3*P*P)/(R*T*-dP);  // Calculate cloud density g/cm^3 of solution cloud that is actually NH3
@@ -572,7 +573,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                     {
                       LX[3]  = LH2O*layer[j-1].q_c;
                       L2X[3] = LX[3]*LH2O/(R*T*T);
-                      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Cp_in);
+                      dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Hydrogen_Curve_Fit_Select);
                       T = layer[j].T;
                       H = R*T/(layer[j-1].mu*layer[j-1].g);
                       alr = 1e5*dT/(dP*H/P);
@@ -680,96 +681,4 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       return; //Go back to main function in TCM.C returning nothing, but having updated values in layers data structure (see model.h)
 }
 
-/* get_P_from_python->is used to interface between python_compressibility/calc_Cp/Specific_Heat_CAPI.py and the TCM.
-              Inputs:
-                     -->T    :temperature in deg K.
-                     -->PH2  : Ideal pressure of Hydrogen in bars (density proxy)
-                     -->PHe  : Ideal pressure of Helium in bars (density proxy)
-                     -->PCH4 : Ideal pressure of Methane in bars (density proxy)
-                     -->PH2O : Ideal pressure of Water in bars (density proxy)
-              Outputs:
-                     <--vals[0]: Real Pressure in bars.
-                     <--vals[1]: Specific heat in erg/K/mol
-*/
-/* get_P_from_python->is used to interface between python_compressibility/calc_Cp/Specific_Heat_CAPI.py and the TCM.
-              Inputs:
-                     -->T    :temperature in deg K.
-                     -->PH2  : Ideal pressure of Hydrogen in bars (density proxy)
-                     -->PHe  : Ideal pressure of Helium in bars (density proxy)
-                     -->PCH4 : Ideal pressure of Methane in bars (density proxy)
-                     -->PH2O : Ideal pressure of Water in bars (density proxy)
-              Outputs:
-                     <--vals[0]: Real Pressure in bars.
-                     <--vals[1]: Specific heat in erg/K/mol
-*/
-             
-double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
-{   
-    char *current_path;
-    PyObject *mymod, *strfunc;
-    PyObject *py_args,*py_out;
-    double P;
-    double Cp;
-    double static vals[2];
-    char *path,*newpath,*to_gaslib,*to_site_packages;
-    to_gaslib="/python_compressibility/calc_Cp";
-    to_site_packages="/tgrs05/scratch/local/lib/python2.6/site-packages";
-    
-    /****************Begin Path Stuff************************/
-    //equivalent to pwd
-    current_path=getcwd(NULL,0);
-    
-    //get paths that python interpreter sees 
-    path=Py_GetPath();
-    
-    //make a blank character array the size of paths + ":"
-    newpath= new char[strlen(path)+strlen(current_path)+4+strlen(to_gaslib)+4+strlen(to_site_packages)];
-    
-    //copy python path to newpath
-    strcpy(newpath,path);
-    
-    //add a : separator
-    strcat(newpath,":");
-    
-    //add current path
-    strcat(newpath,current_path);
-    strcat(newpath,to_gaslib);
 
-    //add site packages
-    strcat(newpath,":");
-    strcat(newpath,to_site_packages);
-    /*****************End Path stuff**************************/
-
-    /*****************Start Talking to Python ****************/
-    Py_Initialize();
-    
-    //tell python where your modules are     
-    PySys_SetPath(newpath);
-    
-    //load your module (filename)
-    mymod=PyImport_ImportModule("Pressure_CAPI");
-    //load your function def
-    //Py_INCREF(strfunc);//do we need this?
-    strfunc=PyObject_GetAttrString(mymod,"PressureCAPI");
-
-   //call your function with built python arg
-    py_out=PyEval_CallFunction(strfunc,"fffff",T,PH2,PHe,PCH4,PH2O);
-    
-   //pull out the answer from the python function
-    PyArg_Parse(py_out,"(dd)",&P,&Cp);
-    
-    //unload/free python stuff?
-    //Py_DECREF(py_out);
-    //Py_DECREF(py_args);
-    //Py_DECREF(strfunc);
-    //Py_DECREF(mymod);
-    
-    //clear out of python interp
-    //PyErr_Clear();
-    //Py_Finalize();
-    //Py_Finalize still crashes things, probably should figure out why.
-    /**************************Done Talking to Python*******************/
-    vals[0]=P;
-    vals[1]=Cp;
-    return vals;    
-}

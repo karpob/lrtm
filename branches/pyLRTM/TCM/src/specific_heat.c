@@ -1,7 +1,7 @@
 /****************************sp_heat.c**************************************/
 #include "layers.h"
 //#include <Python.h>
-
+double *get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O);
 //#include "model.h"
 //#define  NUMBER_H2  16
 //#define  fp         0.0  /* Para fraction.  0.0=equilibrium,  -1.0=intermediate
@@ -30,11 +30,12 @@
 
 
 
-float specific_heat(int j, float T, float P, float Cp_in)
+float specific_heat(int j, float T, float P,float Hydrogen_Curve_Fit_Select)
 {
      
       float XH2, XHe, XH2S, XNH3, XH2O, XCH4, XPH3;
       float Cp_H2, Cp_He, Cp_H2S, Cp_NH3, Cp_H2O, Cp_CH4, Cp_PH3, Cp;
+      double *vals;
       
       
 /**************versions of CpH2*******************************************/
@@ -77,11 +78,13 @@ float specific_heat(int j, float T, float P, float Cp_in)
                 XCH4 = layer[j-1].XCH4;
                 XPH3 = layer[j-1].XPH3;
 
-                Cp=Cp_in;
-
+		vals=get_P_from_python(T,XH2*P,XHe*P,XCH4*P,XH2O*P);
+                Cp=float(vals[1]);
+		
 		Cp_H2S = 4.013;
         	Cp_NH3 = 4.459;  /*Briggs and Sackett*/
 		Cp=Cp+XH2S*Cp_H2S*R+XNH3*Cp_NH3*R;
+                
          }
 /*************************************************************************/
 	if(Hydrogen_Curve_Fit_Select!=666.0)
@@ -103,6 +106,6 @@ float specific_heat(int j, float T, float P, float Cp_in)
 	}
 
       
-
+      //printf("CP, T,PH2,PHe,PCH4,PH2O,sel,vals[1] %f %f %f %f %f %f %f \n",Cp,T,XH2*P,XHe*P,XCH4*P,XH2O*P,Hydrogen_Curve_Fit_Select);
       return ( Cp );
 }

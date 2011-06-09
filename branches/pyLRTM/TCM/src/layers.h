@@ -6,4 +6,4 @@ extern int sol_cloud, NH4SH_cloud_base, AutoStep, CrossP0,jj;
 extern double XCO,AutoStep_constant;
 extern int use_dz;
 static int n_lindal_pts,heronout;
-static float Hydrogen_Curve_Fit_Select;
+//static float Hydrogen_Curve_Fit_Select;

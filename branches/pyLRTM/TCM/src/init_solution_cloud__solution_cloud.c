@@ -1,5 +1,6 @@
 /* Initialize solution cloud (read in Romani's data file), and calculate concentration of NH3 that condenses in solution cloud*/
 #include "model.h"
+
 void init_soln_cloud(int mode);
 float solution_cloud(float TC, float PNH3, float PH2O, float *SPNH3, float *SPH2O);
 
@@ -20,6 +21,7 @@ void PPRES(float C1, float T1, float *VPH, float *VPN);
 #define  NA     20
 #define  NWLT   18
 #define  NWHT   20
+
 
 /****************************************************************************************************
       init_soln_cloud()
@@ -113,9 +115,11 @@ void init_soln_cloud(int mode)
             SPN(CCA,&S7, &S8, &S9, &KA, NA,  YA,  CA,  RTA,  GTA,  AA1, AA2, AA3, DXA, DYA1, DYA2, DYA3);
             SPN(CCW,&S10,&S11,&S12,&KLT,NWLT,YWLT,CWLT,RTWLT,GTWLT,ALT1,ALT2,ALT3,DXLT,DYLT1,DYLT2,DYLT3);
             SPN(CCW,&S13,&S14,&S15,&KHT,NWHT,YWHT,CWHT,RTWHT,GTWHT,AHT1,AHT2,AHT3,DXHT,DYHT1,DYHT2,DYHT3);
+	    
       }
       else if(!mode)
       {
+	    
             printf("\nFreeing solution cloud coefficients.\n\n");
             /* Allocate memory and initialize arrays */
             free(YA);
