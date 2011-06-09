@@ -5,12 +5,12 @@ ifeq ($(platform),Linux)
 	# Linux
 	CC=g++
 	CCC=g++
-	CCOPTS= -Wall -DLinux -DIntel -fpic
+	CCOPTS= -Wall -DLinux -DIntel 
 	OS=linux
-	IFLAGS = -I.
+	IFLAGS = -I/usr/include/python2.7/ -I.
 
 	ifeq ($(hardware),x86_64)
-		IFLAGS = -I/tgrs05/scratch/local/include/python2.6/ -I. 
+		IFLAGS = -I/usr/include/python2.7/Python.h -I. 
 	endif
 endif
 

@@ -135,7 +135,7 @@ for mat in filez:
 	for j in range(0, nlevels+1):
 		for i in range(0,len(layerKeys)):
 			layer[layerKeys[i]].append(TCM.getFloatValues(i,j))
-						
+					
 	#Profiles.append(layer)
 
 	offsets=[0,0,0,0,0,0,0,0,0,0,1,0,0,0,0,0,0,0,0,0,1,0,0];
@@ -171,7 +171,7 @@ for mat in filez:
 			pylab.plot(data[:,k+offset],'b')
 		#	#pylab.plot(data[0:194,k]-layer[layerKeys[k]],'r')
 		#	#pylab.plot(layer[layerKeys[k]],'g')
-			pylab.show()
+			pylab.savefig('poop.pdf')
 		if(layerKeys[k]=='P'):
 			print k,layerKeys[k],data[0,k+offset],layer[layerKeys[k]][0]
 		if(layerKeys[k]=='P_real'):
