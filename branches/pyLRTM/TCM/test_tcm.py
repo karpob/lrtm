@@ -5,7 +5,7 @@ import pylab
 #
 #filez=['testTCM/Depleted_Ammonia_Clouds.mat','testTCM/Depleted_Water_Clouds.mat','testTCM/Enhanced_Ammonia_Clouds.mat','testTCM/Enhanced_Water_Clouds.mat','testTCM/Mean_Lindal_Clouds.mat']
 #filez=['deBoer_check/Depleted_Ammonia_Clouds.mat','deBoer_check/Depleted_Water_Clouds.mat','deBoer_check/Enhanced_Ammonia_Clouds.mat','deBoer_check/Enhanced_Water_Clouds.mat','deBoer_check/Mean_Lindal_Clouds.mat']
-filez=['Mean_Lindal_Clouds.mat']
+filez=['Depleted_Water_No_Clouds.mat']
 for mat in filez:
 	MatlabRuns=loadmat(mat)
 	dz =1#.MatlabRuns['dz']
