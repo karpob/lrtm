@@ -32,27 +32,18 @@ double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
     //FILE* output_T_P;
     double static vals[2];
     char *path,*newpath,*to_gaslib,*to_site_packages;
-    PyThreadState *mainstate,*py_interp;
+
     to_gaslib="/python_compressibility/calc_Cp";
-    to_site_packages="/usr/local/lib/python2.7/site-packages";
+    to_site_packages="/usr/local/lib/python2.7/site-packages";// <-- make me an input arg
+
     current_path=getcwd(NULL,0);
     //output_T_P=fopen("python_compressibility/calc_Cp/output_T_P.txt","w");
     //fprintf(output_T_P,"%f\t%f\t%f\t%f\t%f",T,PH2,PHe,PCH4,PH2O);
     //fclose(output_T_P);
     /****************Begin Path Stuff************************/
     //equivalent to pwd
-    //if (!Py_IsInitialized())
-    //{  
-    //   printf("init!\n");
-    //   
-    //}
-    PyEval_InitThreads();
     Py_Initialize();
-    mainstate = PyEval_SaveThread();
-    PyEval_ReleaseLock();
-    PyGILState_STATE gstate;
-    gstate = PyGILState_Ensure();
-    PyEval_AcquireLock();
+
     //get paths that python interpreter sees 
     path=Py_GetPath();
     
@@ -77,22 +68,21 @@ double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
     
     //tell python where your modules are
     //printf("path %s",newpath);
+
     PySys_SetPath(newpath);     
     
     //load your module (filename)
     mymod=PyImport_ImportModule("Pressure_CAPI");
+
     //load your function def
-    //Py_INCREF(strfunc);//do we need this?
     strfunc=PyObject_GetAttrString(mymod,"PressureCAPI");
 
    //call your function with built python arg
     
-    //Py_INCREF(py_out);
     py_out=PyEval_CallFunction(strfunc,"fffff",T,PH2,PHe,PCH4,PH2O);
     
    //pull out the answer from the python function
     PyArg_Parse(py_out,"(dd)",&P,&Cp);
-    //printf("P Cp %f %f \n",P,Cp);
     Py_DECREF(py_out);
     Py_DECREF(strfunc);
     Py_DECREF(mymod);
@@ -102,10 +92,6 @@ double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
     /**************************Done Talking to Python*******************/
     vals[0]=P;
     vals[1]=Cp;
-    PyGILState_Release(gstate); 
-    PyEval_RestoreThread(mainstate);
-    //Py_Finalize();
-    //PyGILState_Release(gstate);
     
     return vals;    
 }

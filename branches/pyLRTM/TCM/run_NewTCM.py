@@ -99,7 +99,14 @@ for mat in filez:
 					
 	f=netcdf.netcdf_file(mat+'.nc','w')
 	f.history='created for '+str(case[0])+'case.'
-	for key in layerkeys:
-	        f.createDimension(key,'f',len(layer[key]))
+	for key in layerKeys:
+		a="'"+str(key)+'dim'+"'"
+                b='f'
+		c=max(numpy.shape(layer[key]))
+		print a,c
+	        f.createDimension(a,c)
+		var=f.createVariable(key,b,(a,))
+		var[:]=layer[key]
+	
         f.close()
         	
