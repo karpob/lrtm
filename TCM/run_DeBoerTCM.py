@@ -12,8 +12,9 @@ filez=['Depleted_Ammonia_Clouds.mat',
 
 for mat in filez:
 	MatlabRuns=loadmat(mat)
-	dz =MatlabRuns['dz']
+	dz =0#MatlabRuns['dz']
 	case=MatlabRuns['case_select']
+	print 'mr. case?',str(case[0])
 	XHe_i =MatlabRuns['XHe'][:,case-1]
 	tcmeI=MatlabRuns['tcme'][:]
 	idx=numpy.nonzero(tcmeI[:,0]==1.0)
@@ -40,14 +41,14 @@ for mat in filez:
 	supersatNH3_i=0.0
 	supersatH2S_i=0.0
 	AutoStep_constant=int(MatlabRuns['AutoStep_constant'][:])
-	fp =-1.#MatlabRuns['fp']
+	fp =-1#MatlabRuns['fp']
 	dP_init =0.25#float(MatlabRuns['dP_init'][:])
 	dP_fine =0.25#float(MatlabRuns['dP_fine'][:])
 	P_fine_start=float(MatlabRuns['P_fine_start'][:])
 	P_fine_stop=float(MatlabRuns['P_fine_stop'][:])
-	use_dz =MatlabRuns['use_dz'][:]
+	use_dz =0#MatlabRuns['use_dz'][:]
 	frain =float(MatlabRuns['frain'][:])
-	select_ackerman=MatlabRuns['select_ackerman']
+	select_ackerman=0#MatlabRuns['select_ackerman']
 	Profiles=[]
 	print "XHe, XH2S, XNH3, XH2O, XCH4, XPH3, XCO"
 	print float(XHe_i),float(XH2S_i),float(XNH3_i),float(XH2O_i),float(XCH4_i),float(XPH3_i),float(XCO)
@@ -96,9 +97,16 @@ for mat in filez:
 		for i in range(0,len(layerKeys)):
 			layer[layerKeys[i]].append(TCM.getFloatValues(i,j))
 					
-	f=netcdf.netcdf_file(mat+'.nc','w')
-	f.history='created for '+case+'case.'
-	for key in layerkeys:
-	        f.createDimension(key,'f',len(layer[key]))
+	f=netcdf.netcdf_file(mat+'.deboer.nc','w')
+	f.history='created for '+str(case[0])+'case.'
+	for key in layerKeys:
+		a="'"+str(key)+'dim'+"'"
+                b='f'
+		c=max(numpy.shape(layer[key]))
+		print a,c
+	        f.createDimension(a,c)
+		var=f.createVariable(key,b,(a,))
+		var[:]=layer[key]
+	
         f.close()
         	
