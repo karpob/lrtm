@@ -1,17 +1,21 @@
 def DeBoerSteffes(f,T,P_H2,P_He,P_H2S):
-
+        import numpy
+	from scipy.io import loadmat
+	from h2s.brParameters import brParameters
+	from h2s.BenReuven import BenReuven
 	# 12/12/MM
 	# function alphaH2S=falphaH2S(f,T,P,xH2,xHe,xH2S)
 	# T in kelvin, P in bars, xH2,xHe,xH2S = fraction (x/100) of each 
 
-	if (P_H2==0):
-   		alphah2s=0
-   		return
-	end
+	#if (P_H2==0.):
+   	#	alphah2s=0.
+   	#	return
+	#end
 
 
-	LineParameters=loadmat('h2sLineParameters/h2slin.mat')	# use for testing-NEED H2S.lin
+	LineParameters=loadmat('h2s/h2sLineParameters/h2slin.mat')	# use for testing-NEED H2S.lin
 	# ??? is it Converted P/P catalogue with GHz nm^2MHz 1/cm (Freqline Int Eo)
+	
 	Eo=LineParameters['Eo']
 	Ep=LineParameters['Ep']
 	Io=LineParameters['Io']
@@ -74,7 +78,7 @@ def DeBoerSteffes(f,T,P_H2,P_He,P_H2S):
 
 	# Put alpha_max(Eo) into a matrix m x n like ie. Fvvw
 	n=f.shape[0]#size(f,1)
-	nones=numpy.ones(n,1)
+	nones=numpy.ones([n,1])
 
 	alpha_max_matrix=nones*alpha_max
 	# Multiply element by element alpha(1)*F(f,lf(1)) etc...

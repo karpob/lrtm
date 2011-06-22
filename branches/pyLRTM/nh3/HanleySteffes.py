@@ -11,7 +11,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	from scipy.io import loadmat
 	#import pupynere
 	#at some point convert database to netCDF..open format would be better.
-	LineParameters=loadmat('nh3LineParameters/nh3lincat190Latest2.mat')
+	LineParameters=loadmat('NH3/nh3LineParameters/nh3lincat190Latest.mat')
 	Eo=LineParameters['Eo']
 	H2HeBroad=LineParameters['H2HeBroad']
 	Io=LineParameters['Io']
@@ -57,7 +57,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	gH2=gnu1*PH2
 	gHe=gnu2*PHe
 	gNH3=gnu3*PNH3*gammaNH3o
-	gamma=(gH2)*((Tdiv)^(xi1))+(gHe)*((Tdiv)^(xi2))+gNH3*(300/T)^(xi3)
+	gamma=(gH2)*((Tdiv)**(xi1))+(gHe)*((Tdiv)**(xi2))+gNH3*(300/T)**(xi3)
 
 	delt=-0.0363*gamma
 	znu1=1.2747 
@@ -66,7 +66,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	zH2=znu1*PH2
 	zHe=znu2*PHe
 	zNH3=znu3*PNH3*gammaNH3o
-	zeta=(zH2)*((Tdiv)^(xi12))+(zHe)*((Tdiv)^(xi22))+zNH3*(300/T)^(xi32)
+	zeta=(zH2)*((Tdiv)**(xi12))+(zHe)*((Tdiv)**(xi22))+zNH3*(300/T)**(xi32)
 
 	zetasize=fo.shape[0]
 	pst=delt							# answer in GHz
@@ -74,14 +74,16 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 
 	n=f.shape[1]  #returns the number of columns in f
 	m=fo.shape[0] #returns the number of rows in fo
+	
 	# f1 f2 f3 f4 ....fn  n times where n is the number of frequency steps
 	# f1 f2 f3 f4 ....fn				in the observation range                            
 	# ...
 	# f1 f2 f3 f4 ....fn 
 	# m times where m is the number of spectral lines
 
-	nones=numpy.ones(1,n)
-	mones=numpy.ones(m,1) 
+	nones=numpy.ones([1,n])
+	mones=numpy.ones([m,1])
+	 
 	f_matrix=mones*f
 	fo_matrix=fo*nones
 
@@ -91,7 +93,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	expo=-(1./T-1./To)*Eo*hc/k
 	ST=Io*numpy.exp(expo)	# S(T) =S(To)converted for temperature
 	Con=0.9316
-	alpha_noshape=Con*coef*(PNH3/To)*((To/T)^(eta+2))*ST  
+	alpha_noshape=Con*coef*(PNH3/To)*((To/T)**(eta+2))*ST  
 	#Alpha Max Found
 
 	#Ben Reuven lineshape calculated by the brlineshape function gives the answer in GHz	
@@ -101,7 +103,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	ce_matrix=zeta*nones
 	pst_matrix=pst*nones
 	if (lineshape<0.5):
-		Aa=(2./numpy.pi)*(power((f_matrix/fo_matrix),2))			
+		Aa=(2./numpy.pi)*(numpy.power((f_matrix/fo_matrix),2))			
 
 		Bb=(dnu_matrix-ce_matrix)*(numpy.power(f_matrix,2))
 		Cc=dnu_matrix+ce_matrix
@@ -120,7 +122,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 		Ff=Aa/(Bb+Cc)  	
 	
 
-	Fbr=(1/GHztoinv_cm)*Ff
+	Fbr=(1./GHztoinv_cm)*Ff
 
 	alpha_noshape_matrix=alpha_noshape*nones
 	br_alpha_matrix=alpha_noshape_matrix*Fbr

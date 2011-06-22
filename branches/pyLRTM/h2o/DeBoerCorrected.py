@@ -1,15 +1,15 @@
 def DeBoerCorrected(f_in,T,P_H2,P_He,P_H2O):
         from numpy import asarray,power,exp,ones,shape,pi
         from broadening import broadening
-"""
- function alpha_watervapor=fwatervaporalpha(P_H2O,P_H2,P_He,f,T)
- Finds the attenuation due to water vapor
- Taken from DeBoer Thesis page 66 (and related)
- Modified version of Goodman (1969) with Ulaby (1981), Joiner Steffes (1991) etc
- Assuming units are bars and GHz, may need to change
- Check if Bars/GHz correct units
- Uses subroutine watervapor_broadening
-"""
+        """
+         function alpha_watervapor=fwatervaporalpha(P_H2O,P_H2,P_He,f,T)
+         Finds the attenuation due to water vapor
+         Taken from DeBoer Thesis page 66 (and related)
+         Modified version of Goodman (1969) with Ulaby (1981), Joiner Steffes (1991) etc
+         Assuming units are bars and GHz, may need to change
+         Check if Bars/GHz correct units
+        Uses subroutine watervapor_broadening
+        """
 # For this calc, f should be a column vector [1
 #                                             2...]
 # since fo is a row vector[1,2,...]

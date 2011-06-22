@@ -28,7 +28,7 @@ endif
 
 TCM:
 	g++ -c  *.c  $(CCOPTS) $(IFLAGS)
-	$(LD)
+	ld -arch x86_64 -bundle -flat_namespace -undefined suppress -o _TCM.so *.o
 	cp _TCM.so ..
 
 clean:

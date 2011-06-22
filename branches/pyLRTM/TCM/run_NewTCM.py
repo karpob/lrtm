@@ -4,10 +4,10 @@ from scipy.io import netcdf
 import numpy
 import pylab
 
-filez=['Depleted_Ammonia_Clouds.mat',
-       'Depleted_Water_Clouds.mat',
-       'Enhanced_Ammonia_Clouds.mat',
-       'Enhanced_Water_Clouds.mat',
+#filez=['Depleted_Ammonia_Clouds.mat',
+#       'Depleted_Water_Clouds.mat',
+#       'Enhanced_Ammonia_Clouds.mat',
+filez=['Enhanced_Water_Clouds.mat',
        'Mean_Lindal_Clouds.mat']
 
 for mat in filez:

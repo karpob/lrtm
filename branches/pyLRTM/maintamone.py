@@ -1,7 +1,17 @@
 def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
-               select_h2h2_model,select_ammonia_model,select_water_model,
-               include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
-               cassini_pattern,cassini_data_path):
+        select_h2h2_model,select_ammonia_model,select_water_model,
+        include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
+        cassini_pattern,cassini_data_path):
+        import numpy,os
+        from findrefindex import findrefindex
+        from findellipseradiusvector import findellipseradiusvector
+        from findraypath import findraypath
+        from findkappa import findkappa
+        from ftau import ftau
+        from ftam import ftam
+        from fwght import fwght
+        from beamsample import beamsample
+        #from findrefindex import findrefindex
 	#  maintamone.py -> main routine for LRTM function calculates Tb, and
 	#                  weighting functions
 	#
@@ -29,7 +39,7 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
 	#
 	#                            
                                       
-	global CRITICALFLAG
+	#global CRITICALFLAG
 	CRITICALFLAG=0				# If is '1' then critical refraction reached for that ray
 	USEBEAM=1
 
@@ -92,7 +102,7 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
 	P_CH4=P*xCH4
 	P_PH3=P*xPH3
 
-	sph3=size(P_PH3)
+	sph3=P_PH3.shape[0]
 
 	# Find the refractive index profile
 	refindex=findrefindex(T,P_H2,P_He,P_CH4,P_H2O,DSOL,f,refractivity_source)

@@ -1,4 +1,4 @@
-def ftam(T,tau,tau_a,masterindex)
+def ftam(T,tau,tau_a,masterindex):
 	import numpy
 	# function ftam
 	#
@@ -28,6 +28,7 @@ def ftam(T,tau,tau_a,masterindex)
 
 	loss=numpy.exp(-tau)
 	emit=T[masterindex]*(1.-numpy.exp(-tau_a))
+	
 	wlayers=loss*(1.-numpy.exp(-tau_a))
 	layers=loss*emit
 

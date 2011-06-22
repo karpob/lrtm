@@ -1,4 +1,6 @@
 def BenReuven(f,fo,df,ce,pst):
+        from numpy import *
+        import numpy
 	"""
 	 This function determines the Ben-Reuven (BR) lineshape over
 	 a range of freqencies which are user defined as is the frequency step
@@ -34,8 +36,8 @@ def BenReuven(f,fo,df,ce,pst):
 	# f(n) f(n) f(n) f(n)   n times where n is the number of frequency steps
 	# m times where m is the number of spectral lines
 
-	nones=ones(n,1)
-	mones=ones(1,m)
+	nones=ones([n,1])
+	mones=ones([1,m])
 	f_matrix=f*mones
 	fo_matrix=nones*fo
 	df_matrix=nones*df
@@ -45,7 +47,7 @@ def BenReuven(f,fo,df,ce,pst):
 
 	A=(2/numpy.pi)*numpy.power((f_matrix/fo_matrix),2)			# f(1)*fo(1)  f(2)*fo(1) f(3)*fo(1)
                                           # f(1)*fo(2)  f(2)*fo(2) f(3)*fo(2)
-	B=(df_matrix-ce_matrix)*nump.power(f_matrix,2)
+	B=(df_matrix-ce_matrix)*numpy.power(f_matrix,2)
 	C=df_matrix+ce_matrix
 	D=(numpy.power((fo_matrix+pst_matrix),2)) + (numpy.power(df_matrix,2))-(numpy.power(ce_matrix,2))
 	E=numpy.power(f_matrix,2)

@@ -1,5 +1,5 @@
 def rayellipseint(Rayorigin,Raydirection,ellipse):
-
+        import numpy
 	# function [intercept,internormal,d]=rayellipseint(Rayorigin,Raydirection,ellipses)
 	# Haines Ray Intercept Test (with Ellipse modification)
 	# Gets passed ray-info and ellipse info for THE ellipse currently being done
@@ -22,6 +22,7 @@ def rayellipseint(Rayorigin,Raydirection,ellipse):
 	#fred=1
 
 	# Put into notation of the Haines text (Ray tracing, Glassner ed)
+	
 	X0=Rayorigin[0]
 	Y0=Rayorigin[1]
 	Z0=Rayorigin[2]
@@ -49,6 +50,7 @@ def rayellipseint(Rayorigin,Raydirection,ellipse):
 	origin_ellipse_val=((X0**2)*a)+((Y0**2)*b)+((Z0**2)*c)
 	tolerance_roundoff=1e-6
 	flip_rnormal=0.
+	
 	if(origin_ellipse_val<1.-tolerance_roundoff):
     		flip_rnormal=1.
    		print origin_ellipse_val
@@ -81,25 +83,25 @@ def rayellipseint(Rayorigin,Raydirection,ellipse):
 	# A Check and precalculation for later
 	limbflag=0				# Fo checking ray goes outside of atmopshere
 	squarerootterm=B**2-4.*A*C
-	if squarerootterm < 0
+	if squarerootterm < 0.:
    		squarerootpart=numpy.sqrt(squarerootterm)
 		to=(-B-squarerootpart)/(2.*A)		# debug values(-B-sqrt(B^2-4*C))*(0.5)
    		t1=(-B+squarerootpart)/(2.*A)		# debug values(-B+sqrt(B^2-4*C))*(0.5)
    		limbflag=1								# This ray does not hit planet or skips at 90 deg
-   		d=0
+   		d=0.
    		#disp('Ray never intersects sphere')
    		intercept=numpy.array([0., 0., 0.])
    		internormal=numpy.array([0., 0., 0.])
    		return intercept,internormal,d,limbflag
-	end
+	
 
 	squarerootpart=numpy.sqrt(squarerootterm)
 	to=(-B-squarerootpart)/(2.*A)		# (-B-sqrt(B^2-4*C))*(0.5)
 	t1=(-B+squarerootpart)/(2.*A)		# (-B+sqrt(B^2-4*C))*(0.5)
 
 	# Is there a solution????
-	if to<0.:
-   		if t1<0.:
+	if to<0. or numpy.isnan(to):
+   		if t1<0. or numpy.isnan(t1):
       			limbflag=1
       			intercept=numpy.array([0., 0., 0.])
       			internormal=numpy.array([0., 0., 0])
@@ -117,26 +119,26 @@ def rayellipseint(Rayorigin,Raydirection,ellipse):
 	# Easier way to check, if B is greater than squareroot then to is negative, only
 	# check t1
 	if to<t1:				# Which is lesser?									
-   		if to>0							# here to is lesser, but is it positive?
+   		if to>0.:							# here to is lesser, but is it positive?
       			d=to							# here to is also positive, so its the solution
-   		elif t1>0:						# here to is negative so is t1 positive?
+   		elif t1>0.:						# here to is negative so is t1 positive?
       			d=t1							# here t1 is positive, so its the solution
    		else:
       			print 'No solution-Problem'
    			sys.exit()
 	elif to>t1:						# t1 was lesser magnitude
-   		if t1>0:							# is t1 positive?
+   		if t1>0.:							# is t1 positive?
       			d=t1							# here t1 is positive so its the solution
-   		elif to>0:						# here t1 is negative so is to positive?
+   		elif to>0.:						# here t1 is negative so is to positive?
       			d=to							# here to is positive, so its the solution
    		else:
       			print 'No solution2-Problem'
 			sys.exit()
 	elif t1==to:
-   		if t1>0:
+   		if t1>0.:
       			d=t1
       			limbflag=1		# ray skips along tangent to surface, so dz is up not down
-
+        
 
 	# To keep with Haines notation t=d (t=either t1,to) solved above
 	# d is same as t
@@ -147,12 +149,12 @@ def rayellipseint(Rayorigin,Raydirection,ellipse):
 	zi=Z0+Zd*d
 
 	# Find the normal to the intersection point
-	normalize=numpy.sqrt(ellipse.a^2+ellipse.b^2+ellipse.c^2)
-	unita=ellipse.a/normalize
-	unitb=ellipse.b/normalize
-	unitc=ellipse.c/normalize
+	normalize=numpy.sqrt(ellipse['a']**2+ellipse['b']**2+ellipse['c']**2)
+	unita=ellipse['a']/normalize
+	unitb=ellipse['b']/normalize
+	unitc=ellipse['c']/normalize
 	# recall a,b,c===1/(ellipse.a^2) etc
-	delnormal_num=[(xi/(ellipse['a']**2)) (yi/(ellipse['b']**2)) (zi/(ellipse['c']**2))]
+	delnormal_num=numpy.array([xi/(ellipse['a']**2), yi/(ellipse['b']**2), zi/(ellipse['c']**2)])
 	delnormal_den=numpy.sqrt( ((xi**2)/(ellipse['a']**4))+((yi**2)/(ellipse['b']**4))+((zi**2)/(ellipse['c']**4)) )
 	xn=delnormal_num[0]/delnormal_den
 	yn=delnormal_num[1]/delnormal_den

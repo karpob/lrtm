@@ -21,22 +21,22 @@ def lnwidth(To,T,Mol_1,dP_1,Mol_2,dP_2,Mol_3,dP_3):
 	import numpy
 	m=numpy.zeros([3])
 	# LOAD in CORRECT PRESSURE BROADENING FILES	
-	if(Mol_1=='H2')):
-   		p=loadmat('ph3LineParameters/h2pbroad.mat')
+	if(Mol_1=='H2'):
+   		p=loadmat('ph3/ph3LineParameters/h2pbroad.mat')
    		M1=p['h2pbroad']
    		
 		m[0]=7										# force law exponent
 	elif(Mol_1=='He'):
-		p=loadmat('ph3LineParameters/hepbroad.mat')
+		p=loadmat('ph3/ph3LineParameters/hepbroad.mat')
    		M1=p['hepbroad']
-   		load hepbroad
+   		#load hepbroad
    		M1=hepbroad
    		
 		m[0]=7										# force law exponent
 	elif(Mol_1=='PH3'):
-		p=loadmat('ph3LineParameters/ph3pbroad.mat')
+		p=loadmat('ph3/ph3LineParameters/ph3pbroad.mat')
    		M3=p['ph3pbroad']
-   		load ph3pbroad
+   		#load ph3pbroad
    		M1=ph3pbroad
    		
 		m[0]=3										# force law exponent
@@ -44,36 +44,36 @@ def lnwidth(To,T,Mol_1,dP_1,Mol_2,dP_2,Mol_3,dP_3):
    		print 'Unknown Molecule label.'
 
 
-	if(Mol_2=='H2')):
-   		p=loadmat('ph3LineParameters/h2pbroad.mat')
+	if(Mol_2=='H2'):
+   		p=loadmat('ph3/ph3LineParameters/h2pbroad.mat')
    		M2=p['h2pbroad']
    		
 		m[1]=7										# force law exponent
 	elif(Mol_2=='He'):
-		p=loadmat('ph3LineParameters/hepbroad.mat')
+		p=loadmat('ph3/ph3LineParameters/hepbroad.mat')
    		M2=p['hepbroad']
    		
 		m[1]=7										# force law exponent
 	elif(Mol_2=='PH3'):
-		p=loadmat('ph3LineParameters/ph3pbroad.mat')
+		p=loadmat('ph3/ph3LineParameters/ph3pbroad.mat')
    		M3=p['ph3pbroad']
    		
 		m[1]=3										# force law exponent
 	else:
    		print 'Unknown Molecule label.'
 
-	if(Mol_3=='H2')):
-   		p=loadmat('ph3LineParameters/h2pbroad.mat')
+	if(Mol_3=='H2'):
+   		p=loadmat('ph3/ph3LineParameters/h2pbroad.mat')
    		M3=p['h2pbroad']
    		
 		m[2]=7										# force law exponent
 	elif(Mol_3=='He'):
-		p=loadmat('ph3LineParameters/hepbroad.mat')
+		p=loadmat('ph3/ph3LineParameters/hepbroad.mat')
    		M3=p['hepbroad']
    		
 		m[2]=7										# force law exponent
 	elif(Mol_3=='PH3'):
-		p=loadmat('ph3LineParameters/ph3pbroad.mat')
+		p=loadmat('ph3/ph3LineParameters/ph3pbroad.mat')
    		M3=p['ph3pbroad']
    		 		
 		m[2]=3										# force law exponent

@@ -1,4 +1,4 @@
-def [Beamz,Beam_weightz,beam_weighted_ave]=beamsample(Nphi_rings,N_ring_one,BWHM)
+def beamsample(Nphi_rings,N_ring_one,BWHM):
 
 	import numpy
 # function beamsample
@@ -34,21 +34,22 @@ def [Beamz,Beam_weightz,beam_weighted_ave]=beamsample(Nphi_rings,N_ring_one,BWHM
 
 	# center phi on z-axis (around pi/2)
 
-	phi_degree_norm=90+phi_degree;
-	phi=phi_degree_norm*pi/180.; # convert to radian
-	r=1;
+	phi_degree_norm=90.+phi_degree;
+	phi=phi_degree_norm*numpy.pi/180.; # convert to radian
+	r=1.;
 	delta_beam=dphi_degree/2.; # since phi is sampled around by 2pi the delta_phi (from axis is 1/2) AKA halfspace
 	Beam_X=[];
 	Beam_Y=[];
 	Beam_Z=[];
-	Theta=numpy.zeros(Nphi_rings,numpy.max(Ntheta));
+	Theta=numpy.zeros([Nphi_rings,numpy.max(Ntheta)]);
 	beam_weighted_ave=0;
-
+        theta_length=numpy.array([0,0,0])
+        
 	for i_ring in range(0,Nphi_rings):
-     		last_theta_in_ring=2*pi-2*pi/Ntheta[i_ring]
-     		t=numpy.linspace(0,last_theta_in_ring,Ntheta[i_ring])
-     		Theta[i_ring,:]=numpy.transpose(t)
-     		[R[i_ring,:],TH[i_ring,:],PHI[i_ring,:]]=numpy.meshgrid(r,Theta[i_ring,:],phi[i_ring])
+     		last_theta_in_ring=2.*numpy.pi-2.*numpy.pi/Ntheta[i_ring]
+     		t=numpy.linspace(0.,last_theta_in_ring,Ntheta[i_ring])
+     		Theta[i_ring,0:t.shape[0]]=t
+     		[R[i_ring,:],TH[i_ring,:],PHI[i_ring,:]]=numpy.mgrid[1,Theta[i_ring,:],phi[i_ring]]
      		[x[i_ring,:],y[i_ring,:],z[i_ring,:]]=sph2cart(TH[i_ring,:],PHI[i_ring,:],R[i_ring,:])
      		Beam_X[i_ring,:]=x[i_ring,:]
      		Beam_Y[i_ring,:]=y[i_ring,:]
@@ -59,8 +60,9 @@ def [Beamz,Beam_weightz,beam_weighted_ave]=beamsample(Nphi_rings,N_ring_one,BWHM
      		theta_length[i_ring]=len(t)
 
 	kk=1;
-	for i_ring=1:Nphi_rings
-    		for j_theta=1:theta_length(i_ring)
-        		Beamz[:,kk]=numpy.asarray([Beam_X[i_ring,j_theta];Beam_Y[i_ring,j_theta];Beam_Z[i_ring,j_theta]]);
-        		Beam_weightz(kk)=Beam_weight[i_ring];
-        		kk=kk+1;
+	for i_ring in range(0,Nphi_rings):
+    		for j_theta in range(0,theta_length(i_ring)):
+        		Beamz[:,kk]=numpy.asarray([Beam_X[i_ring,j_theta],Beam_Y[i_ring,j_theta],Beam_Z[i_ring,j_theta]])
+        		Beam_weightz[kk]=Beam_weight[i_ring]
+        		kk=kk+1
+        return Beamz,Beam_weightz,beam_weighted_ave

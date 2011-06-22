@@ -8,7 +8,7 @@ def fwght(layers,masterindex):
 
 	sl=layers.shape[1]
 	for n in range(0,sl):
-   		for in range(0,len(masterindex[:,n])):
+   		for k in range(0,len(masterindex[:,n])):
       			ch=masterindex[:,n]==masterindex[k,n]	# are there double contributions?
       			#matchindextemp=masterindex(:).*ch  # Zero out other layer indices
       			matchlayers=ch*layers[:,n] # matched layer values
