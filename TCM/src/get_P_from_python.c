@@ -33,7 +33,7 @@ double* get_P_from_python(float T,float PH2,float PHe,float PCH4,float PH2O)
     double static vals[2];
     char *path,*newpath,*to_gaslib,*to_site_packages;
 
-    to_gaslib="/python_compressibility/calc_Cp";
+    to_gaslib="/TCM/python_compressibility/calc_Cp";
     to_site_packages="/usr/local/lib/python2.7/site-packages";// <-- make me an input arg
 
     current_path=getcwd(NULL,0);

@@ -5,7 +5,8 @@ def DeBoerTCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_i,XCH4_i,
                                 SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,
                                 supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,
                                 dP_init,dP_fine,P_fine_start,P_fine_stop,frain,select_ackerman):
-        import shutil
+        import shutil,os,numpy
+	
         from TCM import TCM                        
         # function DeBoer_TCM is a matlab wrapper for the DeBoer Thermo chemical model. The function TCM is a mex
         # module which must be compiled. The source/mex module is located in TCM_mex. TCM module is compiled by:
@@ -122,14 +123,14 @@ def DeBoerTCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_i,XCH4_i,
                 n_lindal=len(lines)
                 f.close()
         elif(TP_list[5]==TP_force):
-                TP_in_directory=load('TP.TCM')
+                TP_in_directory=load('TCM/TP.TCM')
                 f=open('TP.TCM','r')
                 lines=f.readlines()
                 n_lindal=len(lines)
                 f.close()
         else:
                 print 'Invalid TP profile.'
-        
+        shutil.copyfile('TCM/inputsol.dat','inputsol.dat')
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
@@ -154,7 +155,9 @@ def DeBoerTCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_i,XCH4_i,
 	for j in range(0, nlevels+1):
 		for i in range(0,len(layerKeys)):
 			layer[layerKeys[i]].append(TCM.getFloatValues(i,j))
-        me,n=numpy.shape(P)
+	for key in layer.keys():
+		layer[key]=numpy.asarray(layer[key])
+        me=numpy.shape(layer['P'])
 
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
         # Remove fictional clouds from DeBoer TCM using built-in filter 'clouds'
@@ -166,13 +169,22 @@ def DeBoerTCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_i,XCH4_i,
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
         #  Scale Polar profile according to oblateness factor
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-        clouds=numpy.zeros([me])
+        clouds=numpy.zeros([me[0]])
         #Equatorial
-        tcme[0:me,0:23]=numpy.r_[layer['P'][0:me],layer['T'][0:me],layer['z'][0:me],layer['XH2'][0:me],layer['XHe'][0:me],layer['XH2S'][0:me],layer['XNH3'][0:me],layer['XH2O'][0:me],layer['XCH4'][0:me],layer['XPH3'][0:me],
-                 clouds[0:me],layer['DNH4SH'][0:me],layer['DH2S'][0:me],layer['DNH3'][0:me],layer['DH2O'][0:me],layer['DCH4'][0:me],layer['DPH3'][0:me],layer['DSOL'][0:me],
-                 layer['g'][0:me],layer['mu'][0:me],clouds,clouds,layer['P_real'][0:me]]
-                 #ref_w_o[0:me],ref_w[0:me],Preal[0:me]]
+	
+	tcme=numpy.zeros([me[0],24])
+	tcmp=numpy.zeros([me[0],24])
+        me=me[0]
+        layer['clouds']=clouds
+	tcmelist=['P','T','z','XH2','XHe','XH2S','XNH3','XH2O','XCH4','XPH3','clouds','DNH4SH','DH2S','DNH3','DH2O','DCH4','DPH3','DSOL','g','mu','clouds','clouds','P_real']
+        i=0
+        for item in tcmelist:
+                tcme[:,i]=layer[item]
+                if(item=='z'): tcmp[:,i]=oblateness_factor*layer[item]
+                else: tcmp[:,i]=layer[item]        
+                i+=1
         #Polar
-        tcmp[0:me,0:23]=numpy.r_[tcme[0:me,0:2],oblateness_factor*tcme[0:me,2],tcme[0:me,3:23]]
+        DSOL_NH3=layer['DSOL_NH3']
+	
         return me,tcme,tcmp,DSOL_NH3
  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

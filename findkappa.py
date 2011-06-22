@@ -1,5 +1,5 @@
 def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_h2h2_model,select_ammonia_model,select_water_model,include_clouds):
-
+        import numpy
 	# function kappa=findkappa(f,T,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3)
 	# Finds the atmospheric absorption at each pressure level.
 	# 
@@ -44,50 +44,70 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
 	stopindex=stopindex-1;
  	# can't include bottom P pressure..no appropriate depth associated with it.
 	# Call ammonia
+	farr=numpy.array([[f]])
 	from nh3.HanleySteffes import HanleySteffes
+	alphanh3=numpy.zeros([stopindex])
+	kappa_1=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
-    		if(select_ammonia_model==1):
-        		alphanh3[k]=HanleySteffes(f,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
+    		if(select_ammonia_model==7):
+        		alphanh3_t=HanleySteffes(farr,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
+        		alphanh3[k]=alphanh3_t[0]
     		else:
-			print "sorry nothing other than Hanley Steffes Right now." 
+			print "sorry nothing other than Hanley Steffes Right now. %d"%select_ammonia_model 
 	
 
 
 	# Call phosphine
 	from ph3.HoffmanSteffes import HoffmanSteffes
+	alphaph3=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
-   		alphaph3[k]=HoffmanSteffes(f,T[k],P_H2[k],P_He[k],P_PH3[k])	# Vector in f
-	   
+   		alphaph3_t=HoffmanSteffes(farr,T[k],P_H2[k],P_He[k],P_PH3[k])	# Vector in f
+	        alphaph3[k]=alphaph3_t[0]
 	
 	
 	# Call Hydrogen Sulfide
 	from h2s.DeBoerSteffes import DeBoerSteffes
+	alphah2s=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
-   		alphah2s[k]=falphah2s(f,T[k],P_H2[k],P_He[k],P_H2S[k])	# Vector in f
-	   
+   		alphah2s_t=DeBoerSteffes(farr,T[k],P_H2[k],P_He[k],P_H2S[k])	# Vector in f
+	        alphah2s[k]=alphah2s_t[0]
 	
 	# Call Hydrogen
-	from h2.OrtonCIA import OrtonCIA
-	for k in range(0,stopindex):
-		alphah2[k]=falphah2(f,T[k],P_H2[k],P_He[k],P_CH4[k]);
-   		
+	#from h2.OrtonCIA import OrtonCIA
+	#alphah2=numpy.zeros([stopindex])
+	#for k in range(0,stopindex):
+	#	alphah2_t=OrtonCIA(farr,T[k],P_H2[k],P_He[k],P_CH4[k]);
+   	#	alphah2[k]=alphah2_t[0]
 	from h2o.KarpowiczSteffes import KarpowiczSteffes
 	from h2o.DeBoerCorrected import DeBoerCorrected
 	from h2o.Goodman import Goodman
-	for k=1:stopindex
+	alphah2o=numpy.zeros([stopindex])
+	for k in range(0,stopindex):
    		if(select_water_model==1):
-       			alphah2o[k]=DeBoerCorrected(f,T[k],P_H2[k],P_He[k],P_H2O[k]);
-  		
+       			alphah2o_t=DeBoerCorrected(farr,T[k],P_H2[k],P_He[k],P_H2O[k]);
+  		        alphah2o[k]=alphah2o_t[0]
   		if(select_water_model==2):
-       			alphah2o[k]=Goodman(f,P[k],T[k],XH2O[k],XH2[k],XHe[k]);
-   		
+       			alphah2o_t=Goodman(farr,P[k],T[k],XH2O[k],XH2[k],XHe[k]);
+   		        alphah2o[k]=alphah2o_t[0]
    		if(select_water_model==3):
       			density_h2_g_m3=(P_H2[k]*2.01594)/((8.314472e-5)*T[k]);
       			density_he_g_m3=(P_He[k]*4.0026)/((8.314310e-5)*T[k]);
       			density_h2o_g_m3=(P_H2O[k]*(8.314472/0.46141805))/((8.314472e-5)*T[k]);
-      			alphah2o[k]=KarpowiczSteffes(f,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T[k]);
-   		
-	
+      			alphah2o_t=KarpowiczSteffes(farr,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T[k]);
+   		        alphah2o[k]=alphah2o_t[0]
+	complex_dielectric_SOL=numpy.zeros([stopindex])
+	complex_dielectric_SOL=numpy.zeros([stopindex])
+        complex_dielectric_H2S=numpy.zeros([stopindex])
+        complex_dielectric_NH3=numpy.zeros([stopindex])
+        complex_dielectric_H2O=numpy.zeros([stopindex])
+        complex_dielectric_NH4SH=numpy.zeros([stopindex])
+    
+        alpha_NH4SH=numpy.zeros([stopindex])
+        alpha_H2S=numpy.zeros([stopindex])
+        alpha_NH3=numpy.zeros([stopindex])
+        alpha_H2O=numpy.zeros([stopindex])
+        alpha_SOL=numpy.zeros([stopindex])
+        
 	if(include_clouds==1):
     		
     		for k in range(0,stopindex):
@@ -112,11 +132,11 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
     		
 	else:
 		for k in range(0,stopindex):
-        		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2[k]+alphah2o[k]+alphah2s[k];
+        		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2o[k]+alphah2s[k]#+alphah2[k]
     		
 	
 
 	#save alfs
-	kappa=numpy.transpose(kappa);	# (in 1/cm) if limb-have passed same pressure twice-masterindex keeps track
+	kappa=numpy.transpose(kappa_1);	# (in 1/cm) if limb-have passed same pressure twice-masterindex keeps track
 
 	return kappa

@@ -1,14 +1,17 @@
 def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 	import numpy
 	from scipy.io import loadmat
+	from ph3.lnwidth import lnwidth
+	from ph3.vvwlineshape import vvwlineshape
+	
 	if (PH2==0):
-   		alphaph3=0
+   		alphaph3=0.
    	
-	Par=loadmat('ph3LineParameters/catalog.mat')
+	Par=loadmat('ph3/ph3LineParameters/catalog.mat')
 	catalog=Par['catalog']
-	Par2=loadmat('ph3LineParameters/a1.mat')
+	Par2=loadmat('ph3/ph3LineParameters/a1.mat')
 	a1=Par2['a1']
-	Par3=loadmat('ph3LineParameters/a2.mat')
+	Par3=loadmat('ph3/ph3LineParameters/a2.mat')
 	a2=Par3['a2']
 
 
@@ -70,19 +73,19 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 	#Spp(2:41)=Spp(2:41).*A(2)
 	#Spp(41:105)=Spp(41:105).*A(3)
 
-	Spp[a1]=Spp[a1].*(36.65) #may not work in python
-	Spp[a2]=Spp[a2]*(2.76) #may not work in python
+	Spp[a1]=Spp[a1-1]*(36.65) #may not work in python
+	Spp[a2]=Spp[a2-1]*(2.76) #may not work in python
 
 	# Convert Intensity at 300 Kelvin to Intensity at T kelvin:
 
-	numberdensity=(10**6)*No*dP_PH3/(R*T)	# [molec/cm^3]
+	numberdensity=(1e6)*No*dP_PH3/(R*T)	# [molec/cm^3]
 												# The 10^6 allows use of P(bar) for P(dynes/cm^2)
 
 	eta=3./2.										# for symmetric top molecule
 	expo=-(1./T-1./To)*ELO*hc/K
-	ST=Spp*exp(expo)*(To/T)**(eta+1.)	# S(T) =S(To)converted for temperature
+	ST=Spp*numpy.exp(expo)*(To/T)**(eta+1.)	# S(T) =S(To)converted for temperature
 
-	alpha_max=ST*(power((d_nu),-1))*(numpy.power((numpy.pi*2.9979E18),-1))*numberdensity # 
+	alpha_max=ST*(numpy.power((d_nu),-1))*(numpy.power((numpy.pi*2.9979e18),-1))*numberdensity # 
 
 
 	#### Alpha Max Found
@@ -110,9 +113,10 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 
 	# Put alpha_max(ELO) into a matrix m x n like ie. Fvvw
 
-
-	n=f.shape[1]
-	nones=numpy.ones(1,n)
+        
+	if(len(f.shape)<2):n=1
+	else:n=f.shape[1]
+	nones=numpy.ones([1,n])
 	alpha_max_matrix=alpha_max*nones
 
 	#Multiply element by element alpha(1)*F(f,lf(1)) etc...
@@ -121,10 +125,13 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 
 	#Sum each column, which corresponds to one observation frequency.
 	#ie if 1-10Ghz, first column are the contributions of all line freq at 1 Ghz
-	vvw_alpha_opdepth=numpy.sum(vvw_alpha_matrix,axis=0)*(numpy.pi)
+	vvw_alpha_opdepth=(vvw_alpha_matrix*(numpy.pi)).sum(axis=0)
 	#vvw_alpha=vvw_alpha_opdepth.*OpticaldepthstodB
 	alphaph3=vvw_alpha_opdepth
+        
 
+
+        
 	return alphaph3
 	#br_alpha_neper=sum(br_alpha_matrix,1).*(pi)
 	#br_alpha=br_alpha_neper.*OpticaldepthstodB

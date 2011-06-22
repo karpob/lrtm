@@ -1,4 +1,5 @@
 def vvwlineshape(f,fo,df):
+        import numpy
 	"""
  	This function determines the Van,Velck,Wiesskopf (VVW) lineshape over
  	a range of freqencies which are user defined as is the frequency step
@@ -18,19 +19,27 @@ def vvwlineshape(f,fo,df):
 
  	F =                A      *(     B          +         C       )
 	"""
-	n=f.shape[1]
-	m=fo.shape[0]
+	try:n=len(f)
+	except:n=1
+        m=len(fo)
+        # f(1) f(2) f(3) f(4) ....f(n) n times where n is the number of frequency steps
+        # f(1) f(2) f(3) f(4)				in the observation range                            
+        # ...
+        # m times where m is the number of spectral lines
+
+        nones=numpy.ones([1,n])
+        mones=numpy.ones([m,1])
 	#	 f(1) f(2) f(3) f(4) ....f(n) n times where n is the number of frequency steps
 	# 	f(1) f(2) f(3) f(4)				in the observation range                            
 	# ...
 	# m times where m is the number of spectral lines
 
-	nones=numpy.ones(1,n)
-	mones=numpy.ones(m,1)
+	nones=numpy.ones([1,n])
+	mones=numpy.ones([m,1])
 	f_matrix=mones*f
 	fo_matrix=fo*nones
 	df_matrix=df*nones
-	A=(1./numpy.pi)*numpy.power((f_matrix./fo_matrix),2)			# f(1)*fo(1)  f(2)*fo(1) f(3)*fo(1)
+	A=(1./numpy.pi)*numpy.power((f_matrix/fo_matrix),2)			# f(1)*fo(1)  f(2)*fo(1) f(3)*fo(1)
                                           # f(1)*fo(2)  f(2)*fo(2) f(3)*fo(2)
 	B=df_matrix/((numpy.power((f_matrix-fo_matrix),2))+numpy.power((df_matrix),2))
 	C=df_matrix/((numpy.power((f_matrix+fo_matrix),2))+numpy.power((df_matrix),2))

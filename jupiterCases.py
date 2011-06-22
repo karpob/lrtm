@@ -184,7 +184,7 @@ me,tcme,tcmp,DSOL_NH3=DeBoerTCM(TP_list,TP_force,XH2S[case_select],XNH3[case_sel
 # Set Spacecraft Orientation
 theta=0
 Raydirection[0]=-1.0*numpy.cos(theta*(numpy.pi/180.)) 
-Raydirection[1]=sin(theta*(numpy.pi/180.)) 
+Raydirection[1]=numpy.sin(theta*(numpy.pi/180.)) 
 
 #Run Radiative Transfer model for all frequencies
 for j in range(0,len(f)):

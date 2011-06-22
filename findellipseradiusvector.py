@@ -26,7 +26,7 @@ def findellipseradiusvector(ao,bo,co,major,minor):
 	b=bo+major				# semi-minor axis is also y
 	c=co+minor				# semi-major axis is z
 	ellipses={}
-	ellipses['a']=[a]
-	ellipses['b']=[b]
-	ellipses['c']=[c]
+	ellipses['a']=a
+	ellipses['b']=b
+	ellipses['c']=c
 	return ellipses

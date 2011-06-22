@@ -1,5 +1,5 @@
 def ftau(kappas,s,masterindex):
-
+        import numpy
 	# function ftau
 	#
 	#
@@ -39,7 +39,7 @@ def ftau(kappas,s,masterindex):
 
 	tau1=numpy.cumsum(tau_a,axis=0)
 
-	st=tau.shape[0]
-	tau=numpy.zeros([st+1])
-	tau[1:len(tau)]=tau1
+	st=tau1.shape[0]
+	tau=numpy.zeros([st])
+	tau[1:len(tau)]=tau1[0:st-1]
 	return tau_a, tau
