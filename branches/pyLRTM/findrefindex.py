@@ -48,6 +48,6 @@ def findrefindex(T,P_H2,P_He,P_CH4,P_H2O,D_SOL,f,reference_select):
         if(reference_select==1):Nrtot=NrHe+NrH2+NrCH4+NrH2O-NrSolution_Cloud
         n=(Nrtot/1e6)+1. 
         refindex=n 
-        print refindex
+        
         return refindex 
 

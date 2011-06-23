@@ -9,7 +9,8 @@ def rayleigh_absorption(f,Cloud_Bulk_Density,Material_Density,Complex_Dielectric
 	# Returns alpha (absorption coefficient in cm^-1 sometimes incorrectly
 	# referred to as optical depths).
 
-	c=2.99792458e8 #m/s 
+	c=2.99792458e8 #m/s
+	
 	epp=numpy.imag(Complex_Dielectric_Constant)
 	ep=numpy.real(Complex_Dielectric_Constant)
 	f_in_Hz=f*1.e9
@@ -17,4 +18,4 @@ def rayleigh_absorption(f,Cloud_Bulk_Density,Material_Density,Complex_Dielectric
 	lambdaz=lambdaz_m*100 # Convert to centimeters
 	alpha=((18.*numpy.pi)/lambdaz)*(Cloud_Bulk_Density/Material_Density)*(epp/(((ep+2.)**2)+epp**2))
 
-	return alpha,lambdaz
+	return alpha
