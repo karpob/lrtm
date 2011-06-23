@@ -1,27 +1,28 @@
 def rayellipseint(Rayorigin,Raydirection,ellipse):
-        import numpy
-	# function [intercept,internormal,d]=rayellipseint(Rayorigin,Raydirection,ellipses)
-	# Haines Ray Intercept Test (with Ellipse modification)
-	# Gets passed ray-info and ellipse info for THE ellipse currently being done
-	# IMPOSE
-	# ELLIPSE MODIFICATION: Sr=1, elliptical equation for spherical, origin=0,0,0
-	#
-	# With inputs of ray location, ray vector, center of sphere, and sphere radius
-	# This finds the intercept location (in cartesian), and the local normal, as well
-	# as the distance (d) to the sphere from the observer (ray origin)
+        """
+	 function [intercept,internormal,d]=rayellipseint(Rayorigin,Raydirection,ellipses)
+	 Haines Ray Intercept Test (with Ellipse modification)
+	 Gets passed ray-info and ellipse info for THE ellipse currently being done
+	 IMPOSE
+	 ELLIPSE MODIFICATION: Sr=1, elliptical equation for spherical, origin=0,0,0
+	
+	 With inputs of ray location, ray vector, center of sphere, and sphere radius
+	 This finds the intercept location (in cartesian), and the local normal, as well
+	 as the distance (d) to the sphere from the observer (ray origin)
 
-	# Can be used to find the original distance to the planet from the craft
-	# along with the intercept point and distance
-	# Also can find the pathlength through the spherical shells model
-	# In this case the ray origin is the last intercept point and the ray direction
-	# must be found a priori from snells law for spherical shells and refractive index
-	# 
-	# Modification by Karpowicz. Include "negation" when ray origin is within the
-	# ellipsoid to a tolerance of 1e-6. (if the equation for an ellipse is <1 to
-	# a tolerance of 1e-6 or 0.9999....) 
-	#fred=1
+	 Can be used to find the original distance to the planet from the craft
+	 along with the intercept point and distance
+	 Also can find the pathlength through the spherical shells model
+	 In this case the ray origin is the last intercept point and the ray direction
+	 must be found a priori from snells law for spherical shells and refractive index
+	 
+	 Modification by Karpowicz. Include "negation" when ray origin is within the
+	 ellipsoid to a tolerance of 1e-6. (if the equation for an ellipse is <1 to
+	 a tolerance of 1e-6 or 0.9999....) 
+	"""
 
 	# Put into notation of the Haines text (Ray tracing, Glassner ed)
+	import numpy
 	
 	X0=Rayorigin[0]
 	Y0=Rayorigin[1]
@@ -167,5 +168,5 @@ def rayellipseint(Rayorigin,Raydirection,ellipse):
 	if(flip_rnormal==1):
     		internormal=-1.*internormal
 	isone=(xi**2)*a+(zi**2)*c+(yi**2)*b
-	print 'is one?',isone
+	#print 'is one?',isone
 	return intercept,internormal,d,limbflag

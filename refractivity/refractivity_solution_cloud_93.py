@@ -28,5 +28,5 @@ def refractivity_solution_cloud_93(T,D_sol,rho,f):
 	ZNw=1.5*(D_sol_g_m3)*(((ZEp-1.)/(ZEp+2.))-1.+3./(Eps+2.))
 	Np=numpy.real(ZNw)
 	Npp=numpy.imag(ZNw)
-	print Np, Npp
+	
 	return Np,Npp

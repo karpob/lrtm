@@ -1,17 +1,26 @@
 def DeBoerSteffes(f,T,P_H2,P_He,P_H2S):
+        """
+        function alphaH2S=falphaH2S(f,T,P,xH2,xHe,xH2S)
+        DeBoer-Steffes model absorption for H2S.
+        
+        Input:
+                -->f: frequency (GHz)
+                -->T: Temperature (K)
+                -->P: Pressure (bars)
+                -->xH2: mole fraction H2
+                -->xHe: mole fraction He
+                -->xH2S: mole fraction H2S
+        Output:
+                <--alphaH2Sdb: Absorption coefficient in dB/km        
+        
+        """
+	# T in kelvin, P in bars, xH2,xHe,xH2S = fraction (x/100) of each 
         import numpy
 	from scipy.io import loadmat
 	from h2s.brParameters import brParameters
 	from h2s.BenReuven import BenReuven
-	# 12/12/MM
-	# function alphaH2S=falphaH2S(f,T,P,xH2,xHe,xH2S)
-	# T in kelvin, P in bars, xH2,xHe,xH2S = fraction (x/100) of each 
-
-	#if (P_H2==0.):
-   	#	alphah2s=0.
-   	#	return
-	#end
-
+	
+        if(P_H2<1e-18):return numpy.array([0.0])
 
 	LineParameters=loadmat('h2s/h2sLineParameters/h2slin.mat')	# use for testing-NEED H2S.lin
 	# ??? is it Converted P/P catalogue with GHz nm^2MHz 1/cm (Freqline Int Eo)

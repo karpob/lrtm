@@ -1,11 +1,22 @@
 def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
+        """
+        Hoffman-Steffes PH3 absorption model.
+        
+                Input:
+                        -->f: Frequency (GHz)
+                        -->T: Temperature (K)
+                        -->PH2: Partial pressure Hydrogen (bars)
+                        -->PHe: Partial pressure Helium (bars)
+                        -->PPH3: Partial pressure Phosphine (bars)
+                Output:
+                        <--alphaph3: absorption coefficient in dB/km        
+        """
 	import numpy
 	from scipy.io import loadmat
 	from ph3.lnwidth import lnwidth
 	from ph3.vvwlineshape import vvwlineshape
 	
-	if (PH2==0):
-   		alphaph3=0.
+	if (PH2==0.):return numpy.array([0.0])
    	
 	Par=loadmat('ph3/ph3LineParameters/catalog.mat')
 	catalog=Par['catalog']
@@ -132,6 +143,6 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 
 
         
-	return alphaph3
+	return alphaph3*OpticaldepthstodB
 	#br_alpha_neper=sum(br_alpha_matrix,1).*(pi)
 	#br_alpha=br_alpha_neper.*OpticaldepthstodB
