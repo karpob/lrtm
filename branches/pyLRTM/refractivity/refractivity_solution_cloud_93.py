@@ -11,7 +11,7 @@ def refractivity_solution_cloud_93(T,D_sol,rho,f):
 	#     Output Variables:
 	#                  <--Np: Nprime or real part of refractivity
 	#                  <--Npp: N double prime or imaginary part of refractivity
-
+        
 	D_sol_g_m3=(D_sol*1e6)/rho # convert to g/m^3 This is necessary, since N', N'' are small parts of total refractive index
 	# Use Refractivity from Liebe, 1989 (most closely matches his notation in
 	# paper), but 1993 will work too

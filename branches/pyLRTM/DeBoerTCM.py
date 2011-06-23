@@ -185,6 +185,8 @@ def DeBoerTCM(TP_list,TP_force,XH2S_i,XNH3_i,XH2O_i,XCH4_i,
                 i+=1
         #Polar
         DSOL_NH3=layer['DSOL_NH3']
-	
+	for item in ['DNH4SH','DH2S','DNH3','DH2O','DCH4','DPH3','DSOL']:
+	        layer[item][layer[item]<1e-29]=0.0                       #threshold to turn remove deboer 1e-30 stuff.
+	        print item, layer[item]
         return me,tcme,tcmp,DSOL_NH3
  # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
