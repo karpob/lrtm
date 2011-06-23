@@ -34,9 +34,9 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
 	from h2o.DeBoerCorrected import DeBoerCorrected
 	from h2o.Goodman import Goodman
 	from ph3.HoffmanSteffes import HoffmanSteffes
-	
-	
-
+	from clouds.get_complex_dielectric_constant_water import get_complex_dielectric_constant_water
+	from clouds.rayleigh_absorption import rayleigh_absorption
+        from h2.OrtonCIA import OrtonCIA
 	# THIS VERSION USED FOR IMAGING DOES ALL PRESSURE LEVELS-TO BE USED MULTIPLE TIMES FOR
 	# THE DIFFERENT LOOK ANGLES
 
@@ -53,6 +53,8 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
 	
 	alphanh3=numpy.zeros([stopindex])
 	kappa_1=numpy.zeros([stopindex])
+	
+        
 	for k in range(0,stopindex):
     		if(select_ammonia_model==1):
         		alphanh3_t=HanleySteffes(farr,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
@@ -78,11 +80,12 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
 	        alphah2s[k]=alphah2s_t[0]
 	
 	# Call Hydrogen
-	#from h2.OrtonCIA import OrtonCIA
-	#alphah2=numpy.zeros([stopindex])
-	#for k in range(0,stopindex):
-	#	alphah2_t=OrtonCIA(farr,T[k],P_H2[k],P_He[k],P_CH4[k]);
-   	#	alphah2[k]=alphah2_t[0]
+	
+	alphah2=numpy.zeros([stopindex])
+	for k in range(0,stopindex):
+	        
+		alphah2_t=OrtonCIA(farr,T[k],P_H2[k],P_He[k],P_CH4[k])
+   		alphah2[k]=alphah2_t[0]
 	
 	alphah2o=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
@@ -98,12 +101,12 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
       			density_h2o_g_m3=(P_H2O[k]*(8.314472/0.46141805))/((8.314472e-5)*T[k]);
       			alphah2o_t=KarpowiczSteffes(farr,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T[k])
    		        alphah2o[k]=alphah2o_t[0]/OpticaldepthstodB
-	complex_dielectric_SOL=numpy.zeros([stopindex])
-	complex_dielectric_SOL=numpy.zeros([stopindex])
-        complex_dielectric_H2S=numpy.zeros([stopindex])
-        complex_dielectric_NH3=numpy.zeros([stopindex])
-        complex_dielectric_H2O=numpy.zeros([stopindex])
-        complex_dielectric_NH4SH=numpy.zeros([stopindex])
+	complex_dielectric_SOL=numpy.zeros([stopindex],dtype=numpy.complex)
+	complex_dielectric_SOL=numpy.zeros([stopindex],dtype=numpy.complex)
+        complex_dielectric_H2S=numpy.zeros([stopindex],dtype=numpy.complex)
+        complex_dielectric_NH3=numpy.zeros([stopindex],dtype=numpy.complex)
+        complex_dielectric_H2O=numpy.zeros([stopindex],dtype=numpy.complex)
+        complex_dielectric_NH4SH=numpy.zeros([stopindex],dtype=numpy.complex)
     
         alpha_NH4SH=numpy.zeros([stopindex])
         alpha_H2S=numpy.zeros([stopindex])
@@ -115,28 +118,28 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
     		
     		for k in range(0,stopindex):
         		complex_dielectric_SOL[k]=get_complex_dielectric_constant_water(f,T[k]); #Use equations in Ulaby, Fung, Moore for water
-        		complex_dielectric_H2S[k]=1+sqrt(-1)*1; #Don't care no H2S clouds here.
-        		complex_dielectric_NH3[k]=(((1.48)^2)-((8.73e-4)^2)) + sqrt(-1)*(2*1.48*8.73e-4); #Use Howett, Carlson, Irwin,Calcutt ref index nu=1300 cm^-1
-        		complex_dielectric_H2O[k]=3.15 + sqrt(-1)*1e-3;                                   #Wost Case at 33 GHz Matsuoka,Fujita,Mae 1996
-        		complex_dielectric_NH4SH[k]=(((2.72)^2)-((7.83e-4)^2)) + sqrt(-1)*(2*2.72*7.83e-4);#Use Howett, Carlson, Irwin,Calcutt ref index nu=1300 cm^-1
-    
-        		alpha_NH4SH[k]=rayleigh_absorption(f,DNH4SH[k],1,complex_dielectric_NH4SH[k]);
-        		alpha_H2S[k]=rayleigh_absorption(f,DH2S[k],1,complex_dielectric_H2S[k]);
-        		alpha_NH3[k]=rayleigh_absorption(f,DNH3[k],1,complex_dielectric_NH3[k]);
-        		alpha_H2O[k]=rayleigh_absorption(f,DH2O[k],1,complex_dielectric_H2O[k]);
-        		alpha_SOL[k]=rayleigh_absorption(f,DSOL[k],1,complex_dielectric_SOL[k]);
+        		complex_dielectric_H2S[k]=0.0 #Don't care no H2S clouds here.
+        		complex_dielectric_NH3[k]=(((1.48)**2)-((8.73e-4)**2)) + 1j*(2*1.48*8.73e-4); #Use Howett, Carlson, Irwin,Calcutt ref index nu=1300 cm^-1
+        		complex_dielectric_H2O[k]=3.15 + 1j*1e-3;                                   #Wost Case at 33 GHz Matsuoka,Fujita,Mae 1996
+        		complex_dielectric_NH4SH[k]=(((2.72)**2)-((7.83e-4)**2)) + 1j*(2*2.72*7.83e-4);#Use Howett, Carlson, Irwin,Calcutt ref index nu=1300 cm^-1
+                
+        		alpha_NH4SH[k]=rayleigh_absorption(f,DNH4SH[k],1.,complex_dielectric_NH4SH[k]);
+        		alpha_H2S[k]=rayleigh_absorption(f,DH2S[k],1.,complex_dielectric_H2S[k]);
+        		alpha_NH3[k]=rayleigh_absorption(f,DNH3[k],1.,complex_dielectric_NH3[k]);
+        		alpha_H2O[k]=rayleigh_absorption(f,DH2O[k],1.,complex_dielectric_H2O[k]);
+        		alpha_SOL[k]=rayleigh_absorption(f,DSOL[k],1.,complex_dielectric_SOL[k]);
     		
     	 
 	
 		
     
 		for k in range(0,stopindex):
-        		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2[k]+alphah2o[k]+alphah2s[k]+alpha_NH4SH[k]+alpha_H2S[k]+alpha_NH3[k]+alpha_H2O[k]+alpha_SOL[k];
+        		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2o[k]+alphah2s[k]+alpha_NH4SH[k]+alpha_H2S[k]+alpha_NH3[k]+alpha_H2O[k]+alpha_SOL[k]+alphah2[k]
     		
 	else:
 	        
 		for k in range(0,stopindex):
-        		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2o[k]+alphah2s[k]#+alphah2[k]
+        		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2o[k]+alphah2s[k]+alphah2[k]
     		
 	
 

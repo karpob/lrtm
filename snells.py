@@ -1,5 +1,6 @@
 def snells(eta1,eta2,internormal,Raydirection):
-        from numpy import *
+        from numpy import arccos,dot,sqrt,imag
+        
 	# function [theta2,transmitted]=snells(eta1,eta2,internormal,Raydirection)
 	# Finds theta2, which is the angle of the refracted ray, and the direction
 	# of that refracted ray, which is termed transmitted.
@@ -32,9 +33,12 @@ def snells(eta1,eta2,internormal,Raydirection):
 	etas=(eta1)/(eta2)
 	c11=dot(-I,N)
 	c1=c11#/(vectorlength(I)*vectorlength(N))
-	theta1=arccos(c1)
+	
+	if c1==1.0:theta1=0.0
+	else:theta1=arccos(c1)
+	
 	# c2=cos(theta2) may be found from known quantities =sqrt(1-(etas^2)*(1-c1^2))
-	c2=sqrt(1-(etas**2)*(1-c1**2))
+	c2=sqrt(1.-(etas**2)*(1-c1**2))
 	if imag(c2)>0 :
 	   CRITICALFLAG=1
 	   theta2=pi
@@ -43,8 +47,9 @@ def snells(eta1,eta2,internormal,Raydirection):
 	   return theta2,transmitted
 	
 
-	theta2=arccos(c2)
-
+	if(c2==1.0):theta2=0.0
+	else:theta2=arccos(c2)
+        
 
 # Trasmitted is found
 	transmitted=etas*(I)+(etas*c1-c2)*N	return theta2,transmitted

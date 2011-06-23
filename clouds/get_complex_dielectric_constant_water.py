@@ -9,7 +9,7 @@ def get_complex_dielectric_constant_water(f_in_GHz,T_in_K):
 
 	ep_prime=ep_winf+(ep_wo-ep_winf)/(1.+numpy.power((2.*numpy.pi*f*tau_w),2.))
 
-	ep_prime_prime=(2.*numpy.pi*f*tau_w*(ep_wo-ep_winf))/(1.+numpy.power((2.*pi*f*tau_w),2))
+	ep_prime_prime=(2.*numpy.pi*f*tau_w*(ep_wo-ep_winf))/(1.+numpy.power((2.*numpy.pi*f*tau_w),2))
 
 	complex_dielectric_constant=ep_prime+(1j)*ep_prime_prime
 	return complex_dielectric_constant

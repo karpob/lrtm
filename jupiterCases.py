@@ -4,6 +4,8 @@ from DeBoerTCM import DeBoerTCM
 from maintamone import maintamone
 from scipy.io import savemat
 import numpy
+import scipy.interpolate
+olderr = numpy.seterr(all='ignore')
 oblateness_factor=0.935 
 
 #oblateness_factor=1 
@@ -32,7 +34,7 @@ select_water_model=3
 #include cloud absorption?
 #1=yes
 #0=no
-include_clouds=0
+include_clouds=1
 
 # refractivity_source
 # Select the author you believe is right with regards to values for refractivity (used for raypath calculations)
@@ -246,4 +248,5 @@ weighting_function_a_limb=numpy.asarray(weighting_function_a_limb)
 
 R=100.*(Tbeam_nadir-Tbeam_limb)/Tbeam_nadir 
 a['R']=R
-savemat(output_filename,{'a':a})  
+savemat(output_filename,{'a':a}) 
+numpy.seterr(*olderr) 

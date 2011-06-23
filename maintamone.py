@@ -144,6 +144,7 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
 	# zenith. This is typically what one thinks of from a "ground-based"
 	# observation.
 	###########################################################################
+	print numpy.dot(-internormal[0,:],Raydirection)
 	zenith=numpy.arccos(numpy.dot(-internormal[0,:],Raydirection))*(180./numpy.pi)
         print 'zenith angle',zenith
         
