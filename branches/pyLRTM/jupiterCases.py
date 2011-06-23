@@ -15,34 +15,19 @@ bo=ao        # along y
 co=ao*oblateness_factor  # along z
 
 #select_h2h2_model
-#1=joiner
-#2=goodman
-#3=goodman by joiner
-#4=borysow
-#5=borysow with orton et al, 2007 modification
 #6=orton et al based upon interpolation
 select_h2h2_model=6 
 
 #select_ammonia_model
-#1 original hoffman coding of spilker
-#2 toms code joiner-steffes
-#3 " berge-gulkis
-#4 " mohammed-steffes
-#5 " spilker
-#6 Hanley Steffes Model
-#7 Hanley Steffes Model v 2.0
-# Note, 1 and 5 won't work for current Jupiter/adams data set
-# spilker correction factor C goes negative, giving negative absorption
-# coefficient
+#Hanley Steffes Model
 
-select_ammonia_model=7 
+select_ammonia_model=1
 
 #select_water_model
-#1 original deboer water vapor model
-#2 corrected deboer water vapor model
-#3 (to be implemented goodman 1969 water vapor model
-#4 Karpowicz and Steffes 2011, Icarus absorption model.
-select_water_model=4 
+#1 corrected deboer water vapor model
+#2 (to be implemented goodman 1969 water vapor model
+#3 Karpowicz and Steffes 2011, Icarus absorption model.
+select_water_model=3
 
 #include cloud absorption?
 #1=yes
@@ -186,21 +171,30 @@ theta=0
 Raydirection[0]=-1.0*numpy.cos(theta*(numpy.pi/180.)) 
 Raydirection[1]=numpy.sin(theta*(numpy.pi/180.)) 
 
+Tbeam_nadir=[]
+zenith_nadir=[]
+weighting_function_a_nadir=[]
+refractive_index=[]
 #Run Radiative Transfer model for all frequencies
 for j in range(0,len(f)):
     no_ph3=0  
-    [Tbeam_nadir[j],zenith_nadir[j],weighting_function_a_nadir[:,:,j],refractive_index[:,j]]= maintamone(Raydirection,Rayorigin,
+    [Tbeam_nadir_t,zenith_nadir_t,weighting_function_a_nadir_t,refractive_index_t,Tatma,intercepts_boresight,intercepts_b]= maintamone(Raydirection,Rayorigin,
                                                                                    tcme,tcmp,ao,bo,co,f[j],no_ph3,select_h2h2_model,select_ammonia_model,
                                                                                    select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
                                                                                    cassini_pattern,cassini_data_path) 
-    
+    Tbeam_nadir.append(Tbeam_nadir_t)
+    zenith_nadir.append(zenith_nadir_t)
+    weighting_function_a_nadir.append(weighting_function_a_nadir_t)
+    refractive_index.append(refractive_index_t)
+    print 'Tatma',Tatma
     print 'Tbeam_nadir', Tbeam_nadir
+    """
     a={}
     a['Tbeam_nadir']=Tbeam_nadir
     a['tcme']=tcme
     a['weighting_function_a_nadir']=weighting_function_a_nadir
     savemat(output_filename,{'a':a}) 
-
+    """
 
 
 # Set Spacecraft Orientation
@@ -216,22 +210,41 @@ Z_direction=numpy.sin(theta*(numpy.pi/180))
 Raydirection=numpy.array([X_direction, Y_direction, Z_direction]) 
 
 #Run Radiative Transfer Model For all Frequencies.
+Tbeam_limb=[]
+zenith_limb=[]
+weighting_function_a_limb=[]
 
 for j in range(0,len(f)):
     no_ph3=0 
-    Tbeam_limb[j],zenith_limb[j],weighting_function_a_limb[:,:,j]= maintamone(Raydirection,Rayorigin,
+    Tbeam_limb_t,zenith_limb_t,weighting_function_a_limb_t,refractive_index_t,Tatma,intercepts_boresight,intercepts_b= maintamone(Raydirection,Rayorigin,
                                                                                 tcme,tcmp,ao,bo,co,f[j],no_ph3,select_h2h2_model,select_ammonia_model,
                                                                                 select_water_model,include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
                                                                                 cassini_pattern,cassini_data_path) 
-
+                                                                                
     
+    Tbeam_nadir.append(Tbeam_limb_t)
+    zenith_nadir.append(zenith_limb_t)
+    weighting_function_a_limb.append(weighting_function_a_limb_t)
+    
+    
+    
+    """
     a['Tbeam_limb']=Tbeam_limb    
     a['weighting_function_a_limb']=weighting_function_a_limb 
     
     print 'Tbeam_limb',Tbeam_limb
    
     savemat(output_filename,{'a':a})  
+    """    
 
+Tbeam_nadir=numpy.asarray(Tbeam_nadir)
+zenith_nadir=numpy.asarray(zenith_nadir)
+weighting_function_a_nadir=numpy.asarray(weighting_function_a_nadir)
+refractive_index=numpy.asarray(refractive_index)
+    
+Tbeam_nadir=numpy.asarray(Tbeam_nadir)
+zenith_nadir=numpy.asarray(zenith_nadir)
+weighting_function_a_limb=numpy.asarray(weighting_function_a_limb)
 
 R=100.*(Tbeam_nadir-Tbeam_limb)/Tbeam_nadir 
 a['R']=R

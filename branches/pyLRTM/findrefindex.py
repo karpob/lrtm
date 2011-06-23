@@ -67,7 +67,7 @@ end
         if(reference_select==4):Nrtot=NrHe+NrH2+NrCH4#+NrH2O-NrSolution_Cloud
         n=(Nrtot/1e6)+1. 
         refindex=n 
-        print refindex
+        
         return refindex 
 """
 if(reference_select<3)

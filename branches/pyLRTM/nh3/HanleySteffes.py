@@ -1,11 +1,20 @@
 def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	"""
-	Final Hanley-Steffes model 
+	Final Hanley-Steffes 
 
-	input f as a vector in GHz, T in Kelvin, P in Bars, H2mr, Hemr and NH3mr in mole
-	fraction, so for a 1% mixture of NH3, NH3mr = 0.01, etc.  f is the only
-	variable that can be a vector.  Opacity (alphanh3) is returned as a vector matching f
-	in dB/km.
+	Input:
+	        -->f: Frequency in GHz (vector)
+	        --> T: Temperature in Kelvin, 
+	        --> P: Pressure (bars)
+	        -->H2mr: Hydrogen mole fraction
+	        -->Hemr: Helium mole fraction
+	        -->NH3mr: Ammonia mole fraction
+	
+	Output:
+	        <-alphanh3: Absorption coefficient in dB/km
+	
+	        Opacity (alphanh3) is returned as a vector matching f
+	        in dB/km.
 	"""
 	import numpy
 	from scipy.io import loadmat

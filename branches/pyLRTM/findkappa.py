@@ -1,43 +1,48 @@
 def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_h2h2_model,select_ammonia_model,select_water_model,include_clouds):
+        """
+         function kappa=findkappa(f,T,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3)
+	 Finds the atmospheric absorption at each pressure level.
+	
+	                        -->INPUT:
+	                               ->f: Frequency in GHz
+	                               ->T; Temperature Profile (K)
+	                               ->P: Pressure Profile (bars)
+	                               ->P_H2: Partial pressure of hydrogen/H2 (bars)
+	                               ->P_He: Partial pressure of helium (bars)
+	                               ->P_NH3: Partial pressure of ammonia (bars)
+	                               ->P_H2S: Partial pressure of hydrogen sulfide (bars)
+	                               ->XH2: absolute Mole fraction of hydrogen/H2 
+	                               ->XHe: absolute Mole fraction of He
+	                               ->XNH3: absolute Mole fraction ammonia
+	                               ->XH2O: absolute mole fraction of water
+	                               ->DNH4SH: cloud density of ammonium hydrosulfide cloud (g/cm^3)
+	                               ->DNH3: cloud density of ammonia ice (g/cm^3)
+	                               ->DH2O: cloud density of water ice (g/cm^3)
+	                               ->DSOL: cloud density of water ammonia solution (g/cm^3)
+	                               ->select_h2h2_model: select hydrogen continuum absorption model (1=Joiner Model, 2=Goodman, 3=Goodman by Joiner, 4=Borysow, 5=Borysow Orton modification
+	                               ->select_ammonia_model: select ammonia absorption model (1=Spilker original Hoffman coding,2=Joiner Steffes 3=Berge Gulkis 4=Mohammed Steffes KA_band 5=Spilker Model
+	                               ->select_water_model: select water absorption model (1=DeBoer Original, 2=DeBoer Corrected, 3=Goodman)
+	                               ->include_clouds: select whether or not to include cloud absorption (1=Yes, 0=No)
+	                        <--OUTPUT:
+	                               <-kappa:layer(s) absorption coefficient in cm^-1
+	 Output shoud be in optical depth per centimeter
+	""" 
         import numpy
-	# function kappa=findkappa(f,T,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3)
-	# Finds the atmospheric absorption at each pressure level.
-	# 
-	#
-	#
-	#            VARIABLE DEFINITIONS:
-	#
-	#                        -->INPUT:
-	#                               ->f: Frequency in GHz
-	#                               ->T; Temperature Profile (K)
-	#                               ->P: Pressure Profile (bars)
-	#                               ->P_H2: Partial pressure of hydrogen/H2 (bars)
-	#                               ->P_He: Partial pressure of helium (bars)
-	#                               ->P_NH3: Partial pressure of ammonia (bars)
-	#                               ->P_H2S: Partial pressure of hydrogen sulfide (bars)
-	#                               ->XH2: absolute Mole fraction of hydrogen/H2 
-	#                               ->XHe: absolute Mole fraction of He
-	#                               ->XNH3: absolute Mole fraction ammonia
-	#                               ->XH2O: absolute mole fraction of water
-	#                               ->DNH4SH: cloud density of ammonium hydrosulfide cloud (g/cm^3)
-	#                               ->DNH3: cloud density of ammonia ice (g/cm^3)
-	#                               ->DH2O: cloud density of water ice (g/cm^3)
-	#                               ->DSOL: cloud density of water ammonia solution (g/cm^3)
-	#                               ->select_h2h2_model: select hydrogen continuum absorption model (1=Joiner Model, 2=Goodman, 3=Goodman by Joiner, 4=Borysow, 5=Borysow Orton modification
-	#                               ->select_ammonia_model: select ammonia absorption model (1=Spilker original Hoffman coding,2=Joiner Steffes 3=Berge Gulkis 4=Mohammed Steffes KA_band 5=Spilker Model
-	#                               ->select_water_model: select water absorption model (1=DeBoer Original, 2=DeBoer Corrected, 3=Goodman)
-	#                               ->include_clouds: select whether or not to include cloud absorption (1=Yes, 0=No)
-	#                        <--OUTPUT:
-	#                               <-kappa:layer(s) absorption coefficient in cm^-1
-	# Output shoud be in optical depths per centimeter
+        from nh3.HanleySteffes import HanleySteffes
+        from h2s.DeBoerSteffes import DeBoerSteffes
+        from h2o.KarpowiczSteffes import KarpowiczSteffes
+	from h2o.DeBoerCorrected import DeBoerCorrected
+	from h2o.Goodman import Goodman
+	from ph3.HoffmanSteffes import HoffmanSteffes
+	
+	
 
 	# THIS VERSION USED FOR IMAGING DOES ALL PRESSURE LEVELS-TO BE USED MULTIPLE TIMES FOR
 	# THE DIFFERENT LOOK ANGLES
 
 	# Includes the opcacity due to Ammonia, Phosphine, Hydrogen Sulfide, Hydrogen, Water Vapor
 	# inlcuding H2 collisions with CH4
-	#maxmaster=max(masterindex)			# masterindex may go up and down-only
-	#need to calc repeaters once
+	
 
 	OpticaldepthstodB=434294.5
 	stopindex=T.shape[0];
@@ -45,11 +50,11 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
  	# can't include bottom P pressure..no appropriate depth associated with it.
 	# Call ammonia
 	farr=numpy.array([[f]])
-	from nh3.HanleySteffes import HanleySteffes
+	
 	alphanh3=numpy.zeros([stopindex])
 	kappa_1=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
-    		if(select_ammonia_model==7):
+    		if(select_ammonia_model==1):
         		alphanh3_t=HanleySteffes(farr,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
         		alphanh3[k]=alphanh3_t[0]
     		else:
@@ -58,18 +63,18 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
 
 
 	# Call phosphine
-	from ph3.HoffmanSteffes import HoffmanSteffes
+	
 	alphaph3=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
-   		alphaph3_t=HoffmanSteffes(farr,T[k],P_H2[k],P_He[k],P_PH3[k])	# Vector in f
+   		alphaph3_t=HoffmanSteffes(farr,T[k],P_H2[k],P_He[k],P_PH3[k])/OpticaldepthstodB	# Vector in f
 	        alphaph3[k]=alphaph3_t[0]
 	
 	
 	# Call Hydrogen Sulfide
-	from h2s.DeBoerSteffes import DeBoerSteffes
+	
 	alphah2s=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
-   		alphah2s_t=DeBoerSteffes(farr,T[k],P_H2[k],P_He[k],P_H2S[k])	# Vector in f
+   		alphah2s_t=DeBoerSteffes(farr,T[k],P_H2[k],P_He[k],P_H2S[k])/OpticaldepthstodB	# Vector in f
 	        alphah2s[k]=alphah2s_t[0]
 	
 	# Call Hydrogen
@@ -78,23 +83,21 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
 	#for k in range(0,stopindex):
 	#	alphah2_t=OrtonCIA(farr,T[k],P_H2[k],P_He[k],P_CH4[k]);
    	#	alphah2[k]=alphah2_t[0]
-	from h2o.KarpowiczSteffes import KarpowiczSteffes
-	from h2o.DeBoerCorrected import DeBoerCorrected
-	from h2o.Goodman import Goodman
+	
 	alphah2o=numpy.zeros([stopindex])
 	for k in range(0,stopindex):
    		if(select_water_model==1):
-       			alphah2o_t=DeBoerCorrected(farr,T[k],P_H2[k],P_He[k],P_H2O[k]);
+       			alphah2o_t=DeBoerCorrected(farr,T[k],P_H2[k],P_He[k],P_H2O[k])/OpticaldepthstodB
   		        alphah2o[k]=alphah2o_t[0]
   		if(select_water_model==2):
-       			alphah2o_t=Goodman(farr,P[k],T[k],XH2O[k],XH2[k],XHe[k]);
+       			alphah2o_t=Goodman(farr,P[k],T[k],XH2O[k],XH2[k],XHe[k])/OpticaldepthstodB
    		        alphah2o[k]=alphah2o_t[0]
    		if(select_water_model==3):
       			density_h2_g_m3=(P_H2[k]*2.01594)/((8.314472e-5)*T[k]);
       			density_he_g_m3=(P_He[k]*4.0026)/((8.314310e-5)*T[k]);
       			density_h2o_g_m3=(P_H2O[k]*(8.314472/0.46141805))/((8.314472e-5)*T[k]);
-      			alphah2o_t=KarpowiczSteffes(farr,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T[k]);
-   		        alphah2o[k]=alphah2o_t[0]
+      			alphah2o_t=KarpowiczSteffes(farr,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T[k])
+   		        alphah2o[k]=alphah2o_t[0]/OpticaldepthstodB
 	complex_dielectric_SOL=numpy.zeros([stopindex])
 	complex_dielectric_SOL=numpy.zeros([stopindex])
         complex_dielectric_H2S=numpy.zeros([stopindex])
@@ -131,12 +134,14 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
         		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2[k]+alphah2o[k]+alphah2s[k]+alpha_NH4SH[k]+alpha_H2S[k]+alpha_NH3[k]+alpha_H2O[k]+alpha_SOL[k];
     		
 	else:
+	        
 		for k in range(0,stopindex):
         		kappa_1[k]=alphanh3[k]+alphaph3[k]+alphah2o[k]+alphah2s[k]#+alphah2[k]
     		
 	
 
 	#save alfs
+        
 	kappa=numpy.transpose(kappa_1);	# (in 1/cm) if limb-have passed same pressure twice-masterindex keeps track
-
+        
 	return kappa

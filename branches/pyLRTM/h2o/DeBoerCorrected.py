@@ -1,30 +1,40 @@
 def DeBoerCorrected(f_in,T,P_H2,P_He,P_H2O):
-        from numpy import asarray,power,exp,ones,shape,pi
-        from broadening import broadening
         """
          function alpha_watervapor=fwatervaporalpha(P_H2O,P_H2,P_He,f,T)
+         Input:
+                ->f: Frequency (GHz)
+                ->T: Temperature (K)
+                ->P_H2: Partial Pressure Hydrogen (bars)
+                ->P_He: Partial Pressure Helium (bars)
+                ->P_H2O: Partial Pressure Water vapor (bars)
          Finds the attenuation due to water vapor
          Taken from DeBoer Thesis page 66 (and related)
          Modified version of Goodman (1969) with Ulaby (1981), Joiner Steffes (1991) etc
          Assuming units are bars and GHz, may need to change
          Check if Bars/GHz correct units
-        Uses subroutine watervapor_broadening
+         Uses function watervapor_broadening
+         
+         Output:
+                <-alpha_watervapor: absorption coefficient in dB/km
         """
-# For this calc, f should be a column vector [1
-#                                             2...]
-# since fo is a row vector[1,2,...]
+        from numpy import asarray,power,exp,ones,shape,pi
+        from broadening import broadening
+        
+        # For this calc, f should be a column vector [1
+        #                                             2...]
+        # since fo is a row vector[1,2,...]
 
-# Want to get an alpha for each 'f'
-# So alpha(f)
+        # Want to get an alpha for each 'f'
+        # So alpha(f)
         #if (P_H2O<=0):
         #        alpha_watervapor=0;
         #        return alpha_watervapor
 
         
-      #  print shape(P_H2),shape(P_He),shape(P_H2O),shape(T),shape(f)
-# Equation for alpha is sum of contributions to observation freq from each
-# line frequency, with contributions from each broadening agent
-# Broadening agents are mainly H2, He, and H2O
+        #  print shape(P_H2),shape(P_He),shape(P_H2O),shape(T),shape(f)
+        # Equation for alpha is sum of contributions to observation freq from each
+        # line frequency, with contributions from each broadening agent
+        # Broadening agents are mainly H2, He, and H2O
 
         To=300.0			# Reference Temperature 300 Kelvin
         Tdiv=To/T			# Ratio of Ref Temp to actual temp, used often

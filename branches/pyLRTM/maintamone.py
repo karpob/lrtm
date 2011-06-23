@@ -2,6 +2,41 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
         select_h2h2_model,select_ammonia_model,select_water_model,
         include_clouds,N_ring_one,Nphi,BWHM,refractivity_source,
         cassini_pattern,cassini_data_path):
+        """
+          maintamone.py -> main routine for LRTM function calculates Tb, and
+	                  weighting functions
+	
+	                           Input:
+	                                 -->Raydirection: Direction of Beam in
+	                                                  terms of unit vector [X Y Z]
+	                                 -->Rayorigin: Position of spacecraft in [X Y Z]
+	                                 -->tcme: Thermochemical model values for Equatorial region (values not squished in altitude (z))
+	                                 -->tcmp: Themrochemical model values for Polar region (values squished in altitude (z))
+	                                 -->ao: Ellipse (cm) value along X
+	                                 -->bo: Ellipse (cm) value along Y
+	                                 -->co: Ellipse (cm) value along Z
+	                                 -->f: Frequency in GHz
+	                                 -->no_ph3: Flag to include/exclude Hoffman Phosphine decay module 
+	                                           no_PH3=1-->active will decay phosphine
+	                                           no_PH3=0-->inactive, will use PH3 profile provided by TCM
+	                                 -->select_h2h2_model: Select model for collisionally induced absorption by H2
+	                                 -->select_ammonia_model: Select model for ammonia absorption
+	                                 -->select_water_model: Select model for water absorption
+	                                 -->include_clouds: Include or exclude absorption by clouds
+	                                 -->N_ring_one: Number of rays in first ring of beam battern (sampling param)
+	                                 -->Nphi: Number of phi rings (sampling param)
+	                                 -->BWHM: Beamwidth half maximum in degrees (3dB beamwidth of antenna)
+	                                 -->refractivity_source: Select between original refractivity, and all inclusive refractivity options                     
+	
+	                        Output:
+	                                 <--Tbeam: antenna brightness temperature (K).
+	                                 <--zenith: zenith angle (relative to planet observation).
+	                                 <--wfwa: weighting function along antenna boresight. 
+	                                 <--refindex: profile of refractive index.
+	                                 <--Tatma: antenna brightness temperature along boresight.
+	                                 <--intercepts_boresight: layer intercepts along boresight (path values).
+	                                 <--intercepts_b: layer intercepts for beam pattern (path values for all other rays).
+        """
         import numpy,os
         from findrefindex import findrefindex
         from findellipseradiusvector import findellipseradiusvector
@@ -11,33 +46,9 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
         from ftam import ftam
         from fwght import fwght
         from beamsample import beamsample
-        #from findrefindex import findrefindex
-	#  maintamone.py -> main routine for LRTM function calculates Tb, and
-	#                  weighting functions
-	#
-	#                           Input:
-	#                                 -->Raydirection: Direction of Beam in
-	#                                                  terms of unit vector [X Y Z]
-	#                                 -->Rayorigin: Position of spacecraft in [X Y Z]
-	#                                 -->tcme: Thermochemical model values for Equatorial region (values not squished in altitude (z))
-	#                                 -->tcmp: Themrochemical model values for Polar region (values squished in altitude (z))
-	#                                 -->ao: Ellipse (cm) value along X
-	#                                 -->bo: Ellipse (cm) value along Y
-	#                                 -->co: Ellipse (cm) value along Z
-	#                                 -->f: Frequency in GHz
-	#                                 -->no_ph3: Flag to include/exclude Hoffman Phosphine decay module 
-	#                                           no_PH3=1-->active will decay phosphine
-	#                                           no_PH3=0-->inactive, will use PH3 profile provided by TCM
-	#                                 -->select_h2h2_model: Select model for collisionally induced absorption by H2
-	#                                 -->select_ammonia_model: Select model for ammonia absorption
-	#                                 -->select_water_model: Select model for water absorption
-	#                                 -->include_clouds: Include or exclude absorption by clouds
-	#                                 -->N_ring_one: Number of rays in first ring of beam battern (sampling param)
-	#                                 -->Nphi: Number of phi rings (sampling param)
-	#                                 -->BWHM: Beamwidth half maximum in degrees (3dB beamwidth of antenna)
-	#                                 -->refractivity_source: Select between original refractivity, and all inclusive refractivity options                     
-	#
-	#                            
+        from rotbeam import rotbeam
+        
+	                            
                                       
 	#global CRITICALFLAG
 	CRITICALFLAG=0				# If is '1' then critical refraction reached for that ray
@@ -135,27 +146,34 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
 	###########################################################################
 	zenith=numpy.arccos(numpy.dot(-internormal[0,:],Raydirection))*(180./numpy.pi)
         print 'zenith angle',zenith
+        
+        
 	#Calculate absorption coeff as a function of TP 
 	kappa=findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,
                 xH2,xHe,xNH3,xH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,
                 select_h2h2_model,select_ammonia_model,select_water_model,include_clouds)
 	print 'Absorption coefficients computed.'
-
+        
 	# Calculate Ta (Ray brightness temperature at boresight)
 	if CRITICALFLAG==1:
    		print 'Critical Refraction'
    		disa=d
    		bs=1
+   		
    		[tau_a,tau]=ftau(kappa,d,masterindexa)	# Comes out with deepest first
+   		
    		[Tatma,wlayersa]=ftam(T,tau,tau_a,masterindexa)
    		sura=intercept[0,:]
    		intercepts_boresight=intercept
    		CRITICALFLAG=0
 	else:
+	        
    		[tau_a,tau]=ftau(kappa,d,masterindexa)	# Comes out with deepest first
+   		
    		disa=d
    		bs=1
    		[Tatma,wlayersa]=ftam(T,tau,tau_a,masterindexa)
+   		
    		sura=intercept[0,:]
    		intercepts_boresight=intercept
    
@@ -172,25 +190,29 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
 	else:
     		[beamz,beam_weightz,beam_sum]=beamsample(Nphi,N_ring_one,BWHM)
 
-
+        print Raydirection
 	[Vr1,Zr]=rotbeam(Raydirection,beamz)
 
 	# initialize wlayers
-	wlayersb=numpy.zeros(len(P)-1,len(Vr1))
+	wlayersb=numpy.zeros([len(P)-1,Vr1.shape[1]])
 
 	# masterindex for wght fnctns
-	windexb=numpy.zeros(len(P)-1,len(Vr1))
+	windexb=numpy.zeros([len(P)-1,Vr1.shape[1]])
 	missb=0
-
+	
+        Tatmb=numpy.zeros([Vr1.shape[1]])
+        surb=numpy.zeros([Vr1.shape[1],3])
+        intercepts_b=numpy.zeros([Vr1.shape[1],len(tau)+1,3])
+        
 	# Calculate Optical Depth values, brightness temperature and weighting
 	# function along each ray path.
-	#VRONE=0
-	print 'Raypaths calculated, calculating brightness temperatures along rays.'
-	for p in range(0,len(Vr1)):
+	
+	print 'Beampattern calculated, calculating brightness temperatures along rays.'
+	for p in range(0,Vr1.shape[1]):
    		bs=bs+1						# bs-beamspread- keeps track of beamspread samples
    		Rd=numpy.transpose(Vr1[:,p])
    		[intercept,internormal,d,t,masterindexb,missflag]=findraypath(recordlength,refindex,P,ellipses,Rayorigin,Rd)
-   		windexb[0:masterindexb.shape[0],p]=masterindexb
+   		windexb[0:len(masterindexb),p]=masterindexb
    		
    		disb=d
    		if missflag==1:
@@ -210,16 +232,17 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
       			[tau_a,tau]=ftau(kappa,d,masterindexb)	# Comes out with deepest first
       			[Tatmb[p],wlayersb[:,p]]=ftam(T,tau,tau_a,masterindexb)
       			surb[p,:]=intercept[0,:]
+      			
       			intercepts_b[p,:,:]=intercept
-      
+        
    
 
 
 	# Apply Beam weights (Beam coupling) from beamsample.m
-	print 'Applying beamweights.'
-	Na=len(Tatma)
+	print 'Calculating Antenna Brightness Temperature.'
+	Na=len(numpy.asarray([Tatma]))
 	Nb=len(Tatmb)
-
+	
 	Twa=numpy.sum(Tatma)*1./Na
 	Twb=numpy.sum(Tatmb*beam_weightz)
 	Tbeam=(Twa+Twb)/(1.+beam_sum)
@@ -232,11 +255,10 @@ def maintamone(Raydirection,Rayorigin,tcme,tcmp,ao,bo,co,f,no_ph3,
 	# to the size of the Pressure vector
 	sP=P.shape[0]
 	sa=numpy.zeros([sP-wfa.shape[0],1])
-	#sb=zeros(sP-size(wfb,1),1)
+	
 
 
 	# wfwa is already only 1 column
-	wfwa=[wfasa]
-	# turn into columns
-	#wfwb=[wfbsb]
+	wfwa=numpy.append(wfa,sa)
+	
 	return Tbeam,zenith,wfwa,refindex,Tatma,intercepts_boresight,intercepts_b

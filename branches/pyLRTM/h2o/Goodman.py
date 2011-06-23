@@ -1,10 +1,15 @@
 def Goodman(f,P,T,XH2O,XH2,XHe):
 	"""
-	Goodman,1969 Model.
-	f in GHz
-	P in bars.
-	T in Kelvin.
-	X mole fractions
+	Goodman,1969 Model. for water vapor absorption
+	Input:
+	        ->f: frequency in GHz
+	        ->P: Pressure in bars.
+	        ->T: Temperature in Kelvin.
+	        ->XH2O mole fraction water vapor
+	        ->XH2 mole fraction hydrogen
+	        ->XHe mole fraction helium
+	Output:
+	        <-alpha: absorption coefficient in dB/km        
 	"""
         from numpy import power
         OpticaldepthstodB=434294.5
