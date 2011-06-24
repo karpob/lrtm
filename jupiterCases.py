@@ -1,7 +1,7 @@
 # Go crazy! run it a whole bunch of times!
 #
 from DeBoerTCM import DeBoerTCM
-from maintamone import maintamone
+from rtm.maintamone import maintamone
 from scipy.io import savemat
 import numpy
 import scipy.interpolate
@@ -136,7 +136,7 @@ SuperSatSelf_H2O=0
 supersatNH3=0 
 supersatH2S=0 
 AutoStep_constant=8 
-fp=666 
+fp=-1 #666 
 dz=1 
 XCO=0 
 use_dz=0 
@@ -222,8 +222,8 @@ for j in range(0,len(f)):
                                                                                 cassini_pattern,cassini_data_path) 
                                                                                 
     
-    Tbeam_nadir.append(Tbeam_limb_t)
-    zenith_nadir.append(zenith_limb_t)
+    Tbeam_limb.append(Tbeam_limb_t)
+    zenith_limb.append(zenith_limb_t)
     weighting_function_a_limb.append(weighting_function_a_limb_t)
     
     
@@ -242,10 +242,11 @@ zenith_nadir=numpy.asarray(zenith_nadir)
 weighting_function_a_nadir=numpy.asarray(weighting_function_a_nadir)
 refractive_index=numpy.asarray(refractive_index)
     
-Tbeam_nadir=numpy.asarray(Tbeam_nadir)
-zenith_nadir=numpy.asarray(zenith_nadir)
+Tbeam_limb=numpy.asarray(Tbeam_limb)
+zenith_limb=numpy.asarray(zenith_limb)
 weighting_function_a_limb=numpy.asarray(weighting_function_a_limb)
 
+a={}
 R=100.*(Tbeam_nadir-Tbeam_limb)/Tbeam_nadir 
 a['R']=R
 savemat(output_filename,{'a':a}) 

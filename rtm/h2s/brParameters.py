@@ -22,7 +22,7 @@ def brParameters(To,T,PH2,PHe,PH2S):
 	Tdiv=To/T
 
 
-	LineParameters=loadmat('h2s/h2sLineParameters/h2slin.mat')				# H2S line catalog
+	LineParameters=loadmat('rtm/h2s/h2sLineParameters/h2slin.mat')				# H2S line catalog
 	gH2=1.96
 	gHe=1.20
 	gH2S=LineParameters['gH2So']

@@ -13,16 +13,16 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
         """
 	import numpy
 	from scipy.io import loadmat
-	from ph3.lnwidth import lnwidth
-	from ph3.vvwlineshape import vvwlineshape
+	from lnwidth import lnwidth
+	from vvwlineshape import vvwlineshape
 	
 	if (PH2==0.):return numpy.array([0.0])
    	
-	Par=loadmat('ph3/ph3LineParameters/catalog.mat')
+	Par=loadmat('rtm/ph3/ph3LineParameters/catalog.mat')
 	catalog=Par['catalog']
-	Par2=loadmat('ph3/ph3LineParameters/a1.mat')
+	Par2=loadmat('rtm/ph3/ph3LineParameters/a1.mat')
 	a1=Par2['a1']
-	Par3=loadmat('ph3/ph3LineParameters/a2.mat')
+	Par3=loadmat('rtm/ph3/ph3LineParameters/a2.mat')
 	a2=Par3['a2']
 
 
