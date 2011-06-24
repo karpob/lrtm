@@ -20,7 +20,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	from scipy.io import loadmat
 	#import pupynere
 	#at some point convert database to netCDF..open format would be better.
-	LineParameters=loadmat('NH3/nh3LineParameters/nh3lincat190Latest.mat')
+	LineParameters=loadmat('rtm/nh3/nh3LineParameters/nh3lincat190Latest.mat')
 	Eo=LineParameters['Eo']
 	H2HeBroad=LineParameters['H2HeBroad']
 	Io=LineParameters['Io']

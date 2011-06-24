@@ -228,7 +228,7 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       if(Hydrogen_Curve_Fit_Select==666.0)
        {
          
-      	vals=get_P_from_python(layer[j].T,layer[j].XH2*layer[j].P,layer[j].XHe*layer[j].P,layer[j].XCH4*layer[j].P,layer[j].XH2O*layer[j].P);
+      	vals=get_P_from_python(layer[j].T,layer[j-1].XH2*layer[j].P,layer[j-1].XHe*layer[j].P,layer[j-1].XCH4*layer[j-1].P,layer[j-1].XH2O*layer[j].P);
         P_real=float(vals[0])+layer[j].XNH3*P+layer[j].XH2S*P;
         Cp_in=float(vals[1]);
         
