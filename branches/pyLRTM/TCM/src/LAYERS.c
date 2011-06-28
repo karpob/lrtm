@@ -224,21 +224,14 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
     /* Calculated Partial pressures of previous step*/
       
       dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Hydrogen_Curve_Fit_Select);
-      P_real=layer[j].P;
-      if(Hydrogen_Curve_Fit_Select==666.0)
-       {
-         
-      	vals=get_P_from_python(layer[j].T,layer[j-1].XH2*layer[j].P,layer[j-1].XHe*layer[j].P,layer[j-1].XCH4*layer[j-1].P,layer[j-1].XH2O*layer[j].P);
-        P_real=float(vals[0])+layer[j].XNH3*P+layer[j].XH2S*P;
-        Cp_in=float(vals[1]);
-        
-      	layer[j].P_real=P_real;
-       }
+      
+      
       
       /*dry adiabat*/
       
       P  = layer[j].P;
       T  = layer[j].T;
+      layer[j].first=0;
       PH2  = layer[j-1].XH2*P;
       PHe  = layer[j-1].XHe*P;
       PH2S = layer[j-1].XH2S*P;
@@ -253,10 +246,9 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       H = R*T/(layer[j-1].mu*layer[j-1].g); //Scale Height
       
       
-      if(Hydrogen_Curve_Fit_Select!=666.0)Cp_in=0;
-      //I think this means I use Ideal gas law for lapse rate...which I think is correct...looking for density      
-      P_real=layer[j].P;
-      alr = 1e5*dT/(dP*H/P_real);
+      //looking for density used Pideal      
+      
+      alr = 1e5*dT/(dP*H/layer[j].P);
       dry_adiabatic_lapse_rate=alr;
 
 
@@ -568,7 +560,11 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
                       layer[j].q_c_nh3=q_c_nh3;
                       layer[j].q_c=q_c;
 
-                  if(layer[j].first!=1) wet_adiabatic_lapse_rate=alr;
+                  if(layer[j-1].first!=1)
+                  { 
+                        wet_adiabatic_lapse_rate=alr;
+                        layer[j].first=1;
+                  }      
                   else
                     {
                       LX[3]  = LH2O*layer[j-1].q_c;
@@ -672,8 +668,18 @@ void new_layer(int j, float dz, int *eflag,float dP_init, float dP_fine, float P
       XH2O = layer[j].XH2O;
       XCH4 = layer[j].XCH4;
       XPH3 = layer[j].XPH3;
+      
       //calculated the abundance of H2 as the remainder of the other constituents.
       layer[j].XH2  = (1.0-XH2S-XNH3-XH2O-XCH4-XPH3-XHe-XCO);
+      if(Hydrogen_Curve_Fit_Select==666.0)
+       {
+         
+      	vals=get_P_from_python(layer[j].T,layer[j].XH2*layer[j].P,layer[j].XHe*layer[j].P,layer[j].XCH4*layer[j].P,layer[j].XH2O*layer[j].P);
+        P_real=float(vals[0])+layer[j].XNH3*P+layer[j].XH2S*P;
+        
+        
+      	layer[j].P_real=P_real;
+       }
       XH2  = layer[j].XH2;
       //Calculate the molecular weight (mu in Deboer's thesis chapter 3, not to be confused with cos(theta)) of the "Air"
       layer[j].mu = AMU_H2*XH2 + AMU_He*XHe + AMU_H2S*XH2S + AMU_NH3*XNH3 + AMU_H2O*XH2O + AMU_CH4*XCH4 + AMU_PH3*XPH3;
