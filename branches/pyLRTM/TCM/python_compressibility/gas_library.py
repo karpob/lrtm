@@ -293,7 +293,82 @@ def get_h2_ch4_mix(x_ch4,x_h2):
                    'Po':0,
                    'rho_o':0}
         return h2_ch4_mix_params
+
 def get_h2_h2o_mix(x_h2,x_h2o):
+        from numpy import asarray
+        from gas_library import get_h2_params
+        from gas_library import get_h2o_params
+        h2o_params=get_h2o_params()
+        h2_params=get_h2_params()
+        p=asarray( [ 3.93511381e-01,   5.91798638e-01,   2.17340160e+00,   6.58736091e-01,
+                     1.49527903e+00,   1.80554325e+00,   1.00000975e+00,
+                     2.15932933e+00,  1.70370289e+00,   9.99993200e-01,   1.71161665e+00,   
+                     2.33257272e-05, 1.06367793e+01,   1.35999949e+00,
+                     5.81075049e-01,   2.00846269e+01, 2.80172838e+00,   2.67567649e+00,   
+                     1.85430123e-04,   3.11521103e-01, 1.92272528e+00,   
+                     1.48352080e+00,  -2.27589359e-01,   1.97388639e+00, 1.40630453e+00,
+                     2.01963999e-02,   9.61708221e-01,   5.09904925e+00, 
+                     1.52479618e-01, 6.79051907e-01,   9.66836715e+00,   2.37141683e+00]  )
+        BetaT=abs(p[0])              
+        BetaV=abs(p[1])
+        GammaT=abs(p[2])         
+        GammaV=abs(p[3])
+        
+          
+        N_i=asarray([abs(p[4]),abs(p[11]),abs(p[18]),abs(p[25]),abs(p[7]),abs(p[14]),abs(p[21]),abs(p[28])])
+        tvals=[p[5],p[12],p[19],p[26],p[8],p[15],p[22],p[29]]
+        dvals=[p[6],p[13],p[20],p[27],p[9],p[16],p[23],p[30]]
+        t_i=asarray(tvals)
+        d_i=asarray(dvals)
+        p_i=asarray([0,0,0,0,p[10],p[17],p[24],p[31]])                                             
+       
+        
+        Rmix=x_h2o*h2o_params['R']+x_h2*h2_params['R']
+        M_amu=x_h2o*h2o_params['M_amu']+x_h2*h2_params['M_amu']                              
+        
+        n_power_terms_wo_exp=4
+        n_power_terms_w_exp=4
+
+        mix_params={'N_i':N_i,
+                   'BetaT':BetaT,
+                   'BetaV':BetaV,
+                   'GammaT':GammaT,
+                   'GammaV':GammaV,
+                   't_i':t_i,
+                   'd_i':d_i,
+                   'p_i':p_i,
+                   'n_power_terms_wo_exp':n_power_terms_wo_exp,
+                   'n_power_terms_w_exp':n_power_terms_w_exp,
+                   'phi_i':0,
+                   'Beta_i':0,
+                   'gamma_i':0,
+                   'D_i':0,
+                   'R':Rmix,
+                   'M_amu':M_amu,
+                   'ideal_n': 0,
+                   'ideal_gamma': 0,
+                   'n_gaussian_terms':0,
+                   'n_critical_terms':0,
+                   'RES_a':0,
+                   'RES_b':0,
+                   'RES_B':0,
+                   'RES_C':0,
+                   'RES_D':0,
+                   'RES_A':0,     
+                   'ni':0,
+                   'ti':0,
+                   'vi':0,
+                   'ui':0,
+                   'ho':0,
+                   'so':0,
+                   'n_ideal_gas_terms_pow':0,
+                   'n_ideal_gas_terms_exp':0,
+                   'To':0,
+                   'Po':0,
+                   'rho_o':0}
+        return mix_params        
+       
+def get_h2_h2o_mix_old(x_h2,x_h2o):
         from numpy import asarray
         from gas_library import get_h2_params
         from gas_library import get_h2o_params
