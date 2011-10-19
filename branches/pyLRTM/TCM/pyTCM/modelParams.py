@@ -23,3 +23,4 @@ COUNT_CLOUD=1e-3  #     /* count cloud opacity if greater than this number */
 MAXTRIES=100      #    /* Maximum number of iterations to fit deep temperature */
 TLIMIT=0.05       #  /* allowed % error in T */
 
+CONVT=1.0E-06     #     /*Convert dynes/cm^2 to bars*/

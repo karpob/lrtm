@@ -1,6 +1,6 @@
 
 
-def specific_heat(j, T, P,Hydrogen_Curve_Fit_Select):
+def specific_heat(j, T, P,Hydrogen_Curve_Fit_Select,layer):
         """
 
         specific_heat() this function calculates the specific heat for a 
@@ -18,6 +18,7 @@ def specific_heat(j, T, P,Hydrogen_Curve_Fit_Select):
 
 
         """
+        from modelParams import R
         from python_compressibility.calc_Cp.getCp import getCp
         #      fit for equilibrium   
       	if (T<120.0 and Hydrogen_Curve_Fit_Select==0.0):

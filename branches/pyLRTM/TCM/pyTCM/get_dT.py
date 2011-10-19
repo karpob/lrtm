@@ -17,21 +17,24 @@ def get_dT( j,  T,  P,  dP, LX, L2X, Hydrogen_Curve_Fit_Select,layer,others):
         from numpy import asarray,nonzero
         from modelParams import R
         from specific_heat import specific_heat
+        from numpy import interp,asarray
+        
+        
         
         PfL=others['PfL']
         TfL=others['TfL']
-        if (P<=max(PfL)):   #/*linear interpolation from Lindal's points*/
-                arrPfL=asarray(PfL)
-                arrTfL=asarray(TfL)
-                idx,=nonzero(PfL==P)
-                dT=layer['T'][j-1]-float(arrTfL[idx])
-                layer['T'][j]=layer['T'][j-1]+dT       
+        if (P<max(PfL)):   #/*linear interpolation from Lindal's points*/
+                 idx,=nonzero(P==asarray(PfL))
+                 TfLarr=asarray(TfL)
+                 #print j,TfL,PfL,idx
+                 layer['T'][j]=float(TfLarr[idx])
+                 dT=layer['T'][j]-layer['T'][j-1]       
         else:
-                Cp = specific_heat(j, T, P,Hydrogen_Curve_Fit_Select)
+                Cp = specific_heat(j, T, P,Hydrogen_Curve_Fit_Select,layer)
 	        dT_num = (R*T + LX[0]+LX[1]+LX[2]+LX[3]+LX[4]+LX[5])*dP
                 dT_den = P*(Cp + L2X[0]+L2X[1]+L2X[2]+L2X[3]+L2X[4]+L2X[5])
                 dT = dT_num/dT_den                                         #eqn 3.19 in DeBoer's thesis
-                layer[T][j] = layer['T'][j-1] + dT
+                layer['T'][j]=layer['T'][j-1] + dT
         return dT,layer
 
 
