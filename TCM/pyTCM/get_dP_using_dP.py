@@ -48,9 +48,12 @@ def get_dP_using_dP(j,eflag, inputParams,layer,others):
         elif(eflag==97):
                 arrPfL=asarray(PfL)
                 idx,=nonzero(arrPfL==layer['P'][j-1])
-                dP=float(arrPfL[idx+1])-layer['P'][j-1]
-                P=layer['P'][j-1]+dP
-                print j,eflag,P,dP,arrPfL[idx],idx,layer['P'][j-1]
+                P=float(arrPfL[idx+1])
+                dP=float(arrPfL[idx+1]-layer['P'][j-1])
+                #dP=float(arrPfL[idx])-layer['P'][j-1]
+                #P=layer['P'][j-1]+dP
+                
+                #print j,eflag,P,dP,arrPfL[idx],idx,layer['P'][j-1]
                                         
         if(P <= P_term):
                 eflag = 99
@@ -58,12 +61,10 @@ def get_dP_using_dP(j,eflag, inputParams,layer,others):
                 dP=P - layer['P'][j-1]
         
         dz= -1.0*dP/((layer['P'][j-1]/H)*(1e5))
+        #print 'P',P_term
         layer['P'].append(P)
         layer['z'].append(layer['z'][j-1] + dz)
-        #remove the following lines!
         
-        layer['mu'].append(layer['mu'][j-1])
-        layer['g'].append(layer['g'][j-1])
         return eflag,dP,layer
 
 

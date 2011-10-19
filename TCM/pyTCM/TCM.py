@@ -38,7 +38,7 @@ def runTCM(inputPar):
         from LAYERS import new_layer       
         eflag=0 	  
         layer,others = init_atm(inputPar)
-	 
+	import pylab 
 
         #while error in temperature is greater than Tlimit, or if you've gone on long enough
         #  without converging on a solution ...  
@@ -66,13 +66,19 @@ def runTCM(inputPar):
                                 """
                                 REPLACE FOLLOWING LINE
                                 """          
-                                T = T_targ#layer[j].T                    #  99      <=P_term  
+                                T = layer['T'][j]                    #  99      <=P_term  
                                 T_err = 100.*(T - T_targ)/T_targ  #  98      <=P_targ  
                                 print "Terr %f %f %d \n"%(T_err,TLIMIT,j)
 			        if (abs(T_err)>TLIMIT):
-                        
-                                        layer['T'][0] = layer['T'][0] - (T - T_targ)*2.0;
-                                        P = layer['P'][0];
+			                for key in layer.keys():
+			                        try:print len(layer[key]),key
+			                        except:pass
+                                        
+                                        inputPar['T_temp'] = layer['T'][0] - (T - T_targ)*2.0;
+                                        inputPar['P_temp'] = layer['P'][0];
+                                        print inputPar['T_temp'],inputPar['P_temp']
+                                        layer,others = init_atm(inputPar)
+                                        j=0
                                         eflag = 99;
                                         
 		        j+=1			
