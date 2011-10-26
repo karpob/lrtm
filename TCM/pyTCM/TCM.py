@@ -43,9 +43,9 @@ def runTCM(inputPar):
         #while error in temperature is greater than Tlimit, or if you've gone on long enough
         #  without converging on a solution ...  
         T_err=100.
-        TLIMIT=0.05
+        TLIMIT=0.0001
         MAXTRIES=100
-        MAXLAYERS=10000
+        MAXLAYERS=1e6
         T_targ=max(others['TfL'])
         jcntr=0
         while (abs(T_err) > TLIMIT and jcntr < MAXTRIES):
@@ -92,38 +92,4 @@ def runTCM(inputPar):
         return layer,others		  
 
 
-"""
-/*********************************************************
-Helper function to grab values out of the TCM one by one.
-It seems SWIG will only allow passing via this method?
-Worth revisiting if we can pass a pointer or something...
-**********************************************************/
-double getFloatValues(int i,int j)
-{
 
-		if(i==0) return layer[j].P;
-		if(i==1) return layer[j].T;
-		if(i==2)return layer[j].z-z_offset;
-		if(i==3) return layer[j].XH2;
-		if(i==4) return layer[j].XHe;
-		if(i==5) return layer[j].XH2S;
-		if(i==6) return layer[j].XNH3;
-		if(i==7)return layer[j].XH2O;
-		if(i==8)return layer[j].XCH4;
-		if(i==9)return layer[j].XPH3;
-		if(i==10)return layer[j].DNH4SH;
-		if(i==11)return layer[j].DH2S;
-		if(i==12)return layer[j].DNH3;
-		if(i==13)return layer[j].DH2O;
-		if(i==14)return layer[j].DCH4;
-		if(i==15)return layer[j].DPH3;
-		if(i==16)return layer[j].DSOL;
-		if(i==17)return layer[j].g;
-		if(i==18)return layer[j].mu;
-		if(i==19)return layer[j].DSOL_NH3;
-		if(i==20)return layer[j].P_real;
-                
-		printf("exceed i dimension");
-		return 0;
-}
-"""

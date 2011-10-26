@@ -58,7 +58,14 @@ def init_atm(inputPars):
         layer['DNH4SH'] = [ZERO,]
         layer['DSOL'] = [ZERO,]
         layer['DSOL_NH3']=[ZERO,]
+        layer['C_sol']=[0.0,]
         layer['z'] = [0.0,]
+        layer['first_nh3_ice']=0
+        layer['first_sol_cloud']=0
+        layer['q_c_nh3']=[0.0,]
+        layer['q_c']=[0.0,]
+        layer['q_c_nh3_ice']=[0.0,]
+        layer['sol_cloud']=True
         #*****************************************************#
         #******* Fix deep Temperature and Pressure ********#
         layer['T']=[IN['T_temp'],]
@@ -157,7 +164,9 @@ def init_atm(inputPars):
         f.close() 
         if(inputPars['fp']==666.0):
                 P_real=getPreal(layer['T'][0],layer['P'][0]*layer['XH2'][0],layer['P'][0]*layer['XHe'][0],layer['P'][0]*layer['XCH4'][0],layer['P'][0]*layer['XH2O'][0])
-                layer['P_real']=[P_real,]               
+        else:
+                P_real=0.0        
+        layer['P_real']=[P_real,]               
         others={}
         others['P_targ']=P_targ
         others['T_targ']=T_targ
@@ -224,13 +233,17 @@ def new_layer(j,
         from python_compressibility.calc_Cp.getPreal import getPreal
         from python_compressibility.calc_Cp.getCp import getCp
         from modelParams import R,AMU_H2,AMU_He,AMU_H2S,AMU_NH3,AMU_H2O ,AMU_CH4,AMU_PH3,AMU_NH4SH,TRIPLEPT_H2S,TRIPLEPT_NH3,TRIPLEPT_CH4,TRIPLEPT_PH3,TRIPLEPT_H2O,GONE,ZERO       
-        sol_cloud=True
+        from cloud_loss_ackerman_marley import cloud_loss_ackerman_marley
+        #h2s cloud dissolve doesn't do anything yet...
+        #from h2s_dissolve import h2s_dissolve
+        
         LX=zeros([6])
         L2X=zeros([6])
         supersatNH3=others['supersatNH3']
         supersatH2S=others['supersatH2S']
         SuperSatSelf=others['SuperSatSelf']
         select_ackerman=others['select_ackerman']
+        frain=inputParams['frain']
         CNH4SH=False
         CH2S=False
         CNH3=False
@@ -251,6 +264,10 @@ def new_layer(j,
       
         # Calculated Partial pressures of previous step
         layer['T'].append(0.0)
+        layer['q_c_nh3'].append(0.0)
+        layer['q_c'].append(0.0)
+        layer['q_c_nh3_ice'].append(0.0)
+        layer['C_sol'].append(0.0)                        
         #layer['mu'].append(0.0)
         #layer['g'].append(0.0)
         dT,layer = get_dT(j,layer['T'][j-1],layer['P'][j],dP,LX,L2X,inputParams['fp'],layer,others);
@@ -302,9 +319,10 @@ def new_layer(j,
 
         #/********************** If the user selects the solution cloud***********************************
 
-        if (sol_cloud):
+        if (layer['sol_cloud']):
       
                 C_sol_NH3,SPH2O,SPNH3 = solution_cloud(T,PNH3,PH2O,others);
+                layer['C_sol'][j]=C_sol_NH3
                 # /*This from Briggs and Sackett (from Cook--see also D-230 of CRC)*/
                 if (C_sol_NH3 == -1.0):
                           freeze = 273.1;
@@ -312,7 +330,7 @@ def new_layer(j,
                           freeze = 273.1 - 124.167*C_sol_NH3 - 189.963*SQ(C_sol_NH3) + 2084.370*CU(C_sol_NH3);
 
                 if (T < freeze):
-                        sol_cloud = 0;  #/*Water starts to freeze*/
+                        layer['sol_cloud'] = False;  #/*Water starts to freeze*/
             
                 elif (C_sol_NH3 == -1.0):
                         C_sol_zero=0;
@@ -325,8 +343,9 @@ def new_layer(j,
                   
                                 CNH3 = 1;
                                #/* Comment out if don't want H2S in solution cloud */
-                               #C_sol_H2S = h2s_dissolve(j,&SPH2S);
-                                if (C_sol_H2S != 0.0):CH2S=1
+                               #doesn't do anything...yet.
+                                #C_sol_H2S,SPH2S = h2s_dissolve(j,layer);
+                                if (C_sol_H2S != 0.0):CH2S=True
                         
                   
                         LH2O = C_sol_NH3*(4949.75+2022.11*(SQ(C_sol_NH3)-2.0*C_sol_NH3));
@@ -341,7 +360,7 @@ def new_layer(j,
 #/*       If the user specifies no solution cloud, or the value for the solution cloud is zero.
 #          Calculate the saturation vapor pressures for each type of cloud that could form 
 #***************************************************************************************************/ 
-        if( not sol_cloud or C_sol_zero==1):
+        if( not layer['sol_cloud'] or C_sol_zero==1):
       
                 #layer['DSOL'].append(ZERO)
 
@@ -472,7 +491,7 @@ def new_layer(j,
         if(CH2S):
       
                 layer['XH2S'][j]=SPH2S/P
-                if (sol_cloud):
+                if (layer['sol_cloud']):
             
                         dXH2S = layer['XH2S'][j] - layer['XH2S'][j-1];
                         layer['DH2S'].append(ZERO)
@@ -504,7 +523,7 @@ def new_layer(j,
         if(CNH3):
       
                 layer['XNH3'][j]=SPNH3/P;
-                if (sol_cloud):
+                if (layer['sol_cloud']):
             
                         dXNH3 = layer['XNH3'][j] - layer['XNH3'][j-1];
                         layer['DNH3'].append(ZERO)
@@ -514,16 +533,16 @@ def new_layer(j,
             
                         dXNH3 =(LNH3*layer['XNH3'][j-1])*dT/(R*T*T) - layer['XNH3'][j-1]*dP/P
                         if(select_ackerman==2 or select_ackerman==3):
-                                print "Error not implemented yet!"
-                                #dXNH3= -dXNH3;
-                                #Teff=124; #//in Kelvin
-                                #q_c_nh3_ice=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
-                                #                layer[j-1].z, layer[j-1].q_c_nh3_ice,layer[j].XNH3,layer[j-1].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
-                                #                XCH4, XPH3, dXNH3, frain,Hydrogen_Curve_Fit_Select);
-                                #layer[j].DNH3 = 1e6*AMU_NH3*P*P*q_c_nh3_ice/(R*T*-dP);
-                                #layer[j].q_c_nh3_ice=q_c_nh3_ice;
-                                #layer[j].XNH3 = (double) SPNH3/(double) P + ((double)SPNH3*(double)SuperSatSelf[1])/(double)P;
-                                #layer[j].first_nh3=1;
+                                
+                                dXNH3= -dXNH3;
+                                Teff=124; #//in Kelvin
+                                q_c_nh3_ice=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer['z'][j], \
+                                                layer['z'][j-1], layer['q_c_nh3_ice'][j-1],layer['XNH3'][j],layer['XNH3'][j-1], layer['XH2'][j-1], layer['XHe'][j-1], layer['XH2S'][j-1], layer['XNH3'][j-1], layer['XH2O'][j-1],\
+                                                layer['XCH4'][j-1], layer['XPH3'][j-1], dXNH3, frain,inputParams['fp'],layer,layer['first_nh3_ice']);
+                                layer[j].DNH3 = 1e6*AMU_NH3*P*P*q_c_nh3_ice/(R*T*dP);
+                                layer['q_c_nh3_ice'][j]=q_c_nh3_ice;
+                                layer['XNH3'][j] =  SPNH3/ P + (SPNH3*SuperSatSelf[1])/P;
+                                layer['first_nh3_ice']=1
                   
                         else:
                   
@@ -553,51 +572,51 @@ def new_layer(j,
         if(CH2O):
       
                 layer['XH2O'][j]= SPH2O/ P;
-                if (sol_cloud):
+                if (layer['sol_cloud']):
             
                         dXH2O = layer['XH2O'][j] - layer['XH2O'][j-1]
                   #//Insert Ackerman & Marley Procedure Here
                   
                         if(select_ackerman==1 or select_ackerman==3): #If frain is applied to solution cloud, or both solution cloud and ammonia ice
                   
-                                print "error sed not implemented!"
-                                """                  
-                                #Teff=124; #//Kelvin
+                                
+                                                
+                                Teff=124; #//Kelvin
                                         
-                                #q_c=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
-                                #                        layer[j-1].z, layer[j-1].q_c,layer[j].XH2O,layer[j-1].XH2O, XH2, XHe, XH2S, XNH3, XH2O,\
-                                #                        XCH4, XPH3, (-1)*dXH2O*(1-C_sol_NH3), frain,Hydrogen_Curve_Fit_Select);
+                                q_c=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer['z'][j], \
+                                                        layer['z'][j-1], layer['q_c'][j-1],layer['XH2O'][j],layer['XH2O'][j-1], layer['XH2'][j-1], layer['XHe'][j-1], layer['XH2S'][j-1], layer['XNH3'][j-1], layer['XH2O'][j-1],\
+                                                        layer['XCH4'][j-1], layer['XPH3'][j-1], dXH2O*(1.-C_sol_NH3), frain,inputParams['fp'],layer,layer['first_sol_cloud']);
                       
-                                #q_c_nh3=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer[j].z, \
-                                #                        layer[j-1].z, layer[j-1].q_c_nh3,layer[j].XNH3,layer[j-1].XNH3, XH2, XHe, XH2S, XNH3, XH2O,\
-                                #                        XCH4, XPH3,(-1)*dXNH3*C_sol_NH3, frain,Hydrogen_Curve_Fit_Select);
+                                q_c_nh3=cloud_loss_ackerman_marley(j,Teff, T, P,H, wet_adiabatic_lapse_rate, dry_adiabatic_lapse_rate,layer['z'][j], \
+                                                        layer['z'][j-1], layer['q_c_nh3'][j-1],layer['XNH3'][j],layer['XNH3'][j-1], layer['XH2'][j-1], layer['XHe'][j-1], layer['XH2S'][j-1], layer['XNH3'][j-1], layer['XH2O'][j-1],\
+                                                        layer['XCH4'][j-1], layer['XPH3'][j-1],dXNH3*C_sol_NH3, frain,inputParams['fp'],layer,layer['first_sol_cloud']);
                       
-                                #layer[j].DSOL =1e6*((q_c*AMU_H2O+q_c_nh3)*P*P)/(R*T*-dP); //Calulate cloud density g/cm^3 of solution cloud
-                                #layer[j].DSOL_NH3=1e6*(q_c_nh3*AMU_NH3*P*P)/(R*T*-dP);  // Calculate cloud density g/cm^3 of solution cloud that is actually NH3
+                                layer['DSOL'].append(1e6*((q_c*AMU_H2O+q_c_nh3*AMU_NH3)*P*P)/(R*T*dP)); #//Calulate cloud density g/cm^3 of solution cloud
+                                layer['DSOL_NH3'].append(1e6*(q_c_nh3*AMU_NH3*P*P)/(R*T*dP));  #// Calculate cloud density g/cm^3 of solution cloud that is actually NH3
                       
-                                #layer[j].q_c_nh3=q_c_nh3;
-                                #layer[j].q_c=q_c;
+                                layer['q_c_nh3'][j]=q_c_nh3;
+                                layer['q_c'][j]=q_c;
 
-                                if(layer['first']!=False):
+                                if(layer['first_sol_cloud']!=1):
                    
                                         wet_adiabatic_lapse_rate=alr;
-                                        layer['first']=True
+                                        #layer['first']=1
                         
                                 else:
                     
-                                        LX[3]  = LH2O*layer[j-1].q_c;
-                                        L2X[3] = LX[3]*LH2O/(R*T*T);
-                                        dT = get_dT(j,layer[j-1].T,layer[j].P,dP,LX,L2X,hereonout,Hydrogen_Curve_Fit_Select);
-                                        T = layer[j].T;
-                                        H = R*T/(layer[j-1].mu*layer[j-1].g);
-                                        alr = 1e5*dT/(dP*H/P);
-                                        wet_adiabatic_lapse_rate=alr;
+                                        LX[3]  = LH2O*layer['q_c'][j-1]
+                                        L2X[3] = LX[3]*LH2O/(R*T*T)
+                                        dT = dT,layer = get_dT(j,layer['T'][j-1],layer['P'][j],dP,LX,L2X,inputParams['fp'],layer,others)
+                                        T = layer['T'][j]
+                                        H = R*T/(layer['mu'][j-1]*layer['g'][j-1])
+                                        alr = 1e5*dT/(dP*H/P)
+                                        wet_adiabatic_lapse_rate=alr
                                         
                     
                                 layer['XH2O'][j] = SPH2O/ P + (SuperSatSelf[3]*SPH2O)/P; #//adding supersaturation of water as a fraction of saturation
-                   
-                                layer['first']=True #//Set the first flag to indicate that this is NOT the first level we've seen a solution cloud.
-                                """
+                                layer['XNH3'][j]=  SPNH3/ P + (SuperSatSelf[2]*SPH2O)/P;
+                                layer['first_sol_cloud']=1 #//Set the first flag to indicate that this is NOT the first level we've seen a solution cloud.
+                                
                   
                         else:
                    
@@ -613,7 +632,7 @@ def new_layer(j,
             
                 else:
             
-                        dXH2O = (LH2O*layer['XH2O'][j-1])*dT/(R*T*T) - layer['XH2O'][j-1]*dP/P;
+                        dXH2O = (LH2O*layer['XH2O'][j-1])*dT/(R*T*T) - layer['XH2O'][j-1]*dP/P
                         layer['DH2O'].append(1e6*AMU_H2O*P*P*dXH2O/(R*T*dP))   #//NOTE!!!! no supersaturation included for ice cloud, if you want it, add it with caution
                         layer['XH2O'][j]=SPH2O/ P         #//     (ie. I wouldn't recommend sticking the same value for solution cloud here
                         layer['DSOL'].append(ZERO)
@@ -624,7 +643,7 @@ def new_layer(j,
       
         else:    #//If there isn't a water condensate...Don't Make one via numerical error! Keep mole fraction for next level.
                 dXH2O = 0.0;
-                layer['XH2O'][j]=layer['XH2O'][j-1];
+                layer['XH2O'][j]=layer['XH2O'][j-1]
                 layer['DH2O'].append(ZERO);
                 layer['DSOL_NH3'].append(ZERO)
                 layer['DSOL'].append(ZERO)
@@ -694,7 +713,9 @@ def new_layer(j,
         if(inputParams['fp']==666.0):
                 P_real= getPreal(layer['T'][j],layer['P'][j]*XH2,layer['P'][j]*XHe,layer['P'][j]*XCH4,layer['P'][j]*XH2O)
                 P_real=P_real+layer['XNH3'][j]*P+layer['XH2S'][j]*P
-                layer['P_real'].append(P_real)
+        else:
+                P_real=layer['P'][j]        
+        layer['P_real'].append(P_real)
       
         
         
