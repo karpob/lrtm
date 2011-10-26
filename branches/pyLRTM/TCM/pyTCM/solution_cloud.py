@@ -52,7 +52,7 @@ def PPRES(C1, T1,S1,S2,S3,S4,S5,S6,S7,S8,S9,S10,S11,S12,S13,S14,S15):
                 X = (C1 - 0.9500)/0.0500;
                 P0H = X*P0H;
                 VPH -= P0H;
-      
+        
         return VPH,VPN
 
 def SQ(C):
@@ -134,7 +134,7 @@ def solution_cloud(TC, PNH3, PH2O,others):#, float *SPNH3, float *SPH2O):
         C_sol=LOWER_CONC
         have_cloud=False
         #for (C_sol=LOWER_CONC; *SPNH3<PNH3C && C_sol<UPPER_CONC; C_sol+=CONC_STEP):
-        while(C_sol<UPPER_CONC and SPNH3<PNH3C):        
+        while(C_sol<UPPER_CONC):        
                 PNH3C = PNH3*(1.0-C_sol);
                 if (ROMANI):#/*  Romani version  */
                         S1=ammoniaA(C_sol)
@@ -164,10 +164,10 @@ def solution_cloud(TC, PNH3, PH2O,others):#, float *SPNH3, float *SPH2O):
 
                 if (PH2O > SPH2O and PNH3C > SPNH3): #  We have a solution cloud 
                           have_cloud = True              #   but what C?           
-                if (have_cloud  and  PNH3C < SPNH3):                
-                        SPNH3 = PNH3C;
-		        #SPH2S = h2s_sol_cloud(TC, C_sol,PH2S);  #/*DON'T Ignore H2S in cloud */
-                        return C_sol,SPH2O,SPNH3
+                if (have_cloud  and  PNH3C < SPNH3):
+                        print 'T,Csol,SPNH3,SPH2O',TC,C_sol,SPNH3,SPH2O                
+                        SPNH3 = PNH3C
+		        return C_sol,SPH2O,SPNH3
                     
                 C_sol+=CONC_STEP      
         return -1.0,SPH2O,SPNH3

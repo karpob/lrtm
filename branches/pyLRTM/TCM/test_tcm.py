@@ -12,7 +12,7 @@ for mat in filez:
 	IN['XHe']=float(MatlabRuns['XHe'][:,case-1])
 	tcmeI=MatlabRuns['tcme'][:]
 	idx=numpy.nonzero(tcmeI[:,0]==1.0)
-	IN['T_targ_i']=165.#float(tcmeI[idx,1])
+	IN['T_targ']=165.#float(tcmeI[idx,1])
 	
 	IN['XH2S'] =float(MatlabRuns['XH2S'][:,case-1])
 	IN['XNH3'] =float(MatlabRuns['XNH3'][:,case-1])
@@ -27,7 +27,7 @@ for mat in filez:
 	IN['R0'] =float(MatlabRuns['R0e_i'][:])
 	IN['P0'] =float(MatlabRuns['P0_i'][:])
         IN['P_targ'] =float(MatlabRuns['P_targ_i'][:])
-	IN['P_term'] =float(MatlabRuns['P_term_i'][:])
+	IN['P_term'] =0.001#float(MatlabRuns['P_term_i'][:])
 	IN['use_lindal']='Y'
 	
 	IN['SuperSatSelf1']=0.0
@@ -38,22 +38,30 @@ for mat in filez:
 	IN['supersatH2S']=0.0
 	IN['AutoStep']=False
 	IN['AutoStep_constant']=int(MatlabRuns['AutoStep_constant'][:])
-	IN['fp']=666.#MatlabRuns['fp']
+	IN['fp']=666.0#MatlabRuns['fp']
 	IN['dP_init'] =float(MatlabRuns['dP_init'][:])
 	IN['dP_fine'] =float(MatlabRuns['dP_fine'][:])
 	IN['P_fine_start']=float(MatlabRuns['P_fine_start'][:])
 	IN['P_fine_stop']=float(MatlabRuns['P_fine_stop'][:])
 	IN['use_dz'] =False#MatlabRuns['use_dz'][:]
-	IN['frain'] =float(MatlabRuns['frain'][:])
-	IN['select_ackerman']=0#MatlabRuns['select_ackerman']
+	IN['frain'] =3.#float(MatlabRuns['frain'][:])
+	IN['select_ackerman']=1#MatlabRuns['select_ackerman']
 	Profiles=[]
 	#data=MatlabRuns['Data'][:]
 
-	
+	layerKeys=['P','T','z','XH2','XHe','XH2S','XNH3','XH2O','XCH4','XPH3','DNH4SH','DH2S','DNH3','DH2O','DCH4','DPH3','DSOL','g','mu','DSOL_NH3','P_real','C_sol']
 
 	layers,others=runTCM(IN)
-	for item in layers['P']:
-	        print item
+	for key in layerKeys:
+	        pylab.figure()
+	        print key,len(layers[key])
+	        pylab.plot(layers[key])
+	        pylab.xlabel(key)
+	        if(key=='T'):
+	                for item in layers[key]:
+	                        print item
+	pylab.show()        
+	                
 	        
 	#print 'll\n',layers
 	#print 'oo\n',others
