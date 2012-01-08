@@ -78,4 +78,4 @@ def getPreal(T_i,P_h2_i,P_he_i,P_ch4_i,P_h2o_i):
 	#CP_mix=C_p_vector_mix4(density,T,delta,tau,parameters_H2,parameters_ch4,parameters_he,parameters_h2o,h2_ch4_mix_params,h2_h2o_mix_params,x_h2,x_ch4,x_he,x_h2o)
 	Pcalc=Pcalc/Bars_to_kPa
 
-        return float(P_calc)
+        return float(Pcalc[0])
