@@ -1,6 +1,6 @@
 
 MAXLAYERS=5000
-R=8.3143E7    #/* Universal gas constant [erg/K/mol] */
+R=8.3144621E7    #/* Universal gas constant [erg/K/mol] */
 AMU=1.66056E-24 #/* Atomic Mass Unit in grams */
 AMU_H2=2.01594  #   /*updated karpowicz*/
 AMU_He=4.0026   #   /*updated bk*/  /* constituent masses [amu] */
