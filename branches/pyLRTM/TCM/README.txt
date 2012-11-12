@@ -23,6 +23,10 @@ TP.pdf
 Code which is used by jupiterCasesTCMonly.py includes functions in the pyTCM 
 directory, python_compressibility direcotry, along with DeBoerTCM.py. 
 
+The source code used to compute $c_p$, and $P$ can be obtained using 
+python_compressibility/calc_Cp/getCp.py, and python\_compressibility/calc_Cp/getPreal.py.
+
+
 All other directories are legacy code from the original C implementation
 of DeBoer, 1995's C TCM model.
   
