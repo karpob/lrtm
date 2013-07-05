@@ -15,7 +15,7 @@ def rayleigh_absorption(f,Cloud_Bulk_Density,Material_Density,Complex_Dielectric
 	ep=numpy.real(Complex_Dielectric_Constant)
 	f_in_Hz=f*1.e9
 	lambdaz_m=c/f_in_Hz #Need to convert this to centimeters to get absorption coefficient in cm^-1
-	lambdaz=lambdaz_m*100 # Convert to centimeters
+	lambdaz=lambdaz_m*100. # Convert to centimeters
 	alpha=((18.*numpy.pi)/lambdaz)*(Cloud_Bulk_Density/Material_Density)*(epp/(((ep+2.)**2)+epp**2))
 
 	return alpha
