@@ -7,7 +7,7 @@ import numpy
 import scipy.interpolate
 olderr = numpy.seterr(all='ignore')
 oblateness_factor=0.935 
-
+#test rev
 #oblateness_factor=1 
 #####################################################
 #Planet verticies                                   #
