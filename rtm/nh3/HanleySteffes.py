@@ -16,11 +16,15 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	        Opacity (alphanh3) is returned as a vector matching f
 	        in dB/km.
 	"""
-	import numpy
+	import numpy,os
 	from scipy.io import loadmat
+	
 	#import pupynere
 	#at some point convert database to netCDF..open format would be better.
-	LineParameters=loadmat('rtm/nh3/nh3LineParameters/nh3lincat190Latest.mat')
+	p2h=os.path.abspath(__file__)
+	p2h=os.path.split(p2h)[0]
+	
+	LineParameters=loadmat(os.path.join(p2h,'nh3LineParameters','nh3lincat190Latest.mat'))
 	Eo=LineParameters['Eo']
 	H2HeBroad=LineParameters['H2HeBroad']
 	Io=LineParameters['Io']

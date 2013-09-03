@@ -35,8 +35,14 @@ def init_atm(inputPars):
         /****************************************************************************************************/
         """
         from numpy import zeros
+        import sys,os
         from gravity import gravity
-        from python_compressibility.calc_Cp.getPreal import getPreal
+        p2h=os.path.abspath(__file__)
+        p2h=os.path.split(p2h)[0]
+        p2h=os.path.split(p2h)[0]
+        print os.path.join(p2h,'python_compressibility')
+        sys.path.append(os.path.join(p2h,'python_compressibility'))
+        from calc_Cp.getPreal import getPreal
         from modelParams import AMU_H2,AMU_NH3,AMU_H2O,AMU_He,AMU_H2S,AMU_CH4,AMU_PH3
         IN=inputPars
         layer={}
@@ -223,6 +229,7 @@ def new_layer(j,
         //              <-- values in layer data structure (see model.h)
         /*******************************************************************************/
         """
+        import os,sys
         from numpy import zeros
         from get_dP_using_dP import get_dP_using_dP
         from get_dT import get_dT
@@ -230,8 +237,15 @@ def new_layer(j,
         from solution_cloud import solution_cloud
         from gravity import gravity
         from numpy import sqrt
-        from python_compressibility.calc_Cp.getPreal import getPreal
-        from python_compressibility.calc_Cp.getCp import getCp
+        p2h=os.path.abspath(__file__)
+        p2h=os.path.split(p2h)[0]
+        p2h=os.path.split(p2h)[0]
+        
+        sys.path.append(os.path.join(p2h,'python_compressibility'))
+        from calc_Cp.getPreal import getPreal
+        #from python_compressibility.calc_Cp.getPreal import getPreal
+        #from python_compressibility.calc_Cp.getCp import getCp
+        from calc_Cp.getCp import getCp
         from modelParams import R,AMU_H2,AMU_He,AMU_H2S,AMU_NH3,AMU_H2O ,AMU_CH4,AMU_PH3,AMU_NH4SH,TRIPLEPT_H2S,TRIPLEPT_NH3,TRIPLEPT_CH4,TRIPLEPT_PH3,TRIPLEPT_H2O,GONE,ZERO       
         from cloud_loss_ackerman_marley import cloud_loss_ackerman_marley
         #h2s cloud dissolve doesn't do anything yet...

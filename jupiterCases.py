@@ -1,13 +1,14 @@
 # Go crazy! run it a whole bunch of times!
 #
-from DeBoerTCM import DeBoerTCM
+from TCM.DeBoerTCM import DeBoerTCM
 from rtm.maintamone import maintamone
 from scipy.io import savemat
 import numpy
 import scipy.interpolate
 olderr = numpy.seterr(all='ignore')
+#olderr = numpy.seterr(all='ignore')
 oblateness_factor=0.935 
-#test rev
+
 #oblateness_factor=1 
 #####################################################
 #Planet verticies                                   #
@@ -64,7 +65,7 @@ cassini_data_path='none'
 f=numpy.r_[numpy.arange(0.6,1,0.1),numpy.arange(1.5,9.5,0.5),numpy.arange(10.,22.,2.),23] 
  
 nfreq=len(f)
-Selected_Model='Depleted_Water'
+Selected_Model='Mean_Lindal'
 
 Model_Names=['Mean_Lindal','Mean_Seiff','Depleted_Ammonia', 'Enhanced_Ammonia',
              'Depleted_Water','Enhanced_Water','Hot_Spot']
@@ -116,37 +117,38 @@ for i in range(0,len(XNH3_rel_H2)):
 
 #Misc DeBoer TCM inputs
 #Guess for deep P,T to match 1 bar level.
-P_temp=1000. 
-#T_temp=1.555678710937500e+03 
-T_temp=1583.782470703125 
-#P_temp=6000 
-#T_temp=2200 
-
-g0_i=2330  #2417 
-R0e_i=ao 
-P0_i=1 
-T_targ_i=166 
-P_targ_i=1 
-P_term_i=0.141 
-use_lindal='Y' 
-SuperSatSelf_H2S=0 
-SuperSatSelf_NH3=0 
-SuperSatSelf_PH3=0 
-SuperSatSelf_H2O=0 
-supersatNH3=0 
-supersatH2S=0 
-AutoStep_constant=8 
-fp=-1 #666 
-dz=1 
-XCO=0 
-use_dz=0 
-dP_init=10 
-dP_fine=0.25 
-P_fine_start=13 
-P_fine_stop=1 
-frain=3 
-select_ackerman=0 
-
+inputPar={}
+inputPar['P_temp']=1000.  
+inputPar['T_temp']=1583.782470703125 
+inputPar['g0']=2330.  #2417 
+inputPar['R0']=ao 
+inputPar['P0']=1.0 
+inputPar['T_targ']=165. 
+inputPar['P_targ']=1. 
+inputPar['P_term']=0.001 
+inputPar['use_lindal']='Y' 
+inputPar['SuperSatSelf_H2S']=0 
+inputPar['SuperSatSelf_NH3']=0 
+inputPar['SuperSatSelf_PH3']=0 
+inputPar['SuperSatSelf_H2O']=0
+inputPar['SuperSatSelf1']=0.0
+inputPar['SuperSatSelf2']=0.0
+inputPar['SuperSatSelf3']=0.0
+inputPar['SuperSatSelf4']=0.0 
+inputPar['supersatNH3']=0 
+inputPar['supersatH2S']=0 
+inputPar['AutoStep']=False
+inputPar['AutoStep_constant']=8 
+inputPar['fp']=0.25 
+inputPar['dz']=1 
+inputPar['use_dz']=False 
+inputPar['dP_init']=0.05 
+inputPar['dP_fine']=0.05 
+inputPar['P_fine_start']=13 
+inputPar['P_fine_stop']=1 
+inputPar['frain']=3. 
+inputPar['select_ackerman']=0 
+inputPar['XCO']=0.0
 #table_output=[XH2 XHe (1e6)*XH2S (1e6)*XNH3 (1e6)*XH2O (1e6)*XCH4 (1e6)*XPH3] 
 #to_dlm=transpose(table_output) 
 #dlmwrite('mole_fractions_jupiter.dat',to_dlm,'delimiter','&','precision','#.4f')
@@ -154,17 +156,17 @@ select_ackerman=0
 for i in range(0,len(XNH3)):
     if( Selected_Model==Model_Names[i]):
         case_select=i 
+inputPar['XH2S']=XH2S[case_select]
+inputPar['XNH3']=XNH3[case_select]
+inputPar['XH2O']=XH2O[case_select]
+inputPar['XCH4']=XCH4[case_select]
+inputPar['XPH3']=XPH3[case_select]
+inputPar['XHe']=XHe[case_select]
 
 ################################
 # Thermo-chemical Modeling
 ################################
-me,tcme,tcmp,DSOL_NH3=DeBoerTCM(TP_list,TP_force,XH2S[case_select],XNH3[case_select],XH2O[case_select],XCH4[case_select],
-                                XPH3[case_select],XHe[case_select],XCO,P_temp,T_temp, g0_i,R0e_i,
-                                P0_i,T_targ_i,P_targ_i,P_term_i,
-                                use_lindal,SuperSatSelf_H2S,SuperSatSelf_NH3,
-                                SuperSatSelf_PH3,SuperSatSelf_H2O,supersatNH3,
-                                supersatH2S,AutoStep_constant,fp,dz,oblateness_factor,use_dz,
-                                dP_init,dP_fine,P_fine_start,P_fine_stop,frain,select_ackerman) 
+me,tcme,tcmp,DSOL_NH31=DeBoerTCM(TP_list,TP_force,oblateness_factor,inputPar) 
 ################################
 # Set Spacecraft Orientation
 theta=0

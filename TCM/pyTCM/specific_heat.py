@@ -19,7 +19,17 @@ def specific_heat(j, T, P,Hydrogen_Curve_Fit_Select,layer):
 
         """
         from modelParams import R
-        from python_compressibility.calc_Cp.getCp import getCp
+        import os,sys
+        p2h=os.path.abspath(__file__)
+        p2h=os.path.split(p2h)[0]
+        p2h=os.path.split(p2h)[0]
+        
+        sys.path.append(os.path.join(p2h,'python_compressibility'))
+        from calc_Cp.getPreal import getPreal
+        #from python_compressibility.calc_Cp.getPreal import getPreal
+        #from python_compressibility.calc_Cp.getCp import getCp
+        from calc_Cp.getCp import getCp
+        #from python_compressibility.calc_Cp.getCp import getCp
         #      fit for equilibrium   
       	if (T<120.0 and Hydrogen_Curve_Fit_Select==0.0):
       	        Cp_H2 = 8.8477 - 1.0421*T + 6.1631e-2*T**2 - 1.6961e-3*pow(T,3.0) + \
