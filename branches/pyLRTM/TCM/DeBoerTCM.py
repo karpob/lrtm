@@ -77,7 +77,8 @@ def DeBoerTCM(TP_list,TP_force,oblateness_factor,inputPar):
         #               <-       DSOL_NH3: Density of Solution cloud which is ammonia in solution
         #                      *note* refractivity isn't used in maintamone it is a legacy from the DeBoer TCM model
         #
-
+        path2Here=os.path.abspath(__file__)
+        path2Here=os.path.split(path2Here)[0]
         if(inputPar['use_lindal']=='Y'):
                 lindal_profile_switch=1
         else:
@@ -87,44 +88,44 @@ def DeBoerTCM(TP_list,TP_force,oblateness_factor,inputPar):
         # Copy over desired Temp Pressure profile
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
         if(TP_list[0]==TP_force):
-                shutil.copyfile('pyTCM/TP_Seiff_Jupiter.JUP', 'TP.TCM')
+                shutil.copyfile(os.path.join(path2Here,'pyTCM','TP_Seiff_Jupiter.JUP'), 'TP.TCM')
                 f=open('TP.TCM','r')
                 lines=f.readlines()
                 n_lindal=len(lines)    
                 f.close()
         elif(TP_list[1]==TP_force):
-                shutil.copyfile('pyTCM/TP.JUP','TP.TCM')
+                shutil.copyfile(os.path.join(path2Here,'pyTCM','TP.JUP'),'TP.TCM')
                 f=open('TP.TCM','r')
                 lines=f.readlines()
                 n_lindal=len(lines)
                 f.close()
         elif(TP_list[2]==TP_force):
-                shutil.copyfile('pyTCM/TP.SAT TP.TCM')
+                shutil.copyfile(os.path.join(path2Here,'pyTCM','TP.SAT'), 'TP.TCM')
                 f=open('TP.TCM','r')
                 lines=f.readlines()
                 n_lindal=len(lines)
                 f.close()
         elif(TP_list[3]==TP_force):
-                shutil.copyfile('pyTCM/TP.URN', 'TP.TCM')
+                shutil.copyfile(os.path.join(path2Here,'pyTCM','TP.URN'), 'TP.TCM')
                 f=open('TP.TCM','r')
                 lines=f.readlines()
                 n_lindal=len(lines)
                 f.close()
         elif(TP_list[4]==TP_force):
-                shutil.copyfile('pyTCM/TP.NEP', 'TP.TCM')
+                shutil.copyfile(os.path.join(path2Here,'pyTCM','TP.NEP'), 'TP.TCM')
                 f=open('TP.TCM','r')
                 lines=f.readlines()
                 n_lindal=len(lines)
                 f.close()
         elif(TP_list[5]==TP_force):
-                TP_in_directory=load('pyTCM/TP.TCM')
+                TP_in_directory=load(os.path.join('pyTCM','TP.TCM'))
                 f=open('TP.TCM','r')
                 lines=f.readlines()
                 n_lindal=len(lines)
                 f.close()
         else:
                 print 'Invalid TP profile.'
-        shutil.copyfile('pyTCM/inputsol.dat','inputsol.dat')
+        shutil.copyfile(os.path.join(path2Here,'pyTCM','inputsol.dat'),'inputsol.dat')
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
         # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #

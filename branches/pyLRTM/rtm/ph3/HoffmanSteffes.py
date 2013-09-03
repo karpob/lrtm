@@ -1,28 +1,30 @@
 def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
-        """
-        Hoffman-Steffes PH3 absorption model.
-        
-                Input:
-                        -->f: Frequency (GHz)
-                        -->T: Temperature (K)
-                        -->PH2: Partial pressure Hydrogen (bars)
-                        -->PHe: Partial pressure Helium (bars)
-                        -->PPH3: Partial pressure Phosphine (bars)
-                Output:
-                        <--alphaph3: absorption coefficient in dB/km        
-        """
-	import numpy
+	"""
+		Hoffman-Steffes PH3 absorption model.
+		
+				Input:
+						-->f: Frequency (GHz)
+						-->T: Temperature (K)
+						-->PH2: Partial pressure Hydrogen (bars)
+						-->PHe: Partial pressure Helium (bars)
+						-->PPH3: Partial pressure Phosphine (bars)
+				Output:
+						<--alphaph3: absorption coefficient in dB/km		
+	"""
+	import numpy,os
 	from scipy.io import loadmat
 	from lnwidth import lnwidth
 	from vvwlineshape import vvwlineshape
 	
 	if (PH2==0.):return numpy.array([0.0])
-   	
-	Par=loadmat('rtm/ph3/ph3LineParameters/catalog.mat')
+   	p2h=os.path.abspath(__file__)
+	p2h=os.path.split(p2h)[0]
+	
+	Par=loadmat(os.path.join(p2h,'ph3LineParameters','catalog.mat'))
 	catalog=Par['catalog']
-	Par2=loadmat('rtm/ph3/ph3LineParameters/a1.mat')
+	Par2=loadmat(os.path.join(p2h,'ph3LineParameters','a1.mat'))
 	a1=Par2['a1']
-	Par3=loadmat('rtm/ph3/ph3LineParameters/a2.mat')
+	Par3=loadmat(os.path.join(p2h,'ph3LineParameters','a2.mat'))
 	a2=Par3['a2']
 
 
@@ -31,7 +33,7 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 	OpticaldepthstodB=434294.5 				#/* converts from cm^-1 to dB/km */
 	torrperatm=760.
 	atmperbar=0.987
-	GHzperMHz=1/1000
+	GHzperMHz=1./1000.
 	hc=19.858252418E-24			#	planks (J.s) light (cm/s)
 	K=1.38e-23					#	boltzmann's in J/K or N.m/K
 	No=6.02297e23					# Avogadros Number [mole^-1]
@@ -124,7 +126,7 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 
 	# Put alpha_max(ELO) into a matrix m x n like ie. Fvvw
 
-        
+		
 	if(len(f.shape)<2):n=1
 	else:n=f.shape[1]
 	nones=numpy.ones([1,n])
@@ -139,10 +141,10 @@ def HoffmanSteffes(f,T,PH2,PHe,PPH3):	# Revised 9/21/99
 	vvw_alpha_opdepth=(vvw_alpha_matrix*(numpy.pi)).sum(axis=0)
 	#vvw_alpha=vvw_alpha_opdepth.*OpticaldepthstodB
 	alphaph3=vvw_alpha_opdepth
-        
+		
 
 
-        
+		
 	return alphaph3*OpticaldepthstodB
 	#br_alpha_neper=sum(br_alpha_matrix,1).*(pi)
 	#br_alpha=br_alpha_neper.*OpticaldepthstodB
