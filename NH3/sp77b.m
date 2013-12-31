@@ -1,9 +1,0 @@
-h2=0.92338;
-he=0.0563;
-nh3=0.02032;
-T=290;
-f=[27]';
-P=2;
-quickbg
-quickspil
-[alphanh3,alphaspilker]*434294.5
