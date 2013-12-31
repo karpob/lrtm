@@ -21,7 +21,7 @@ def main():
                  '18_375_0.5bar_13bar_he',
                  '19_333_0.05bar_13bar_he',
                  '20_500K_2bH2O_14bHe',
-		 '21_500K_1.5bH2O_6bHe'
+         '21_500K_1.5bH2O_6bHe'
                  ]
 
         GasFiles,GasDir,ArgonFiles,ArgonDir,TransFiles,TransDir,VacFiles,VacDir=getFileLists(dirList)
@@ -96,7 +96,7 @@ def sortArgonFiles(ArgonDir,ArgonFiles):
         for crapola in crapolas:
                 useful=[]
                 for item in crapola[1:len(crapola)]:
-			
+            
                         if(item=='' or item=='Ar' or item=='match' or item=='h2o'):pass
                         else:
                                 if(item[len(item)-4:len(item)]=='.mat'):
@@ -183,7 +183,7 @@ def sortGasFiles(GasDir,GasFiles):
                 useful=[]
                 
                 for item in crapola[1:len(crapola)]:
-			
+            
                         if(item[len(item)-4:len(item)]=='.mat'):
                                 item=item[0:len(item)-4]
                         
@@ -193,7 +193,7 @@ def sortGasFiles(GasDir,GasFiles):
                                 item=1
                         if(item=='backside' or item=='backwards'):
                                 item=-1
-				
+                
                         if(item=='13bars2'):
                                 item=13
                         if(item=='pure3'):
@@ -229,7 +229,7 @@ def sortGasFiles(GasDir,GasFiles):
                 ExperimentNumber=int(GasDir[ii].split('_')[0])
                 key=ExperimentNumber*1000000+1000*int(pressureOrder[ii][0])+int(ResNumbers[ii])
                 #print filez,key,pressureOrder[ii][0],pressureOrder[ii]
-		print filez, ExperimentNumber, pressureOrder[ii][0],ResNumbers[ii]
+        print filez, ExperimentNumber, pressureOrder[ii][0],ResNumbers[ii]
                 keys.append(key)
                 ii+=1
                

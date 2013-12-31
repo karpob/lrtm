@@ -53,15 +53,15 @@ for i in Spectra.keys():
                 ax=Axis[i]
                 ss=S22[i]
                 tt=Trans2[i]         
-	ex=cPickle.load(file_handle)
-	InterpSpectra=ex['nh3InterpSpec']
-	for kk in ex.keys():
-	       if('nh3' in kk): print kk        
+    ex=cPickle.load(file_handle)
+    InterpSpectra=ex['nh3InterpSpec']
+    for kk in ex.keys():
+           if('nh3' in kk): print kk        
         for pressureLevel in s.keys():
-    		            
+                        
                 for resonance in s[pressureLevel]:
                         print i, pressureLevel,resonance.shape,InterpSpectra.shape,ex['nh3Q'].shape,ex['f'].shape
-	                print jj,pressureLevel
+                    print jj,pressureLevel
                         gamma=10**(ss[pressureLevel][jj]/20)
                         pfo=NAprocess(resonance,gamma,ax[pressureLevel][jj],numpy.mean(tt[pressureLevel][jj],axis=1).reshape([1601,1]),jj,i,pressureLevel,InterpSpectra[jj,pressureLevel-1,:,:],ex['nh3PeakFa'][jj,pressureLevel-1],ex['nh3Q'][jj,pressureLevel-1],'Gas')
                         press.append(pfo)
@@ -78,7 +78,7 @@ for i in Spectra.keys():
         ex=[]
         gc.collect()
                 
-file_handle.close()	
+file_handle.close()    
 file_handle2=open('allGasQs.pkl','w')
 cPickle.dump(allExperiments,file_handle2)
 
