@@ -29,14 +29,14 @@ for i in Spectra.keys():
         s=Spectra[i]
         ax=Axis[i]
         ss=S11[i]
-	tt=Trans[i]
+    tt=Trans[i]
         for pressureLevel in s.keys():
                 
                 for resonance in s[pressureLevel]:
                         print i, pressureLevel,jj
-			gamma=10**(ss[pressureLevel][jj]/20)
+            gamma=10**(ss[pressureLevel][jj]/20)
                         #pfo=NAprocess(resonance,0.0*ss[pressureLevel][jj],ax[pressureLevel][jj],numpy.zeros(1601),jj)
-			pfo=NAprocess(resonance,0.0*gamma,ax[pressureLevel][jj],numpy.mean(tt[pressureLevel][jj],axis=1).reshape([1601,1]),jj)
+            pfo=NAprocess(resonance,0.0*gamma,ax[pressureLevel][jj],numpy.mean(tt[pressureLevel][jj],axis=1).reshape([1601,1]),jj)
                         press.append(pfo)
                         jj+=1
                 jj=0

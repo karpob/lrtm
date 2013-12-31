@@ -98,7 +98,7 @@ Mean_rosenkranz_old=zeros([19])
 
 pp=[]
 
-		          
+                  
 #print optimized_pp
 optimized_pp=numpy.asarray([1.0,1.0])
 
@@ -128,22 +128,22 @@ for i in experiments:
         Max_rosenkranz_old[i],Min_rosenkranz_old[i],Mean_rosenkranz_old[i]]=plot_experiment(i,Plot_Number,Masked_Data[i],
                                                                                 h2o_density[i,:],h2_density[i,:],he_density[i,:],
                                                                                 h2o_density_high_P[i,:],h2_density_high_P[i,:],he_density_high_P[i,:],
-										h2o_density_low_P[i,:],h2_density_low_P[i,:],he_density_low_P[i,:],
- 										h2o_density_high_T[i,:],h2_density_high_T[i,:],he_density_high_T[i,:],
-										h2o_density_low_T[i,:],h2_density_low_T[i,:],he_density_low_T[i,:],
-										Sigma_T,Sigma_P,p,constants,fitType,'pdf')
+                                        h2o_density_low_P[i,:],h2_density_low_P[i,:],he_density_low_P[i,:],
+                                         h2o_density_high_T[i,:],h2_density_high_T[i,:],he_density_high_T[i,:],
+                                        h2o_density_low_T[i,:],h2_density_low_T[i,:],he_density_low_T[i,:],
+                                        Sigma_T,Sigma_P,p,constants,fitType,'pdf')
 
                  
         plot_refractivity(i,Plot_Number,Masked_Data[i],h2o_density[i,:],h2_density[i,:],he_density[i,:],
                           h2o_density_high_P[i,:],h2_density_high_P[i,:],he_density_high_P[i,:],
-       			  h2o_density_low_P[i,:],h2_density_low_P[i,:],he_density_low_P[i,:],
-        		  h2o_density_high_T[i,:],h2_density_high_T[i,:],he_density_high_T[i,:],
-       		          h2o_density_low_T[i,:],h2_density_low_T[i,:],he_density_low_T[i,:],
-       		          Sigma_T,Sigma_P,optimized_pp,'pdf')
-       	#print ArDensity[i,:]	          
-       	#plot_refractivity_argon(i,Masked_Data[i],ArDensity[i,:],'pdf')	          
+                     h2o_density_low_P[i,:],h2_density_low_P[i,:],he_density_low_P[i,:],
+                  h2o_density_high_T[i,:],h2_density_high_T[i,:],he_density_high_T[i,:],
+                         h2o_density_low_T[i,:],h2_density_low_T[i,:],he_density_low_T[i,:],
+                         Sigma_T,Sigma_P,optimized_pp,'pdf')
+           #print ArDensity[i,:]              
+           #plot_refractivity_argon(i,Masked_Data[i],ArDensity[i,:],'pdf')              
         
-		          																										         
+                                                                                                                                   
    
 Total_deboer=N_deboer.sum()
 Total_goodman=N_goodman.sum()
@@ -238,4 +238,3 @@ cPickle.dump(Sigma_e_h2o,output_file)
 output_file.close()
 print constants
 print optimized_pp
-
