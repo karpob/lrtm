@@ -1,5 +1,6 @@
 from numpy import interp
 import numpy as np
+import os
 from pandas.io.parsers import read_table
 def NH3H2HeH2OModel(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
     """
@@ -50,19 +51,19 @@ def NH3H2HeH2OModel(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
     # H2HeBroad are self and foreign gas broadening parameters.
     # old matlab -->[fo, Io, Eo, gammaNH3o, H2HeBroad] = textread('ammonia_inversion.dat','#f #f #f #f #f','headerlines',1);
     #pandas read_table to read in variable whitespace "stuff"
-    a=read_table('ammonia_inversion.dat',sep=r"\s*",header=0)
+    a=read_table(os.path.join('nh3LineParameters','ammonia_inversion.dat'),sep=r"\s*",header=0)
     fo,Io,Eo,gammaNH3o,H2HeBroad=np.asarray(a['fo']),np.asarray(a['Io']),np.asarray(a['Eo']),np.asarray(a['gammaNH3o']),np.asarray(a['H2HeBroad'])
 
     # Rotational lines: fo_rot is frequency in GHz, Io_rot is line intensity in
     # cm^-1/(molecule./cm^2), Eo_rot is lower state energy in cm^-1, gNH3_rot,
     # gH2_rot, gHe_rot are broadening parameters for rotational lines.
     #old matlab-->[fo_rot, Io_rot, Eo_rot, gNH3_rot, gH2_rot gHe_rot] = textread('ammonia_rotational.dat','#f #f #f #f #f #f','headerlines',1);
-    a=read_table('ammonia_rotational.dat',sep=r"\s*", header=0)
+    a=read_table(os.path.join('nh3LineParameters','ammonia_rotational.dat'),sep=r"\s*", header=0)
     fo_rot, Io_rot, Eo_rot, gNH3_rot, gH2_rot,gHe_rot=np.asarray(a['fo_rot']),np.asarray(a['Io_rot']), np.asarray(a['Eo_rot']), np.asarray(a['gNH3_rot']), np.asarray(a['gH2_rot']),np.asarray(a['gHe_rot'])    
     # v2 roto-vibrational lines: fo_v2 is frequency in GHz, Io_v2 is line intensity in
     # cm^-1/(molecule./cm^2), Eo_v2 is lower state energy in cm^-1,
     #old matlab --> [fo_v2, Io_v2, Eo_v2] = textread('ammonia_rotovibrational.dat','#f #f #f','headerlines',1);
-    a=read_table('ammonia_rotovibrational.dat',sep=r"\s*", header=0)
+    a=read_table(os.path.join('nh3LineParameters','ammonia_rotovibrational.dat'),sep=r"\s*", header=0)
     fo_v2,Io_v2,Eo_v2=np.asarray(a['fo_v2']),np.asarray(a['Io_v2']),np.asarray(a['Eo_v2'])
     #clear out a in case it's big and hogs up RAM
     a=[]
