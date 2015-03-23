@@ -1,3 +1,5 @@
+import numpy,os
+from scipy.io import loadmat
 def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	"""
 	Final Hanley-Steffes 
@@ -16,8 +18,7 @@ def HanleySteffes(f,T,P,H2mr,Hemr,NH3mr):
 	        Opacity (alphanh3) is returned as a vector matching f
 	        in dB/km.
 	"""
-	import numpy,os
-	from scipy.io import loadmat
+	
 	
 	#import pupynere
 	#at some point convert database to netCDF..open format would be better.
