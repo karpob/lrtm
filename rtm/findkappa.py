@@ -1,3 +1,16 @@
+
+import numpy
+from nh3.HanleySteffes import HanleySteffes
+from nh3.DevarajSteffesDuong import DevarajSteffesDuong
+from h2s.DeBoerSteffes import DeBoerSteffes
+from h2o.KarpowiczSteffes import KarpowiczSteffes
+from h2o.DeBoerCorrected import DeBoerCorrected
+from h2o.Goodman import Goodman
+from ph3.HoffmanSteffes import HoffmanSteffes
+from clouds.get_complex_dielectric_constant_water import get_complex_dielectric_constant_water
+from clouds.rayleigh_absorption import rayleigh_absorption
+from h2.OrtonCIA import OrtonCIA
+
 def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DNH4SH,DH2S,DNH3,DH2O,DSOL,select_h2h2_model,select_ammonia_model,select_water_model,include_clouds):
     """
          function kappa=findkappa(f,T,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3)
@@ -27,16 +40,7 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
                                    <-kappa:layer(s) absorption coefficient in cm^-1
      Output shoud be in optical depth per centimeter
     """ 
-    import numpy
-    from nh3.HanleySteffes import HanleySteffes
-    from h2s.DeBoerSteffes import DeBoerSteffes
-    from h2o.KarpowiczSteffes import KarpowiczSteffes
-    from h2o.DeBoerCorrected import DeBoerCorrected
-    from h2o.Goodman import Goodman
-    from ph3.HoffmanSteffes import HoffmanSteffes
-    from clouds.get_complex_dielectric_constant_water import get_complex_dielectric_constant_water
-    from clouds.rayleigh_absorption import rayleigh_absorption
-    from h2.OrtonCIA import OrtonCIA
+
     # THIS VERSION USED FOR IMAGING DOES ALL PRESSURE LEVELS-TO BE USED MULTIPLE TIMES FOR
     # THE DIFFERENT LOOK ANGLES
 
@@ -59,7 +63,10 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
             if(select_ammonia_model==1):
                 alphanh3_t=HanleySteffes(farr,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
                 alphanh3[k]=alphanh3_t[0]
-            else: print "sorry nothing other than Hanley Steffes Right now. %d"%select_ammonia_model 
+            elif(select_ammmonia_model=2):
+                alphanh3_t=DevarajSteffesDuong(farr,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
+                alphanh3[k]=alphanh3_t[0]
+            else: print "sorry nothing other than Hanley-Steffes and Devaraj-Steffes-Duong Right now. %d is an invalid selection 1 or 2 are your options."%select_ammonia_model 
     
 
 
