@@ -46,6 +46,7 @@ def findrefindex(T,P_H2,P_He,P_CH4,P_H2O,D_SOL,f,reference_select):
                 NrSolution_Cloud,Nimag=refractivity_solution_cloud_93(T,D_SOL,1.,f)  # Minus 1 necessary because Liebe is interested in Delay, leaves out the - in Re(-K)
         
         if(reference_select==1):Nrtot=NrHe+NrH2+NrCH4+NrH2O-NrSolution_Cloud
+        else:Nrtot=NrH2+NrHe
         n=(Nrtot/1e6)+1. 
         refindex=n 
         
