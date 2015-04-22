@@ -24,13 +24,13 @@ select_h2h2_model=6
 #select_ammonia_model
 #Hanley Steffes Model
 
-select_ammonia_model=1
+select_ammonia_model=2
 
 #select_water_model
 #1 corrected deboer water vapor model
 #2 (to be implemented goodman 1969 water vapor model
 #3 Karpowicz and Steffes 2011, Icarus absorption model.
-select_water_model=3
+select_water_model=4
 
 #include cloud absorption?
 #1=yes
