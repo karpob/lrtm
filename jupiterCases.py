@@ -30,6 +30,7 @@ select_ammonia_model=2
 #1 corrected deboer water vapor model
 #2 (to be implemented goodman 1969 water vapor model
 #3 Karpowicz and Steffes 2011, Icarus absorption model.
+#4 Karpowicz and Steffes Model modified to remove extra high temperature term.
 select_water_model=4
 
 #include cloud absorption?
