@@ -63,7 +63,7 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
             if(select_ammonia_model==1):
                 alphanh3_t=HanleySteffes(farr,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
                 alphanh3[k]=alphanh3_t[0]
-            elif(select_ammmonia_model=2):
+            elif(select_ammmonia_model==2):
                 alphanh3_t=DevarajSteffesDuong(farr,T[k],P[k],XH2[k],XHe[k],XNH3[k])/OpticaldepthstodB
                 alphanh3[k]=alphanh3_t[0]
             else: print "sorry nothing other than Hanley-Steffes and Devaraj-Steffes-Duong Right now. %d is an invalid selection 1 or 2 are your options."%select_ammonia_model 
@@ -107,6 +107,12 @@ def findkappa(f,T,P,P_H2,P_He,P_NH3,P_H2O,P_CH4,P_PH3,P_H2S,XH2,XHe,XNH3,XH2O,DN
             density_h2o_g_m3=(P_H2O[k]*(8.314472/0.46141805))/((8.314472e-5)*T[k]);
             alphah2o_t=KarpowiczSteffes(farr,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T[k])
             alphah2o[k]=alphah2o_t[0]/OpticaldepthstodB
+        if(select_water_model==4):
+            density_h2_g_m3=(P_H2[k]*2.01594)/((8.314472e-5)*T[k]);
+            density_he_g_m3=(P_He[k]*4.0026)/((8.314310e-5)*T[k]);
+            density_h2o_g_m3=(P_H2O[k]*(8.314472/0.46141805))/((8.314472e-5)*T[k]);
+            alphah2o_t=KarpowiczSteffesModified(farr,density_h2o_g_m3,density_h2_g_m3,density_he_g_m3,T[k])
+            
     complex_dielectric_SOL=numpy.zeros([stopindex],dtype=numpy.complex)
     complex_dielectric_SOL=numpy.zeros([stopindex],dtype=numpy.complex)
     complex_dielectric_H2S=numpy.zeros([stopindex],dtype=numpy.complex)
