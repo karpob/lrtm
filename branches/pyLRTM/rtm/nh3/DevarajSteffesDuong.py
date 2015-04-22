@@ -3,7 +3,7 @@ import numpy as np
 import os
 from pandas.io.parsers import read_table
 
-def NH3H2HeH2OModel(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
+def DevarajSteffesDuong(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
     """
     THIS FUNCTION COMPUTES THE OPACITY OF AMMONIA BROADENED BY HYDROGEN, 
     HELIUM, AND WATER VAPOR UNDER JOVIAN CONDITIONS BETWEEN 1-150 GHz
@@ -339,7 +339,7 @@ if __name__ == '__main__':
     alphaCalculated=np.zeros(n)
     for i in range(0,n):
         
-        alphaCalculated[i]=NH3H2HeH2OModel(np.asarray(o['Freq'][i]).T,o['T'][i],o['P'][i],o['H2mr'][i],o['Hemr'][i],o['H2Omr'][i],o['NH3mr'][i])
+        alphaCalculated[i]=DevarajSteffesDuong(np.asarray(o['Freq'][i]).T,o['T'][i],o['P'][i],o['H2mr'][i],o['Hemr'][i],o['H2Omr'][i],o['NH3mr'][i])
     
     alphaCalculated=alphaCalculated.reshape(alphaCalculated.shape[0],1)
     alph=o['alphaCalculated'].reshape(o['alphaCalculated'].shape[1],1)
