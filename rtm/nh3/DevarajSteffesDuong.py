@@ -52,7 +52,7 @@ def DevarajSteffesDuong(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
     # H2HeBroad are self and foreign gas broadening parameters.
     # old matlab -->[fo, Io, Eo, gammaNH3o, H2HeBroad] = textread('ammonia_inversion.dat','#f #f #f #f #f','headerlines',1);
     #pandas read_table to read in variable whitespace "stuff"
-    a=read_table(os.path.join('nh3LineParameters','ammonia_inversion.dat'),sep=r"\s*",header=0)
+    a=read_table(os.path.join(os.getcwd(),'nh3LineParameters','ammonia_inversion.dat'),sep=r"\s*",header=0)
     fo,Io,Eo,gammaNH3o,H2HeBroad=np.asarray(a['fo']),np.asarray(a['Io']),np.asarray(a['Eo']),np.asarray(a['gammaNH3o']),np.asarray(a['H2HeBroad'])
     mm=fo.shape[0]
     fo=fo.reshape(mm,1)
@@ -62,7 +62,7 @@ def DevarajSteffesDuong(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
     # cm^-1/(molecule./cm^2), Eo_rot is lower state energy in cm^-1, gNH3_rot,
     # gH2_rot, gHe_rot are broadening parameters for rotational lines.
     #old matlab-->[fo_rot, Io_rot, Eo_rot, gNH3_rot, gH2_rot gHe_rot] = textread('ammonia_rotational.dat','#f #f #f #f #f #f','headerlines',1);
-    a=read_table(os.path.join('nh3LineParameters','ammonia_rotational.dat'),sep=r"\s*", header=0)
+    a=read_table(os.path.join(os.getcwd(),'nh3LineParameters','ammonia_rotational.dat'),sep=r"\s*", header=0)
     fo_rot, Io_rot, Eo_rot, gNH3_rot, gH2_rot,gHe_rot=np.asarray(a['fo_rot']),np.asarray(a['Io_rot']), np.asarray(a['Eo_rot']), np.asarray(a['gNH3_rot']), np.asarray(a['gH2_rot']),np.asarray(a['gHe_rot'])    
     mm=fo_rot.shape[0]
     fo_rot=fo_rot.reshape(mm,1)
