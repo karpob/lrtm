@@ -4,6 +4,7 @@ from nh3.HanleySteffes import HanleySteffes
 from nh3.DevarajSteffesDuong import DevarajSteffesDuong
 from h2s.DeBoerSteffes import DeBoerSteffes
 from h2o.KarpowiczSteffes import KarpowiczSteffes
+from h2o.KarpowiczSteffesModified import KarpowiczSteffesModified
 from h2o.DeBoerCorrected import DeBoerCorrected
 from h2o.Goodman import Goodman
 from ph3.HoffmanSteffes import HoffmanSteffes
