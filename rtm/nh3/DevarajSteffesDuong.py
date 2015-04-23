@@ -62,6 +62,7 @@ def DevarajSteffesDuong(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
     # cm^-1/(molecule./cm^2), Eo_rot is lower state energy in cm^-1, gNH3_rot,
     # gH2_rot, gHe_rot are broadening parameters for rotational lines.
     #old matlab-->[fo_rot, Io_rot, Eo_rot, gNH3_rot, gH2_rot gHe_rot] = textread('ammonia_rotational.dat','#f #f #f #f #f #f','headerlines',1);
+    
     a=read_table(os.path.join(os.path.dirname(os.path.realpath(__file__)),'nh3LineParameters','ammonia_rotational.dat'),sep=r"\s*", header=0)
     fo_rot, Io_rot, Eo_rot, gNH3_rot, gH2_rot,gHe_rot=np.asarray(a['fo_rot']),np.asarray(a['Io_rot']), np.asarray(a['Eo_rot']), np.asarray(a['gNH3_rot']), np.asarray(a['gH2_rot']),np.asarray(a['gHe_rot'])    
     mm=fo_rot.shape[0]
@@ -75,7 +76,7 @@ def DevarajSteffesDuong(f,T,P,H2mr,Hemr,H2Omr,NH3mr):
     # v2 roto-vibrational lines: fo_v2 is frequency in GHz, Io_v2 is line intensity in
     # cm^-1/(molecule./cm^2), Eo_v2 is lower state energy in cm^-1,
     #old matlab --> [fo_v2, Io_v2, Eo_v2] = textread('ammonia_rotovibrational.dat','#f #f #f','headerlines',1);
-    a=read_table(os.path.join('nh3LineParameters','ammonia_rotovibrational.dat'),sep=r"\s*", header=0)
+    a=read_table(os.path.join(os.path.dirname(os.path.realpath(__file__)),'nh3LineParameters','ammonia_rotovibrational.dat'),sep=r"\s*", header=0)
     fo_v2,Io_v2,Eo_v2=np.asarray(a['fo_v2']),np.asarray(a['Io_v2']),np.asarray(a['Eo_v2'])
     mm=fo_v2.shape[0]
     fo_v2=fo_v2.reshape(mm,1)
